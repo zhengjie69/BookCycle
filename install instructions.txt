@@ -1,0 +1,25 @@
+Requirements:
+
+Python 3.10 installed
+Visual Studio Code
+
+Steps to run project(windows):
+
+1.On VS Code, open the BookCycle folder
+2.Open a terminal in VS Code
+3.In the VS Code terminal, navigate to the backend folder
+4.In the VS Code terminal, run the command : py -m venv venv
+5.In VS Code, click on the Python version on the bottom right corener of the IDE
+6.Click on "Enter interpreter path" under "Select Interpreter"
+7.Locate the "python.exe" file in BookCycle\backend\venv\scripts and select it
+8.Click on "Select Interpreter"
+9.In the VS Code terminal, run the command : venv\scripts\activate.bat
+10.Ensure that the (venv) text is shown in front of the folder location in the terminal
+11.In the VS Code terminal, run the command : pip install -r requirements.txt
+12.In the VS Code terminal, run the command : flask run
+
+steps to use apis:
+
+1.Refer to the paths in the files in routes folder (e.g. user_routes.py) to call the apis in the web browser
+2.For commands that requires form data input, use postman for testing(with the postman desktop plugin)
+3.For what data is required and it's key, refer to the files in the apis folder (e.g. user_api.py) to pass with the api
