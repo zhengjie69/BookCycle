@@ -10,6 +10,7 @@ pyvenv.cfg
 /backend/database.db
 /backend/app/static/BookImages
 /frontend/api
+/.vscode
 
 # **/bin/*
 # */include
