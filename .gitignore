@@ -6,6 +6,10 @@
 /lib/
 **/lib/
 pyvenv.cfg
+/backend/app/__pycache__
+/backend/database.db
+/backend/app/static/BookImages
+/frontend/api
 
 # **/bin/*
 # */include
