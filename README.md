@@ -11,9 +11,8 @@ To facilitate issues such as removing fraudulent book listings or disabling acco
 <h1>FrontEnd</h1>
 
 Requirements:
-Node.js v16.13.0
-
-Visual Studio Code
+- Node.js v16.13.0
+- Visual Studio Code
 
 Steps to run codes:
 1. Open the BookCycle foler in VS Code
@@ -24,9 +23,8 @@ Steps to run codes:
 <h1>BackEnd</h1>
 
 Requirements:
-Python 3.10
-
-Visual Studio Code
+- Python 3.10
+- Visual Studio Code
 
 Steps to run codes:
 1. On VS Code, open the BookCycle folder
