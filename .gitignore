@@ -9,6 +9,9 @@ pyvenv.cfg
 /backend/app/__pycache__
 /backend/database.db
 /backend/app/static/BookImages
+/backend/app/apis/__pycache__
+/backend/app/models/__pycache__
+/backend/app/routes/__pycache__
 /frontend/api
 /.vscode
 
