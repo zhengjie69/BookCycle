@@ -35,7 +35,7 @@ function App() {
           <Row><h3><b>{BookGenre}</b></h3></Row>
         </div>
         <div className="d-flex justify-content-center">
-          <Row>
+          <Row xs="auto">
             {items.map(item => (
               <div className="col-sm mb-2" key={item.BookID}>
                 {item.Genre === BookGenre ?
@@ -45,11 +45,12 @@ function App() {
                       <Card.Title>{item.Title}</Card.Title>
                       {item.Price === 0 ? <Card.Text>Free</Card.Text> : null}
                       {item.Price > 0 ? <Card.Text>${item.Price}</Card.Text> : null}
-                      <Card.Text>New</Card.Text>
+                      <Card.Text>{item.BookCondition}</Card.Text>
                       <Button onClick={() => {
                         navigate('/BookListingInformation', {
                           state: {
                             BookID: item.BookID,
+                            Condition: item.BookCondition,
                             Title: item.Title,
                             Price: item.Price,
                             Description: item.Description,

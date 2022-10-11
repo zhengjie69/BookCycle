@@ -84,7 +84,6 @@ export default function NewListings() {
         console.log(LocationID);
         console.log("Condition:" + Condition);
 
-        //*****TO ADD BOOK CONDITION AFTER DATABASE UPDATE*****
         NewListingsFormData.append("Price", Price);
         NewListingsFormData.append("Title", BookTitle);
         NewListingsFormData.append("Description", Description);
@@ -136,11 +135,13 @@ export default function NewListings() {
                                 }
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="formCondition" value={Condition} onChange={(e) => setCondition(e.target.value)}>
-                            <Form.Label controlId="formConditionLabel" label="Book Condition">Book Condition:</Form.Label>
-                            <Form.Select required aria-label="Floating label select condition" >
-                                <option value="New">New</option>
-                                <option value="Well Used">Well Used</option>
+                        <Form.Group className="mb-3" controlId="formBookCondition" value={Condition} onChange={e => setCondition(e.target.value)}>
+                            <Form.Label>Book Condition:</Form.Label>
+                            <Form.Select aria-label="Floating label select location" >
+                                {Array.isArray(bookConditionDropdown) ?
+                                    bookConditionDropdown.map(bookConditionDropdown => (
+                                        <option value={bookConditionDropdown.BookConditionID}>{bookConditionDropdown.BookConditionName}</option>)) : null
+                                }
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBookPrice" value={Price} onChange={e => setPrice(e.target.value)}>
@@ -165,16 +166,6 @@ export default function NewListings() {
                                     {Array.isArray(locationDropdown) ?
                                         locationDropdown.map(locationDropdown => (
                                             <option value={locationDropdown.LocationID}>{locationDropdown.LocationName}</option>)) : null
-                                    }
-                                </Form.Select>
-                            </FloatingLabel>
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="formBookCondition" value={Condition} onChange={e => setCondition(e.target.value)}>
-                            <FloatingLabel controlId="floatingSelectBookCondition" label="Book Condition">
-                                <Form.Select aria-label="Floating label select location" >
-                                    {Array.isArray(bookConditionDropdown) ?
-                                        bookConditionDropdown.map(bookConditionDropdown => (
-                                            <option value={bookConditionDropdown.BookConditionID}>{bookConditionDropdown.BookConditionName}</option>)) : null
                                     }
                                 </Form.Select>
                             </FloatingLabel>

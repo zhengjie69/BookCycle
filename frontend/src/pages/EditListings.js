@@ -11,8 +11,10 @@ export default function EditListings() {
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
+
     const [GenreDropdown, setGenreDropdown] = useState([]);
     const [LocationDropdown, setLocationDropdown] = useState([]);
+    const [ConditionDropdown, setConditionDropdown] = useState([]);
 
     const [BookTitle, setBookTitle] = useState(itemLocation.state.Title);
     const [Price, setPrice] = useState(itemLocation.state.Price);
@@ -61,6 +63,18 @@ export default function EditListings() {
                 }
             )
 
+        fetch('/apis/book/get_all_book_conditions')
+            .then(res => res.json())
+            .then(data => {
+                setIsLoaded(true);
+                setConditionDropdown(data);
+            },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+
     }, [])
 
     const postEditListings = async (e) => {
@@ -76,13 +90,14 @@ export default function EditListings() {
             Description: location.state.Description,
             BookStatus: location.state.BookStatus */
 
-        console.log(itemLocation.state.BookID);
         console.log(BookTitle);
+        console.log(Genre);
+        console.log(Condition);
         console.log(Price);
         console.log(Description);
-        console.log(Genre);
-        console.log(Location);
         console.log(itemLocation.state.Image);
+        console.log(itemLocation.state.BookID);
+        console.log(Location);
     }
     return (
         <Container>
@@ -115,8 +130,18 @@ export default function EditListings() {
                     <Form.Group className="mb-3" controlId="formCondition" value={Condition} onChange={(e) => setCondition(e.target.value)}>
                         <Form.Label controlId="floatingSelectCondition" label="Book Condition">Book Condition:</Form.Label>
                         <Form.Select required aria-label="Floating label select condition" >
-                            <option value="New">New</option>
-                            <option value="Well Used">Well Used</option>
+                            {Array.isArray(ConditionDropdown) ?
+                                ConditionDropdown
+                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName === Condition)
+                                    .map(FilteredConditionDropdown => (
+                                        <option value={FilteredConditionDropdown.BookConditionID}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
+                            }
+                            {Array.isArray(ConditionDropdown) ?
+                                ConditionDropdown
+                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName !== Condition)
+                                    .map(FilteredConditionDropdown => (
+                                        <option value={FilteredConditionDropdown.BookConditionID}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
+                            }
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBookPrice" >

@@ -11,15 +11,6 @@ function BookListingInformation() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    function CheckLogin() {
-        if (Authentication === null) {
-
-        }
-        else if (Authentication === 'true') {
-            navigate('/');
-        }
-    }
-
     return (
         <Container>
             <SearchBar />
@@ -48,8 +39,8 @@ function BookListingInformation() {
                                         Image: location.state.Image,
                                         Location: location.state.Location,
                                         Description: location.state.Description,
-                                        BookStatus: location.state.BookStatus
-                                        //bookStatusID,
+                                        BookStatus: location.state.BookStatus,
+                                        Condition: location.state.Condition
                                     }
                                 });
                             }}>Edit Listings</Button> : null}
@@ -59,7 +50,7 @@ function BookListingInformation() {
                     </Row>
                     <Row className="mb-2 mt-2">
                         <Col md={4} xs={6} className="mb-2 mt-2">
-                            <p>Used</p>
+                            <p>{location.state.Condition}</p>
                         </Col>
                         <Col style={{ justifyContent: 'end' }} md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
                             {location.state.Route === "MyListings" && Authentication === "true" ? <DeleteBookModal /> : null}

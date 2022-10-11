@@ -52,11 +52,12 @@ function MyListings() {
                                             <Card.Title>{item.Title}</Card.Title>
                                             {item.Price === 0 ? <Card.Text>Free</Card.Text> : null}
                                             {item.Price > 0 ? <Card.Text>${item.Price}</Card.Text> : null}
-                                            <Card.Text>New</Card.Text>
+                                            <Card.Text>{item.BookCondition}</Card.Text>
                                             <Button onClick={() => {
                                                 navigate('/BookListingInformation', {
                                                     state: {
                                                         BookID: item.BookID,
+                                                        Condition: item.BookCondition,
                                                         Title: item.Title,
                                                         Price: item.Price,
                                                         Description: item.Description,
