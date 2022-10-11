@@ -417,9 +417,16 @@ class Book:
                 print ("Opened database successfully")
                 
 
-
+                
                 cur = con.cursor()
-                cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "%" + bookTitle + "%", "Avaliable"))
+
+                # if user is logged in, hide user books
+                if userEmail is not None:
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "%" + bookTitle + "%", "Avaliable"))
+                
+                # if no user email is provided when not logged in:
+                else:
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), ("%" + bookTitle + "%", "Avaliable"))
                 rows = cur.fetchall()
                    
                 # if there are book records found:
