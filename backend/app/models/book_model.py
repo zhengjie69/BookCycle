@@ -1,6 +1,7 @@
 import sqlite3
+from tokenize import Double
 from flask import current_app, url_for
-
+from .data_cleaning import *
 
 class Book:
 
@@ -133,6 +134,161 @@ class Book:
             #return("Error in creating book")
             return False
 
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
+    def search_book(self, bookTitle = None, userEmail = None, genreFilter = None, locationFilter = None, bookConditionFilter = None, minPriceFilter = None, maxPriceFilter = None):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+                #cur.execute("SELECT * FROM {}".format(self.tablename))
+
+                # SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName FROM Book AS a 
+                # INNER JOIN Genre AS b ON a.GenreID = b.GenreID INNER JOIN Location AS c ON a.LocationID = c.LocationID 
+                # INNER JOIN BookCondition AS d ON a.BookConditionID = d.BookConditionID
+                # INNER JOIN BookStatus AS e ON a.BookStatusID = e.BookStatusID 
+                # WHERE a.Email != "test4@gmail.com" 
+                # AND e.BookStatusName = "Avaliable" 
+                # AND a.Price >= 0
+                # AND a.Price <= 5
+                # AND b.GenreID in (0, 1, 2)
+                # AND c.LocationID in (1) 
+                # AND d.BookConditionID in (0);
+                
+                queryStorage = []
+                filterQuery = ""
+
+                if userEmail is not None:
+                    if userEmail != "":
+                        queryStorage.append("a.Email != \"{}\"".format(userEmail))
+
+                # checks if title is None, if not none build the command for title filter
+                if bookTitle is not None:
+                    
+                    # check if the values is not empty string
+                    if bookTitle != "":
+
+                        queryStorage.append("a.Title LIKE \"{}\"".format("%" + bookTitle + "%"))
+
+
+                # checks if min and max price filter is None, if not none build the command for min and max price filter
+                if minPriceFilter is not None and maxPriceFilter is not None:
+                    
+                    # check if the values is not negative
+                    if float(minPriceFilter) >= 0 and float(maxPriceFilter) >= 0:
+
+                        queryStorage.append("a.Price >= {} AND a.Price <= {} ".format(float(minPriceFilter), float(maxPriceFilter)))
+                    
+                elif minPriceFilter is not None and maxPriceFilter is None:
+
+                    # check if the values is not negative
+                    if float(minPriceFilter) >= 0:
+
+                        queryStorage.append("a.Price >= {} ".format(float(minPriceFilter)))
+                    
+                elif minPriceFilter is None and maxPriceFilter is not None:
+
+                    # check if the values is not negative
+                    if float(maxPriceFilter) >= 0:
+
+                        queryStorage.append("a.Price <= {} ".format(float(maxPriceFilter)))
+
+
+                # checks if genre is None, if not none build the command for genre filter
+                if genreFilter is not None:
+                    tempData = "("
+                    for idx, genre in enumerate(genreFilter):
+                        tempData += str(genre)
+                        if idx < len(genreFilter) - 1:
+                            tempData += ","
+                        else:
+                            tempData += ")"
+
+                        
+                    queryStorage.append("b.GenreID in {}".format(tempData))
+
+
+                # checks if location is None, if not none build the command for location filter
+                if locationFilter is not None:
+                    tempData2 = "("
+                    for idx, location in enumerate(locationFilter):
+                        tempData2 += str(location)
+                        if idx < len(locationFilter) - 1:
+                            tempData2 += ","
+                        else:
+                            tempData2 += ")"
+
+                        
+                    queryStorage.append("c.LocationID in {}".format(tempData2))
+
+                
+                # checks if book Condition Query is None, if not none build the command for book Condition Query filter
+                if bookConditionFilter is not None:
+                    tempData3 = "("
+                    for idx, bookCondition in enumerate(bookConditionFilter):
+                        tempData3 += str(bookCondition)
+                        if idx < len(bookConditionFilter) - 1:
+                            tempData3 += ","
+                        else:
+                            tempData3 += ")"
+
+                        
+                    queryStorage.append("a.BookConditionID in {}".format(tempData3))
+
+                # if there are queries
+                if len(queryStorage) > 0:
+                    for idx, query in enumerate(queryStorage):
+                        
+                        # checks if it is not the last object in the list, as sql commands cannot have "AND" at the end with no values to compare
+                        if query != "" and idx < len(queryStorage) - 1:
+                            filterQuery += query + " AND "
+
+                        elif query != "" and idx < len(queryStorage):
+                            filterQuery += query
+                
+                print("filter query is {}".format(filterQuery))
+
+                if filterQuery != "":
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE e.BookStatusName = ? AND {}".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename, filterQuery), ("Avaliable",))
+                else:
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), ("Avaliable",))
+                rows = cur.fetchall()
+                   
+                # if there are book records found:
+                if len(rows) > 0:
+                    print("rows of records:")
+                    returnData = []
+                    for records in rows:
+                        print(records)
+
+
+                        # builds the image url
+                        fileurl = url_for('static', filename='BookImages/{}'.format(records[4]))
+                        imgurl = "http://127.0.0.1:5000" + fileurl
+
+                        # creates a dictonary for each book record and inserts into a list for return
+                        roledict = {'BookID': records[0], 'Title': records[1], 'Price': records[2], 'Description': records[3], 'Image': imgurl, 'Genre': records[5], 'Location': records[6], 'BookCondition': records[7]}
+                        returnData.append(roledict)
+                    return(returnData)
+                else:
+                    return("No results found") 
+
+        except sqlite3.Error as er:
+            con.rollback()
+            print(er)
+            return("Error in fetching books")
+
+        # catch every other error 
+        except:
+            con.rollback()
+            return("Error in fetching books")
         finally:
             con.close()
             print("Successfully closed connection")

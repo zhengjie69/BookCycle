@@ -96,6 +96,20 @@ def create_book():
             #return(jsonify("Invalid File Type, Please only upload files with .jpg, .png"), 401)
             return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Error creating a book", "create_book", "Error , invalid File Type, Please only upload files with .jpg, .png"))
 
+def search_book():
+    if request.method == "GET":
+
+        bookTitle = request.args.get("BookTitle")
+        userEmail = request.args.get("Email")
+        genreFilter = request.args.get("GenreFilter")
+        locationFilter = request.args.get("LocationFilter")
+        bookConditionFilter = request.args.get("BookConditionFilter")
+        minPriceFilter = request.args.get("MinPriceFilter")
+        maxPriceFilter = request.args.get("MaxPriceFilter")
+
+        # checks if the result is an error result
+        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_books", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
+
 def get_all_available_books():
     if request.method == "GET":
 
