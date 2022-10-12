@@ -20,6 +20,7 @@ export default function EditListings() {
     const [Price, setPrice] = useState(itemLocation.state.Price);
     const [Description, setDescription] = useState(itemLocation.state.Description);
     const [Condition, setCondition] = useState(itemLocation.state.Condition);
+
     const [Genre, setGenre] = useState(itemLocation.state.Genre);
     const userEmail = localStorage.getItem('Email');
     const [Location, setLocation] = useState(itemLocation.state.Location);
@@ -74,7 +75,6 @@ export default function EditListings() {
                     setError(error);
                 }
             )
-
     }, [])
 
     const postEditListings = async (e) => {
@@ -132,7 +132,7 @@ export default function EditListings() {
                         <Form.Select required aria-label="Floating label select condition" >
                             {Array.isArray(ConditionDropdown) ?
                                 ConditionDropdown
-                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName === Condition)
+                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName === itemLocation.state.Condition)
                                     .map(FilteredConditionDropdown => (
                                         <option value={FilteredConditionDropdown.BookConditionID}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
                             }

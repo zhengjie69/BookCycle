@@ -14,7 +14,7 @@ function App() {
   const userEmail = localStorage.getItem('Email');
 
   useEffect(() => {
-    fetch('/apis/book/get_all_available_books?Email=' + userEmail)
+    fetch('/apis/book/search_book?Email=' + userEmail)
       .then(res => res.json())
       .then(data => {
         setIsLoaded(true);

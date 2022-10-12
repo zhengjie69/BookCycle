@@ -20,6 +20,7 @@ export function SearchBar() {
                     SearchKey: Search
                 }
             });
+            window.location.reload(false);
         }
     }
 

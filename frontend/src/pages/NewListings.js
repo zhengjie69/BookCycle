@@ -82,7 +82,7 @@ export default function NewListings() {
         console.log(Description);
         console.log(GenreID);
         console.log(LocationID);
-        console.log("Condition:" + Condition);
+        console.log(Condition);
 
         NewListingsFormData.append("Price", Price);
         NewListingsFormData.append("Title", BookTitle);
