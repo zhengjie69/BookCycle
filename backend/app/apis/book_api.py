@@ -1,3 +1,4 @@
+from operator import contains
 import os
 from flask import jsonify, request, current_app
 from ..models.book_model import Book
@@ -107,6 +108,26 @@ def search_book():
         minPriceFilter = request.args.get("MinPriceFilter")
         maxPriceFilter = request.args.get("MaxPriceFilter")
 
+        if bookTitle is not None and bookTitle == "null":
+            bookTitle = None
+
+        if userEmail is not None and userEmail == "null":
+            userEmail = None
+        
+        if genreFilter is not None and genreFilter == "null":
+            genreFilter = None
+
+        if locationFilter is not None and locationFilter == "null":
+            locationFilter = None
+        
+        if bookConditionFilter is not None and bookConditionFilter == "null":
+            bookConditionFilter = None
+        
+        if minPriceFilter is not None and minPriceFilter == "null":
+            minPriceFilter = None
+
+        if maxPriceFilter is not None and maxPriceFilter == "null":
+            maxPriceFilter = None    
         # checks if the result is an error result
         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_books", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
 

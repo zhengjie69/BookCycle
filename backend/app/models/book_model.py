@@ -101,6 +101,13 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
+    def isfloat(self, num):
+        try:
+            float(num)
+            return True
+        except ValueError:
+            return False
+
     def create_book(self, title, price, description, genreID, email, image, locationID, bookConditionID):
         try:
 
@@ -137,7 +144,7 @@ class Book:
         finally:
             con.close()
             print("Successfully closed connection")
-
+    
     def search_book(self, bookTitle = None, userEmail = None, genreFilter = None, locationFilter = None, bookConditionFilter = None, minPriceFilter = None, maxPriceFilter = None):
         try:
         
@@ -177,23 +184,24 @@ class Book:
 
                         queryStorage.append("a.Title LIKE \"{}\"".format("%" + bookTitle + "%"))
 
-
+                print("minvalue is {}".format(str(minPriceFilter)))
+                print("maxvalue is {}".format(str(maxPriceFilter)))
                 # checks if min and max price filter is None, if not none build the command for min and max price filter
                 if minPriceFilter is not None and maxPriceFilter is not None:
                     
                     # check if the values is not negative
-                    if float(minPriceFilter) >= 0 and float(maxPriceFilter) >= 0:
+                    if float(minPriceFilter) >= 0 and float(maxPriceFilter) >= 0 and self.isfloat(minPriceFilter) and self.isfloat(maxPriceFilter):
 
                         queryStorage.append("a.Price >= {} AND a.Price <= {} ".format(float(minPriceFilter), float(maxPriceFilter)))
                     
-                elif minPriceFilter is not None and maxPriceFilter is None:
+                elif minPriceFilter is not None and maxPriceFilter is None and self.isfloat(minPriceFilter):
 
                     # check if the values is not negative
                     if float(minPriceFilter) >= 0:
 
                         queryStorage.append("a.Price >= {} ".format(float(minPriceFilter)))
                     
-                elif minPriceFilter is None and maxPriceFilter is not None:
+                elif minPriceFilter is None and maxPriceFilter is not None and self.isfloat(maxPriceFilter):
 
                     # check if the values is not negative
                     if float(maxPriceFilter) >= 0:
@@ -285,10 +293,6 @@ class Book:
             print(er)
             return("Error in fetching books")
 
-        # catch every other error 
-        except:
-            con.rollback()
-            return("Error in fetching books")
         finally:
             con.close()
             print("Successfully closed connection")
