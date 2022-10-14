@@ -101,12 +101,6 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def isfloat(self, num):
-        try:
-            float(num)
-            return True
-        except ValueError:
-            return False
 
     def create_book(self, title, price, description, genreID, email, image, locationID, bookConditionID):
         try:
@@ -173,35 +167,36 @@ class Book:
                 filterQuery = ""
 
                 if userEmail is not None:
-                    if userEmail != "":
+
+
+                    if userEmail != "" and isemail(userEmail):
                         queryStorage.append("a.Email != \"{}\"".format(userEmail))
 
                 # checks if title is None, if not none build the command for title filter
                 if bookTitle is not None:
-                    
+
+                    filteredBookTitle = data_cleaning(bookTitle)
                     # check if the values is not empty string
-                    if bookTitle != "":
+                    if filteredBookTitle != "":
 
-                        queryStorage.append("a.Title LIKE \"{}\"".format("%" + bookTitle + "%"))
+                        queryStorage.append("a.Title LIKE \"{}\"".format("%" + filteredBookTitle + "%"))
 
-                print("minvalue is {}".format(str(minPriceFilter)))
-                print("maxvalue is {}".format(str(maxPriceFilter)))
                 # checks if min and max price filter is None, if not none build the command for min and max price filter
                 if minPriceFilter is not None and maxPriceFilter is not None:
                     
                     # check if the values is not negative
-                    if float(minPriceFilter) >= 0 and float(maxPriceFilter) >= 0 and self.isfloat(minPriceFilter) and self.isfloat(maxPriceFilter):
+                    if float(minPriceFilter) >= 0 and float(maxPriceFilter) >= 0 and isfloat(minPriceFilter) and isfloat(maxPriceFilter):
 
                         queryStorage.append("a.Price >= {} AND a.Price <= {} ".format(float(minPriceFilter), float(maxPriceFilter)))
                     
-                elif minPriceFilter is not None and maxPriceFilter is None and self.isfloat(minPriceFilter):
+                elif minPriceFilter is not None and maxPriceFilter is None and isfloat(minPriceFilter):
 
                     # check if the values is not negative
                     if float(minPriceFilter) >= 0:
 
                         queryStorage.append("a.Price >= {} ".format(float(minPriceFilter)))
                     
-                elif minPriceFilter is None and maxPriceFilter is not None and self.isfloat(maxPriceFilter):
+                elif minPriceFilter is None and maxPriceFilter is not None and isfloat(maxPriceFilter):
 
                     # check if the values is not negative
                     if float(maxPriceFilter) >= 0:
@@ -290,9 +285,10 @@ class Book:
 
         except sqlite3.Error as er:
             con.rollback()
-            print(er)
             return("Error in fetching books")
 
+        except Exception as e:
+            return("Error in fetching books")
         finally:
             con.close()
             print("Successfully closed connection")
@@ -495,7 +491,7 @@ class Book:
                         return("No book offers found")
                 
                 else:
-                    return("Book Does not belong to user")
+                    return("Error Book Does not belong to user")
 
         except sqlite3.Error as er:
             con.rollback()
@@ -505,39 +501,41 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def add_book_offer(self, bookID, email, offer):
-        try:
+    # def add_book_offer(self, bookID, email, offer):
+    #     try:
         
-            with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
+    #         with sqlite3.connect(self.dbname + ".db") as con:
+    #             print ("Opened database successfully")
 
-                # this command forces sqlite to enforce the foreign key rules set  for the tables
-                con.execute("PRAGMA foreign_keys = 1")
+    #             # this command forces sqlite to enforce the foreign key rules set  for the tables
+    #             con.execute("PRAGMA foreign_keys = 1")
                 
-                returnResult = False
-                # checks if the row exists
-                cur = con.cursor()
-                cur.execute("SELECT BookID, OffererEmail FROM {} WHERE BookID = ? AND OffererEmail = ?".format(self.bookoffertablename),(bookID, email))
-                rows = cur.fetchall()
-                # if there are no book offer records for selected bookid and email, insert offer, else return error message
-                if len(rows) == 0:
-                    cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename),("Pending",))
-                    result = cur.fetchall()
+    #             returnResult = False
+    #             # checks if the row exists
+    #             cur = con.cursor()
+    #             cur.execute("SELECT BookID, OffererEmail FROM {} WHERE BookID = ? AND OffererEmail = ?".format(self.bookoffertablename),(bookID, email))
+    #             rows = cur.fetchall()
+    #             print(rows)
+    #             # if there are no book offer records for selected bookid and email, insert offer, else return error message
+    #             if len(rows) == 0:
+    #                 print("no offers from  this user found, inserting offer")
+    #                 cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename),("Pending",))
+    #                 result = cur.fetchall()
 
-                    if len(result) == 1:
-                        bookOfferStatusID = result[0][0]
-                        cur.execute("INSERT INTO {} (BookID,OfferPrice,BuyerEmail,BookOfferStatusID) VALUES (?, ?, ?, ?)".format(self.bookoffertablename), (bookID, offer, email, bookOfferStatusID))
-                        returnResult = True
-                return returnResult
+    #                 if len(result) == 1:
+    #                     bookOfferStatusID = result[0][0]
+    #                     cur.execute("INSERT INTO {} (BookID,OfferPrice,BuyerEmail,BookOfferStatusID) VALUES (?, ?, ?, ?)".format(self.bookoffertablename), (bookID, offer, email, bookOfferStatusID))
+    #                     returnResult = True
+    #             return returnResult
 
-        except sqlite3.Error as er:
-            con.rollback()
-            returnResult = None
-            return returnResult
+    #     except sqlite3.Error as er:
+    #         con.rollback()
+    #         returnResult = None
+    #         return returnResult
 
-        finally:
-            con.close()
-            print("Successfully closed connection")
+    #     finally:
+    #         con.close()
+    #         print("Successfully closed connection")
 
     def delete_book_offer(self, bookOfferID, bookID, email):
         try:
@@ -716,19 +714,22 @@ class Book:
                     if recordCount == 0:
 
                         # gets the status ID relating to "Pending" book status
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
+                        cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
                         bookOfferStatusID = cur.fetchall()[0][0]
 
                         con.execute("INSERT INTO {} (BookID,OfferPrice,OffererEmail,BookOfferStatusID) VALUES(?,?,?,?)".format(self.bookoffertablename), (bookID, offer, email, bookOfferStatusID))
                         con.commit()
-                        return(True)
+                        return("Successfully Sent Offer")
+
+                    else:
+                        return("Error cannot send offer again for same Book")
 
                 else:
-                    return(False)
+                    return("Error cannot send offer for own Book")
 
         except sqlite3.Error as er:
             con.rollback()
-            return(False)
+            return("Error sending offer for Book")
 
         finally:
             con.close()
@@ -736,45 +737,47 @@ class Book:
 
     def accept_book_offer(self, bookOfferID, ownerEmail):
         try:
-        
-            with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
-                # this command forces sqlite to enforce the foreign key rules set  for the tables
-                con.execute("PRAGMA foreign_keys = 1")
-
-                cur = con.cursor()
-                
-                # checks if the book offer belongs to the owner email
-                cur.execute("SELECT COUNT(*) FROM {} WHERE BookOfferID = ? AND OffererEmail = ?".format(self.bookoffertablename), (bookOfferID, ownerEmail))
-                bookCount = cur.fetchall()[0][0]
-
-                # if the offer does not belong to the owner email, check if the offer is not Accepted or Rejected
-                if bookCount == 0:
-
-                    # tries to fetch a record of the BookOfferID with "Pending" status
-                    cur.execute("SELECT COUNT(*) FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID WHERE a.BookOfferID = ? AND b.BookOfferStatusName = ?".format(self.bookoffertablename, self.bookofferstatustablename), (bookOfferID, "Pending"))
-                    recordCount = cur.fetchall()[0][0]
-
-                    # if there is a record for the book offer with the same bookOfferID and with "Pending" status, proceed to update, else return error
-                    if recordCount == 1:
-
-                        # gets the status ID relating to "Accepted" book status
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Accepted",))
-                        bookOfferStatusID = cur.fetchall()[0][0]
-
-                        con.execute("UPDATE {} SET BookOfferStatusID = ? ON BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, bookOfferID))
-                        con.commit()
-                        return(True)
+            if bookOfferID is not None and ownerEmail is not None:
+                with sqlite3.connect(self.dbname + ".db") as con:
+                    print ("Opened database successfully")
                     
-                    return(False)
+                    # this command forces sqlite to enforce the foreign key rules set  for the tables
+                    con.execute("PRAGMA foreign_keys = 1")
 
-                else:
-                    return(False)
+                    cur = con.cursor()
+                    
+                    # checks if the book offer belongs to the owner email
+                    cur.execute("SELECT COUNT(*) FROM {} WHERE BookOfferID = ? AND OffererEmail = ?".format(self.bookoffertablename), (bookOfferID, ownerEmail))
+                    bookCount = cur.fetchall()[0][0]
+
+                    # if the offer does not belong to the owner email, check if the offer is not Accepted or Rejected
+                    if bookCount == 0:
+
+                        # tries to fetch a record of the BookOfferID with "Pending" status
+                        cur.execute("SELECT COUNT(*) FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID WHERE a.BookOfferID = ? AND b.BookOfferStatusName = ?".format(self.bookoffertablename, self.bookofferstatustablename), (bookOfferID, "Pending"))
+                        recordCount = cur.fetchall()[0][0]
+                        # if there is a record for the book offer with the same bookOfferID and with "Pending" status, proceed to update, else return error
+                        if recordCount == 1:
+
+                            # gets the status ID relating to "Accepted" book status
+                            cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Accepted",))
+                            bookOfferStatusID = cur.fetchall()[0][0]
+                            con.execute("UPDATE {} SET BookOfferStatusID = ? WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, bookOfferID))
+                            con.commit()
+                            return("Successfully Accepted Offer")
+                        
+                        else:
+                            return("Error Accepting offer for Book")
+
+                    else:
+                        return("Error Accepting offer for Book")
+            else:
+                return("Error Accepting offer for Book")
 
         except sqlite3.Error as er:
             con.rollback()
-            return(False)
+            print(er)
+            return("Error Accepting offer for Book")
 
         finally:
             con.close()
@@ -783,45 +786,45 @@ class Book:
 
     def edit_book_offer(self, bookOfferID, offererEmail, newOffer):
         try:
-        
-            with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
-                # this command forces sqlite to enforce the foreign key rules set  for the tables
-                con.execute("PRAGMA foreign_keys = 1")
-
-                cur = con.cursor()
-                
-                # checks if the book offer belongs to the offerer email
-                cur.execute("SELECT COUNT(*) FROM {} WHERE BookOfferID = ? AND OffererEmail = ?".format(self.bookoffertablename), (bookOfferID, offererEmail))
-                bookCount = cur.fetchall()[0][0]
-
-                # if the offer belong to the offerer email, check if the offer is not Accepted
-                if bookCount == 1:
-
-                    # tries to fetch a record of the BookOfferID with "Pending" or "Rejected" status (Not Accepted)
-                    cur.execute("SELECT COUNT(*) FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID WHERE a.BookOfferID = ? AND b.BookOfferStatusName != ?".format(self.bookoffertablename, self.bookofferstatustablename), (bookOfferID, "Accepted"))
-                    recordCount = cur.fetchall()[0][0]
-
-                    # if there is a record for the book offer with the same bookOfferID and with "Pending" or "Rejected" status, proceed to update offer and status back to "Pending", else return error
-                    if recordCount == 1:
-
-                        # gets the status ID relating to "Pending" book status
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
-                        bookOfferStatusID = cur.fetchall()[0][0]
-
-                        con.execute("UPDATE {} SET BookOfferStatusID = ?, OfferPrice = ? ON BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, newOffer, bookOfferID))
-                        con.commit()
-                        return(True)
+            if bookOfferID is not None and offererEmail is not None and newOffer is not None:
+                with sqlite3.connect(self.dbname + ".db") as con:
+                    print ("Opened database successfully")
                     
-                    return(False)
+                    # this command forces sqlite to enforce the foreign key rules set  for the tables
+                    con.execute("PRAGMA foreign_keys = 1")
 
-                else:
-                    return(False)
+                    cur = con.cursor()
+                    
+                    # checks if the book offer belongs to the offerer email
+                    cur.execute("SELECT COUNT(*) FROM {} WHERE BookOfferID = ? AND OffererEmail = ?".format(self.bookoffertablename), (bookOfferID, offererEmail))
+                    bookCount = cur.fetchall()[0][0]
+
+                    # if the offer belong to the offerer email, check if the offer is not Accepted
+                    if bookCount == 1:
+                        
+                        # tries to fetch a record of the BookOfferID with "Pending" or "Rejected" status (Not Accepted)
+                        cur.execute("SELECT COUNT(*) FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID WHERE a.BookOfferID = ? AND b.BookOfferStatusName != ?".format(self.bookoffertablename, self.bookofferstatustablename), (bookOfferID, "Accepted"))
+                        recordCount = cur.fetchall()[0][0]
+
+                        # if there is a record for the book offer with the same bookOfferID and with "Pending" or "Rejected" status, proceed to update offer and status back to "Pending", else return error
+                        if recordCount == 1:
+
+                            # gets the status ID relating to "Pending" book status
+                            cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
+                            bookOfferStatusID = cur.fetchall()[0][0]
+
+                            con.execute("UPDATE {} SET BookOfferStatusID = ?, OfferPrice = ? WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, newOffer, bookOfferID))
+                            con.commit()
+                            return("Successfully edited book offer")
+                        else:
+                            return("Error no book offer found")
+
+                    else:
+                        return("Error failed to edit book offer")
 
         except sqlite3.Error as er:
             con.rollback()
-            return(False)
+            return("Error failed to edit book offer")
 
         finally:
             con.close()
@@ -854,21 +857,21 @@ class Book:
                     if recordCount == 1:
 
                         # gets the status ID relating to "Pending" book status
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
+                        cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Pending",))
                         bookOfferStatusID = cur.fetchall()[0][0]
 
                         con.execute("DELETE FROM {} WHERE BookOfferID = ? AND OffererEmail = ?".format(self.bookoffertablename), (bookOfferID, offererEmail))
                         con.commit()
-                        return(True)
-                    
-                    return(False)
+                        return("Successfully deleted book offer")
+                    else:
+                        return("Error failed to deleted book offer")
 
                 else:
-                    return(False)
+                    return("Error failed to deleted book offer")
 
         except sqlite3.Error as er:
             con.rollback()
-            return(False)
+            return("Error failed to delete book offer")
 
         finally:
             con.close()

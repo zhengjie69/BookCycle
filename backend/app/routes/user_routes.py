@@ -28,7 +28,13 @@ user.route('/update_profile', methods=['POST'])(update_profile)
 user.route('/send_book_offer', methods=['POST'])(send_book_offer)
 
 # 'http://localhost:5000/apis/user/get_book_offers'
-user.route('/get_book_offers', methods=['POST'])(get_book_offers)
+user.route('/get_book_offers', methods=['GET'])(get_book_offers)
 
 # 'http://localhost:5000/apis/user/accept_book_offer'
 user.route('/accept_book_offer', methods=['POST'])(accept_book_offer)
+
+# 'http://localhost:5000/apis/user/edit_book_offer'
+user.route('/edit_book_offer', methods=['POST'])(edit_book_offer)
+
+# 'http://localhost:5000/apis/user/delete_book_offer'
+user.route('/delete_book_offer', methods=['POST'])(delete_book_offer)

@@ -98,42 +98,35 @@ def send_book_offer():
             offererEmail = request.form.get("Email")
             offer = request.form.get("Offer")
             
-            if bookModel.Send_book_offer(bookID, offer, offererEmail):
-                return(jsonify("Successfully Sent Offer"), 201)
-            else:
-                return(jsonify("Error sending offer for Book"), 401)
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.Send_book_offer(bookID, offer, offererEmail))
 
 def get_book_offers():
-    if request.method == "POST":         
-            bookID = request.form.get("BookID")
-            ownerEmail = request.form.get("Email")
+    if request.method == "GET":         
+            bookID = request.args.get("BookID")
+            ownerEmail = request.args.get("Email")
             userTableName = userModel.get_tablename()
 
-            result = bookModel.get_book_offers(bookID, ownerEmail, userTableName)
-
-            if type(result) == str and "Error" in result:
-
-                return(jsonify(result), 401)
-
-            else:
-
-                return(jsonify(result), 201)
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting book offer", "get_book_offers", bookModel.get_book_offers(bookID, ownerEmail, userTableName))
 
 def accept_book_offer():
     if request.method == "POST":
         bookOfferID = request.form.get("BookOfferID")
         ownerEmail = request.form.get("Email")
 
-        # checks if there are data input for the required fields 
-        if bookOfferID is not None and ownerEmail is not None:
-            if bookModel.accept_book_offer(bookOfferID, ownerEmail):
-                return(jsonify("Successfully Accepted Offer"), 201)
-            else:
-                return(jsonify("Error Accepting offer for Book"), 401)
-        
-        else:
-            return(jsonify("Error Accepting offer for Book"), 401)
+        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Accepting book offer", "accept_book_offer", bookModel.accept_book_offer(bookOfferID, ownerEmail))
 
             
+def edit_book_offer():
+    if request.method == "POST":
+        bookOfferID = request.form.get("BookOfferID")
+        offererEmail = request.form.get("Email")
+        newOffer = request.form.get("Offer")
 
+        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Editing book offer", "edit_book_offer", bookModel.edit_book_offer(bookOfferID, offererEmail, newOffer))
 
+def delete_book_offer():
+    if request.method == "POST":
+        bookOfferID = request.form.get("BookOfferID")
+        offererEmail = request.form.get("Email")
+
+        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
