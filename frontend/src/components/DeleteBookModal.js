@@ -66,7 +66,7 @@ export default function DeleteBookModal() {
                     <Modal.Title>Are you sure you want to delete this listing?</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{showErrors ? errorMessages.map((item, index) => {
-                    return <ul key={index}>{item}</ul>;
+                    return <b><p key={index}>{item}</p></b>;
                 }) : null}</Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={postDeleteBook}>
