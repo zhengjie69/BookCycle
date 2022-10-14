@@ -58,7 +58,7 @@ export default function DeleteBookModal() {
     return (
         <>
             <Button variant="danger" onClick={handleShow}>
-                Delete
+                Delete this listing
             </Button>
 
             <Modal show={show} onHide={handleClose}>

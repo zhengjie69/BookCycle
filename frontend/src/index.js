@@ -16,6 +16,7 @@ import ForgetPassword from './pages/ForgetPassword'
 import Register from './pages/Register'
 import EditListings from './pages/EditListings'
 import { SearchResult } from './pages/SearchResult'
+import ViewOffers from './pages/ViewOffers'
 
 //Homepage is App.js, Navbar is NavbarComp.js
 
@@ -35,6 +36,7 @@ root.render(
         {isAuthenticated ? <Route exact path='/MyListings' element={<MyListings />} /> : null}
         {isAuthenticated ? <Route exact path='/MyListings/NewListings' element={<NewListings />} /> : null}
         {isAuthenticated ? <Route exact path='/MyListings/EditListings' element={<EditListings />} /> : null}
+        {isAuthenticated ? <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} /> : null}
         {isAuthenticated ? <Route exact path='/MyProfile' element={<MyProfile />} /> : null}
         {isAuthenticated ? <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} /> : null}
         {isAuthenticated ? <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} /> : null}
