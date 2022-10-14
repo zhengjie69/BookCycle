@@ -14,6 +14,8 @@ pyvenv.cfg
 /backend/app/models/__pycache__
 /backend/app/routes/__pycache__
 /frontend/api
+/frontend/package-lock.json
+/frontend/node_modules
 /.vscode
 
 # **/bin/*

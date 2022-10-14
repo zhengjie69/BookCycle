@@ -18,7 +18,8 @@ Steps to run codes:
 1. Open the BookCycle foler in VS Code
 2. Open a terminal in VS Code
 3. In the VS Code terminal, navigate to the frontend folder (cd .\frontend\)
-4. Run the command: npm start
+4. Run the command: npm install
+5. Run the command: npm start
 
 <h1>BackEnd</h1>
 
