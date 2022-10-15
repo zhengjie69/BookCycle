@@ -47,25 +47,26 @@ export default function ViewOffers() {
                 <Col></Col>
                 <Col></Col>
             </Row>
-            {bookOffers.map(bookOffers => (
-                <Row>
-                    <Col>
-                        <p>{bookOffers.Username}</p>
-                    </Col>
-                    <Col>
-                        <p>{bookOffers.OfferPrice}</p>
-                    </Col>
-                    <Col>
-                        <p>{bookOffers.BookOfferStatus}</p>
-                    </Col>
-                    <Col>
-                        <Button variant="primary">Accept</Button>
-                    </Col>
-                    <Col>
-                        <Button variant="danger">Reject</Button>
-                    </Col>
-                </Row>
-            ))}
+            {Array.isArray(bookOffers) ?
+                bookOffers.map(bookOffers => (
+                    <Row>
+                        <Col>
+                            <p>{bookOffers.Username}</p>
+                        </Col>
+                        <Col>
+                            <p>{bookOffers.OfferPrice}</p>
+                        </Col>
+                        <Col>
+                            <p>{bookOffers.BookOfferStatus}</p>
+                        </Col>
+                        <Col>
+                            <Button variant="primary">Accept</Button>
+                        </Col>
+                        <Col>
+                            <Button variant="danger">Reject</Button>
+                        </Col>
+                    </Row>
+                )) : <h3> No offers </h3>}
         </Container>
     );
 }
