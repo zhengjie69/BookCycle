@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Col, Row, Container, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
+import AcceptOfferModal from "../components/AcceptOfferModal";
 import { SearchBar } from "../components/SearchBar";
 
 
@@ -13,6 +14,8 @@ export default function ViewOffers() {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [bookOffers, setBookOffers] = useState([]);
+    var ListOfPending = [];
+    var ListOfAccepted = [];
 
     useEffect(() => {
         fetch('/apis/user/get_book_offers?BookID=' + location.state.BookID + '&Email=' + userEmail)
@@ -29,6 +32,12 @@ export default function ViewOffers() {
             )
     }, [])
 
+    if (Array.isArray(bookOffers)) {
+        ListOfPending = bookOffers.filter(bookOffers => bookOffers.BookOfferStatus === "Pending")
+        ListOfAccepted = bookOffers.filter(bookOffers => bookOffers.BookOfferStatus === "Accepted")
+    }
+
+
     return (
         <Container>
             <SearchBar />
@@ -37,7 +46,7 @@ export default function ViewOffers() {
             </div>
             <div className="d-flex align-items-center justify-content-center mb-4">
                 <Row>
-                    <h2>Offers for {location.state.Title}</h2>
+                    <h2>Offers for "{location.state.Title}"</h2>
                 </Row>
             </div>
             <Row>
@@ -45,28 +54,51 @@ export default function ViewOffers() {
                 <Col><h4>Offer Price</h4></Col>
                 <Col><h4>Book Offer Status</h4></Col>
                 <Col></Col>
-                <Col></Col>
             </Row>
-            {Array.isArray(bookOffers) ?
-                bookOffers.map(bookOffers => (
-                    <Row>
-                        <Col>
-                            <p>{bookOffers.Username}</p>
-                        </Col>
-                        <Col>
-                            <p>{bookOffers.OfferPrice}</p>
-                        </Col>
-                        <Col>
-                            <p>{bookOffers.BookOfferStatus}</p>
-                        </Col>
-                        <Col>
-                            <Button variant="primary">Accept</Button>
-                        </Col>
-                        <Col>
-                            <Button variant="danger">Reject</Button>
-                        </Col>
-                    </Row>
-                )) : <h3> No offers </h3>}
+            {/* if there is accepted offer */}
+            {ListOfAccepted.length > 0 ?
+                ListOfAccepted
+                    .map(AcceptedBookOffers => (
+                        <Row>
+                            <Col>
+                                <p>{AcceptedBookOffers.Username}</p>
+                            </Col>
+                            <Col>
+                                <p>{AcceptedBookOffers.OfferPrice}</p>
+                            </Col>
+                            <Col>
+                                <p>{AcceptedBookOffers.BookOfferStatus}</p>
+                            </Col>
+                            <Col>
+                            </Col>
+                        </Row>
+                    )) : null}
+            {ListOfAccepted.length === 0 && ListOfPending.length === 0 ?
+                <div className="d-flex align-items-center justify-content-center mt-4">
+                    <h4>No Offers</h4>
+                </div> : null
+            }
+            {/* if there is no accepted offers */}
+            {ListOfAccepted.length === 0 ?
+                ListOfPending
+                    .map(bookOffers => (
+                        <Row>
+                            <Col>
+                                <p>{bookOffers.Username}</p>
+                            </Col>
+                            <Col>
+                                <p>{bookOffers.OfferPrice}</p>
+                            </Col>
+                            <Col>
+                                <p>{bookOffers.BookOfferStatus}</p>
+                            </Col>
+                            <Col>
+                                {bookOffers.BookOfferStatus === "Pending" ?
+                                    <AcceptOfferModal BookOfferID={bookOffers.BookOfferID} /> : null
+                                }
+                            </Col>
+                        </Row>
+                    )) : null}
         </Container>
     );
 }

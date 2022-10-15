@@ -12,6 +12,7 @@ function BookListingInformation() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    console.log(location.state.BookStatus)
     return (
         <Container>
             <SearchBar />
@@ -30,7 +31,7 @@ function BookListingInformation() {
                             {location.state.Price > 0 ? "$" + location.state.Price : null}
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" ?
+                            {location.state.Route === "MyListings" && Authentication === "true" && location.state.BookStatus === "Avaliable" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/ViewOffers', {
                                         state: {
@@ -39,7 +40,7 @@ function BookListingInformation() {
                                             Image: location.state.Image,
                                         }
                                     });
-                                }}>View Offers</Button> : null}
+                                }}>View Offers</Button> : <b>{location.state.BookStatus}</b>}
                             {location.state.Route !== "MyListings" && Authentication === "true" ?
                                 <OfferBookModal /> : null
                             }
@@ -53,21 +54,22 @@ function BookListingInformation() {
                             <p>{location.state.Condition}</p>
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" ? <Button onClick={() => {
-                                navigate('/MyListings/EditListings', {
-                                    state: {
-                                        Title: location.state.Title,
-                                        BookID: location.state.BookID,
-                                        Price: location.state.Price,
-                                        Genre: location.state.Genre,
-                                        Image: location.state.Image,
-                                        Location: location.state.Location,
-                                        Description: location.state.Description,
-                                        BookStatus: location.state.BookStatus,
-                                        Condition: location.state.Condition
-                                    }
-                                });
-                            }}>Edit Listings</Button> : null}
+                            {location.state.Route === "MyListings" && location.state.BookStatus === "Avaliable" ?
+                                <Button onClick={() => {
+                                    navigate('/MyListings/EditListings', {
+                                        state: {
+                                            Title: location.state.Title,
+                                            BookID: location.state.BookID,
+                                            Price: location.state.Price,
+                                            Genre: location.state.Genre,
+                                            Image: location.state.Image,
+                                            Location: location.state.Location,
+                                            Description: location.state.Description,
+                                            BookStatus: location.state.BookStatus,
+                                            Condition: location.state.Condition
+                                        }
+                                    });
+                                }}>Edit Listings</Button> : null}
                         </Col>
                     </Row>
                     <Row className="mb-2 mt-2">
