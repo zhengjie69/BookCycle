@@ -98,7 +98,7 @@ def send_book_offer():
             offererEmail = request.form.get("Email")
             offer = request.form.get("Offer")
             
-            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.Send_book_offer(bookID, offer, offererEmail))
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.send_book_offer(bookID, offer, offererEmail))
 
 def get_book_offers():
     if request.method == "GET":         
@@ -108,13 +108,24 @@ def get_book_offers():
 
             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting book offer", "get_book_offers", bookModel.get_book_offers(bookID, ownerEmail, userTableName))
 
+def get_all_user_book_offers():
+    if request.method == "GET": 
+            email = request.args.get("Email")
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all book offers made by selected user email", "get_all_user_book_offers", bookModel.get_all_user_book_offers(email))
+
 def accept_book_offer():
     if request.method == "POST":
         bookOfferID = request.form.get("BookOfferID")
         ownerEmail = request.form.get("Email")
 
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Accepting book offer", "accept_book_offer", bookModel.accept_book_offer(bookOfferID, ownerEmail))
+        result = bookModel.accept_book_offer(bookOfferID, ownerEmail)
 
+        if type(result) == str and "Error" in result:
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Accepting book offer", "accept_book_offer", result)
+        
+        else:
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Accepting book offer", "accept_book_offer", userModel.create_transaction(result))
+            
             
 def edit_book_offer():
     if request.method == "POST":
@@ -130,3 +141,9 @@ def delete_book_offer():
         offererEmail = request.form.get("Email")
 
         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
+
+
+def get_all_user_transcations():
+     if request.method == "GET": 
+            email = request.args.get("Email")
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transcations(email))

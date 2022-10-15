@@ -75,7 +75,7 @@ class User:
     
 
 
-    def create_Transaction(self, bookDetails, PurchaserEmail):
+    def create_transaction(self, transactionDetails):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
@@ -84,26 +84,87 @@ class User:
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
-                bookTitle = bookDetails[0][0]
-                bookPrice = bookDetails[0][1]
-                ownerEmail = bookDetails[0][2]
+                bookTitle = transactionDetails[0]
+                bookPrice = transactionDetails[1]
+                ownerEmail = transactionDetails[2]
+                purchaserEmail = transactionDetails[3]
 
                 cur = con.cursor()
-                cur.execute("INSERT INTO {} (BookTitle, Price, Email, PurchaserEmail) VALUES(?,?,?,?)".format(self.transactionsTableName), (bookTitle, bookPrice, ownerEmail, PurchaserEmail))
+                cur.execute("INSERT INTO {} (BookTitle, Price, Email, PurchaserEmail) VALUES(?,?,?,?)".format(self.transactionsTableName), (bookTitle, bookPrice, ownerEmail, purchaserEmail))
                 con.commit()
                 return("Successfully Created Transaction")
 
-        except:
+        except sqlite3.Error as er:
             con.rollback()
-            return("Error in Logging in, Please try again")
+            return("Error failed to create transaction")
+
+        except Exception as e:
+            return("Error in fetching books")
+            
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
+    def get_transaction_details(self, transactionID):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+                
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+                cur.execute("SELECT * FROM {} WHERE TransactionID = ?".format(self.transactionsTableName), (transactionID,))
+                transactionInfo = cur.fetchall()[0][0]
+
+                cur.execute("SELECT ContactNumber FROM {} WHERE Email = ?".format(self.tablename), (transactionInfo[3],))
+                contactNumber = cur.fetchall()[0]
+                return({'TransactionID': transactionInfo[0], 'BookTitle': transactionInfo[1], 'Price': transactionInfo[2], 'Owner': transactionInfo[3], 'OwnerPhoneNumber': contactNumber, 'PurchaserEmail': transactionInfo[4]})
+
+        except sqlite3.Error as er:
+            con.rollback()
+            return("Error failed to get transaction")
       
         finally:
             con.close()
             print("Successfully closed connection")
 
 
+    def get_all_user_transcations(self, email):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+                
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
 
+                cur = con.cursor()
+                cur.execute("SELECT * FROM {} WHERE PurchaserEmail = ? OR Email = ?".format(self.transactionsTableName), (email, email))
+                transactionRows = cur.fetchall()
 
+                if len(transactionRows) > 0:
+                    returnList = []
+                    for transaction in transactionRows:
+                        cur.execute("SELECT ContactNumber FROM {} WHERE Email = ?".format(self.tablename), (transaction[3],))
+                        contactNumber = cur.fetchall()[0][0]
+
+                        returnList.append({'TransactionID': transaction[0], 'BookTitle': transaction[1], 'Price': transaction[2], 'Owner': transaction[3], 'OwnerPhoneNumber': contactNumber, 'PurchaserEmail': transaction[4]})
+                    return (returnList)
+                else:
+                    return("No transactions found")
+
+        except sqlite3.Error as er:
+            con.rollback()
+            return("Error failed to get transaction")
+        
+        except Exception as e:
+            return("Error in fetching books")
+      
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
         
         

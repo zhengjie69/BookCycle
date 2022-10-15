@@ -501,6 +501,43 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
+
+    def get_all_user_book_offers(self, OffererEmail):
+        try:
+            
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+
+                if OffererEmail is not None and isemail(OffererEmail):
+                    cur = con.cursor()
+
+                    # gets 
+                    cur.execute("SELECT a.BookOfferID, a.BookID, c.Title, a.OfferPrice, b.BookOfferStatusName FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.BookID = c.BookID  WHERE a.OffererEmail = ?".format(self.bookoffertablename,self.bookofferstatustablename,self.tablename), (OffererEmail,))
+                    offerRecords = cur.fetchall()
+
+                    if len(offerRecords) > 0:
+
+                        dataList = []
+                        for offers in offerRecords:
+
+                            dataList.append({'BookOfferID': offers[0], 'BookID': offers[1],'BookTitle': offers[2], 'OfferPrice': offers[3], 'BookOfferStatus': offers[4]})
+                                
+                        return dataList
+                    else:
+                        return("No book offers found")
+                
+                else:
+                    return("No book offers found")
+                
+
+        except sqlite3.Error as er:
+            con.rollback()
+            return("Error in fetching book offers")
+
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
     # def add_book_offer(self, bookID, email, offer):
     #     try:
         
@@ -687,7 +724,7 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def Send_book_offer(self, bookID, offer, email):
+    def send_book_offer(self, bookID, offer, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
@@ -763,9 +800,28 @@ class Book:
                             cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename), ("Accepted",))
                             bookOfferStatusID = cur.fetchall()[0][0]
                             con.execute("UPDATE {} SET BookOfferStatusID = ? WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, bookOfferID))
+
+                             # builds the return data for transaction
+                            cur.execute("SELECT BookID FROM {} WHERE BookOfferID = ?".format(self.bookoffertablename),(bookOfferID,))
+                            print("getting bookid")
+                            bookID = cur.fetchall()[0][0]
+                            if bookID is not None:  
+                                returnData = []
+                                
+                                cur.execute("SELECT Title, Email FROM {} WHERE BookID = ?".format(self.tablename),(bookID,))
+                                bookInfo = cur.fetchall()[0]
+
+                                cur.execute("SELECT OffererEmail, OfferPrice FROM {} WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferID,))
+                                offerInfo = cur.fetchall()[0]
+
+                                returnData.append(bookInfo[0])
+                                returnData.append(offerInfo[1])
+                                returnData.append(bookInfo[1])
+                                returnData.append(offerInfo[1])
+                                
+                                return(returnData)
+                            
                             con.commit()
-                            return("Successfully Accepted Offer")
-                        
                         else:
                             return("Error Accepting offer for Book")
 
@@ -815,6 +871,7 @@ class Book:
 
                             con.execute("UPDATE {} SET BookOfferStatusID = ?, OfferPrice = ? WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, newOffer, bookOfferID))
                             con.commit()
+            
                             return("Successfully edited book offer")
                         else:
                             return("Error no book offer found")
