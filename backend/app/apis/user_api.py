@@ -111,7 +111,9 @@ def get_book_offers():
 def get_all_user_book_offers():
     if request.method == "GET": 
             email = request.args.get("Email")
-            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all book offers made by selected user email", "get_all_user_book_offers", bookModel.get_all_user_book_offers(email))
+            userTableName = userModel.get_tablename()
+            transactionsTableName = userModel.get_transactionsTableName()
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all book offers made by selected user email", "get_all_user_book_offers", bookModel.get_all_user_book_offers(email, userTableName, transactionsTableName))
 
 def accept_book_offer():
     if request.method == "POST":

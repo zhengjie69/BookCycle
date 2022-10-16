@@ -502,17 +502,17 @@ class Book:
             print("Successfully closed connection")
 
 
-    def get_all_user_book_offers(self, OffererEmail):
+    def get_all_user_book_offers(self, offererEmail, userTableName, getTransactionsTableName):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
                 print ("Opened database successfully")
 
-                if OffererEmail is not None and isemail(OffererEmail):
+                if offererEmail is not None and isemail(offererEmail) and userTableName is not None and getTransactionsTableName is not None:
                     cur = con.cursor()
 
                     # gets 
-                    cur.execute("SELECT a.BookOfferID, a.BookID, c.Title, a.OfferPrice, b.BookOfferStatusName FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.BookID = c.BookID  WHERE a.OffererEmail = ?".format(self.bookoffertablename,self.bookofferstatustablename,self.tablename), (OffererEmail,))
+                    cur.execute("SELECT a.BookOfferID, a.BookID, c.Title, a.OfferPrice, b.BookOfferStatusName FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.BookID = c.BookID  WHERE a.OffererEmail = ?".format(self.bookoffertablename,self.bookofferstatustablename,self.tablename), (offererEmail,))
                     offerRecords = cur.fetchall()
 
                     if len(offerRecords) > 0:
@@ -520,7 +520,12 @@ class Book:
                         dataList = []
                         for offers in offerRecords:
 
-                            dataList.append({'BookOfferID': offers[0], 'BookID': offers[1],'BookTitle': offers[2], 'OfferPrice': offers[3], 'BookOfferStatus': offers[4]})
+                            cur.execute("SELECT d.TransactionID FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.OffererEmail = c.Email INNER JOIN {} AS d ON c.Email = d.PurchaserEmail WHERE a.BookOfferID = ? AND a.OffererEmail = ? AND b.BookOfferStatusName = ?".format(self.bookoffertablename, self.bookofferstatustablename, userTableName, getTransactionsTableName), (offers[0], offererEmail, "Accepted"))
+                            transactionID = cur.fetchall()[0][0]
+                            tempDict = {'BookOfferID': offers[0], 'BookID': offers[1],'BookTitle': offers[2], 'OfferPrice': offers[3], 'BookOfferStatus': offers[4]}
+                            if transactionID is not None:
+                                tempDict['TransactionID'] = transactionID
+                            dataList.append(tempDict)
                                 
                         return dataList
                     else:
@@ -824,7 +829,7 @@ class Book:
                                 returnData.append(bookInfo[0])
                                 returnData.append(offerInfo[1])
                                 returnData.append(bookInfo[1])
-                                returnData.append(offerInfo[1])
+                                returnData.append(offerInfo[0])
                                 
                                 return(returnData)
                             

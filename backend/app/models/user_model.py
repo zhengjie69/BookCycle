@@ -14,6 +14,9 @@ class User:
     def get_tablename(self):
         return self.tablename
 
+    def get_transactionsTableName(self):
+        return self.transactionsTableName    
+
     def create_user(self, username, email, password, contactNumber):
         try:
             
