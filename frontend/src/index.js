@@ -17,6 +17,7 @@ import Register from './pages/Register'
 import EditListings from './pages/EditListings'
 import { SearchResult } from './pages/SearchResult'
 import ViewOffers from './pages/ViewOffers'
+import MyOffers from './pages/MyOffers'
 
 //Homepage is App.js, Navbar is NavbarComp.js
 
@@ -33,6 +34,7 @@ root.render(
         <Route exact path='/Register' element={<Register />} />
         <Route exact path='/BookListingInformation' element={<BookListingInformation />} />
         <Route exact path='/SearchResult' element={<SearchResult />} />
+        {isAuthenticated ? <Route exact path='/MyOffers' element={<MyOffers />} /> : null}
         {isAuthenticated ? <Route exact path='/MyListings' element={<MyListings />} /> : null}
         {isAuthenticated ? <Route exact path='/MyListings/NewListings' element={<NewListings />} /> : null}
         {isAuthenticated ? <Route exact path='/MyListings/EditListings' element={<EditListings />} /> : null}

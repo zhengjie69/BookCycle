@@ -26,6 +26,11 @@ const NavBarComp = () => {
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-auto">
                         {Authentication === "true" ?
+                            <LinkContainer to="/MyOffers">
+                                <Nav.Link>My Offers</Nav.Link>
+                            </LinkContainer> : null
+                        }
+                        {Authentication === "true" ?
                             <LinkContainer to="/MyListings">
                                 <Nav.Link>My Listings</Nav.Link>
                             </LinkContainer> : null

@@ -39,7 +39,7 @@ const AcceptOfferModal = ({ BookOfferID }) => {
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        if (trimmedResponseMessage == "Successfully Accepted Offer") {
+        if (trimmedResponseMessage == "Successfully Created Transaction") {
             handleClose();
             window.location.reload(false);
         }

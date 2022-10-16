@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Col, Row, Container, Button } from "react-bootstrap";
+import { Col, Row, Container } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import AcceptOfferModal from "../components/AcceptOfferModal";
 import { SearchBar } from "../components/SearchBar";
