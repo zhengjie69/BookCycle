@@ -801,11 +801,18 @@ class Book:
                             bookOfferStatusID = cur.fetchall()[0][0]
                             con.execute("UPDATE {} SET BookOfferStatusID = ? WHERE BookOfferID = ?".format(self.bookoffertablename), (bookOfferStatusID, bookOfferID))
 
-                             # builds the return data for transaction
+                            # getting setting book status of sold to set bookstatus to sold:
+                            
                             cur.execute("SELECT BookID FROM {} WHERE BookOfferID = ?".format(self.bookoffertablename),(bookOfferID,))
-                            print("getting bookid")
                             bookID = cur.fetchall()[0][0]
-                            if bookID is not None:  
+
+                            cur.execute("SELECT BookStatusID FROM {} WHERE BookStatusName = ?".format(self.bookstatustablename), ("Sold",))
+                            bookStatusID = cur.fetchall()[0][0]
+
+                            # builds the return data for transaction
+                            if bookID is not None:
+
+                                con.execute("UPDATE {} SET BookStatusID = ? WHERE BookID = ?".format(self.tablename), (bookStatusID, bookID))
                                 returnData = []
                                 
                                 cur.execute("SELECT Title, Email FROM {} WHERE BookID = ?".format(self.tablename),(bookID,))
