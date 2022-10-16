@@ -116,10 +116,10 @@ class User:
 
                 cur = con.cursor()
                 cur.execute("SELECT * FROM {} WHERE TransactionID = ?".format(self.transactionsTableName), (transactionID,))
-                transactionInfo = cur.fetchall()[0][0]
+                transactionInfo = cur.fetchall()[0]
 
                 cur.execute("SELECT ContactNumber FROM {} WHERE Email = ?".format(self.tablename), (transactionInfo[3],))
-                contactNumber = cur.fetchall()[0]
+                contactNumber = cur.fetchall()[0][0]
                 return({'TransactionID': transactionInfo[0], 'BookTitle': transactionInfo[1], 'Price': transactionInfo[2], 'Owner': transactionInfo[3], 'OwnerPhoneNumber': contactNumber, 'PurchaserEmail': transactionInfo[4]})
 
         except sqlite3.Error as er:
@@ -131,7 +131,7 @@ class User:
             print("Successfully closed connection")
 
 
-    def get_all_user_transcations(self, email):
+    def get_all_user_transactions(self, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:

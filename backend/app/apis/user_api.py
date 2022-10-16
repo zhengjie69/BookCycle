@@ -142,8 +142,12 @@ def delete_book_offer():
 
         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
 
+def get_transaction_details():
+        if request.method == "GET": 
+            transactionID = request.args.get("TransactionID")
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation detail of a specific transcation", "get_transaction_details", userModel.get_transaction_details(transactionID))
 
-def get_all_user_transcations():
+def get_all_user_transactions():
      if request.method == "GET": 
             email = request.args.get("Email")
-            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transcations(email))
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transactions(email))

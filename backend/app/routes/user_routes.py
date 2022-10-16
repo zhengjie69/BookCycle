@@ -42,5 +42,8 @@ user.route('/edit_book_offer', methods=['POST'])(edit_book_offer)
 # 'http://localhost:5000/apis/user/delete_book_offer'
 user.route('/delete_book_offer', methods=['POST'])(delete_book_offer)
 
-# 'http://localhost:5000/apis/user/get_all_user_transcations'
-user.route('/get_all_user_transcations', methods=['GET'])(get_all_user_transcations)
+# 'http://localhost:5000/apis/user/get_transaction_details'
+user.route('/get_transaction_details', methods=['GET'])(get_transaction_details)
+
+# 'http://localhost:5000/apis/user/get_all_user_transactions'
+user.route('/get_all_user_transactions', methods=['GET'])(get_all_user_transactions)
