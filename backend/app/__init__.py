@@ -163,7 +163,7 @@ def sqlite_database_setup():
             bookOfferRows = cur.fetchall()
             if bookOfferRows[0][0] == 0:
                 con.execute("INSERT INTO BookOffers (BookID,OfferPrice,OffererEmail,BookOfferStatusID) VALUES (?,?,?,?)",(1, 3.00, "test2@gmail.com", 2))
-
+                con.execute("INSERT INTO BookOffers (BookID,OfferPrice,OffererEmail,BookOfferStatusID) VALUES (?,?,?,?)",(2, 0.00, "test2@gmail.com", 1))
 
 
 
