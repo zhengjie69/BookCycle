@@ -521,10 +521,12 @@ class Book:
                         for offers in offerRecords:
 
                             cur.execute("SELECT d.TransactionID FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.OffererEmail = c.Email INNER JOIN {} AS d ON c.Email = d.PurchaserEmail WHERE a.BookOfferID = ? AND a.OffererEmail = ? AND b.BookOfferStatusName = ?".format(self.bookoffertablename, self.bookofferstatustablename, userTableName, getTransactionsTableName), (offers[0], offererEmail, "Accepted"))
-                            transactionID = cur.fetchall()[0][0]
+                            returnedRows = cur.fetchall()
+                            print(returnedRows)
+
                             tempDict = {'BookOfferID': offers[0], 'BookID': offers[1],'BookTitle': offers[2], 'OfferPrice': offers[3], 'BookOfferStatus': offers[4]}
-                            if transactionID is not None:
-                                tempDict['TransactionID'] = transactionID
+                            if len(returnedRows) == 1:
+                                tempDict['TransactionID'] = returnedRows[0][0]
                             dataList.append(tempDict)
                                 
                         return dataList
