@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, Modal, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const AcceptOfferModal = ({ BookOfferID }) => {
     const [show, setShow] = useState(false);
@@ -8,7 +8,6 @@ const AcceptOfferModal = ({ BookOfferID }) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const location = useLocation();
     const navigate = useNavigate();
 
     const userEmail = localStorage.getItem('Email');
@@ -39,8 +38,9 @@ const AcceptOfferModal = ({ BookOfferID }) => {
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        if (trimmedResponseMessage == "Successfully Created Transaction") {
+        if (trimmedResponseMessage === "Successfully Created Transaction") {
             handleClose();
+            navigate('/MyListings');
             window.location.reload(false);
         }
 

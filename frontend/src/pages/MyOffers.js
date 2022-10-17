@@ -16,12 +16,6 @@ export default function MyOffers() {
 
     const userEmail = localStorage.getItem('Email');
 
-    if (Array.isArray(userOffers)) {
-        PendingList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Pending")
-        AcceptedList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Accepted")
-        RejectedList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Rejected")
-    }
-
     useEffect(() => {
         fetch('/apis/user/get_all_user_book_offers?Email=' + userEmail)
             .then(res => res.json())
@@ -36,6 +30,13 @@ export default function MyOffers() {
                 }
             )
     }, [])
+
+    if (Array.isArray(userOffers)) {
+        PendingList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Pending")
+        AcceptedList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Accepted")
+        RejectedList = userOffers.filter(userOffers => userOffers.BookOfferStatus === "Rejected")
+    }
+
     return (
         <Container>
             <div className="d-flex align-items-center justify-content-center mb-4">
@@ -63,13 +64,19 @@ export default function MyOffers() {
                                 <p>{AcceptedOffers.BookTitle}</p>
                             </Col>
                             <Col>
-                                <p>{AcceptedOffers.OfferPrice}</p>
+                                <p>{AcceptedOffers.OfferPrice !== 0 ? "$" + AcceptedOffers.OfferPrice : "Free"}</p>
                             </Col>
                             <Col>
                                 <p>{AcceptedOffers.BookOfferStatus}</p>
                             </Col>
                             <Col>
-                                <p><Button variant="primary">Details</Button></p>
+                                <Button onClick={() => {
+                                    navigate('/MyOffers/TransactionDetails', {
+                                        state: {
+                                            TransactionID: AcceptedOffers.TransactionID,
+                                        }
+                                    });
+                                }}>Details</Button>
                             </Col>
                         </Row>
                     )) : null
@@ -87,7 +94,7 @@ export default function MyOffers() {
                                 <p>{PendingOffers.BookTitle}</p>
                             </Col>
                             <Col>
-                                <p>{PendingOffers.OfferPrice}</p>
+                                <p>{PendingOffers.OfferPrice !== 0 ? "$" + PendingOffers.OfferPrice : "Free"}</p>
                             </Col>
                             <Col>
                                 <p>{PendingOffers.BookOfferStatus}</p>
