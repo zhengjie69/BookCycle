@@ -114,7 +114,7 @@ def sqlite_database_setup():
             
             if bookStatusRows[0][0] == 0:
                 # insert BookStatus
-                con.execute("INSERT INTO BookStatus (BookStatusName) VALUES (?)",("Avaliable",) )
+                con.execute("INSERT INTO BookStatus (BookStatusName) VALUES (?)",("Available",) )
                 con.execute("INSERT INTO BookStatus (BookStatusName) VALUES (?)",("Sold",) )
 
 

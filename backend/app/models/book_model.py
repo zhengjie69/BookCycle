@@ -390,10 +390,10 @@ class Book:
                 print(filterQuery)
 
                 if filterQuery == "":
-                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "Avaliable"))
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "Available"))
                 
                 else:
-                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND e.BookStatusName = ? AND {}".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename, filterQuery), (userEmail, "Avaliable"))
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND e.BookStatusName = ? AND {}".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename, filterQuery), (userEmail, "Available"))
                 
                 rows = cur.fetchall()
                    
@@ -545,41 +545,6 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    # def add_book_offer(self, bookID, email, offer):
-    #     try:
-        
-    #         with sqlite3.connect(self.dbname + ".db") as con:
-    #             print ("Opened database successfully")
-
-    #             # this command forces sqlite to enforce the foreign key rules set  for the tables
-    #             con.execute("PRAGMA foreign_keys = 1")
-                
-    #             returnResult = False
-    #             # checks if the row exists
-    #             cur = con.cursor()
-    #             cur.execute("SELECT BookID, OffererEmail FROM {} WHERE BookID = ? AND OffererEmail = ?".format(self.bookoffertablename),(bookID, email))
-    #             rows = cur.fetchall()
-    #             print(rows)
-    #             # if there are no book offer records for selected bookid and email, insert offer, else return error message
-    #             if len(rows) == 0:
-    #                 print("no offers from  this user found, inserting offer")
-    #                 cur.execute("SELECT BookOfferStatusID FROM {} WHERE BookOfferStatusName = ?".format(self.bookofferstatustablename),("Pending",))
-    #                 result = cur.fetchall()
-
-    #                 if len(result) == 1:
-    #                     bookOfferStatusID = result[0][0]
-    #                     cur.execute("INSERT INTO {} (BookID,OfferPrice,BuyerEmail,BookOfferStatusID) VALUES (?, ?, ?, ?)".format(self.bookoffertablename), (bookID, offer, email, bookOfferStatusID))
-    #                     returnResult = True
-    #             return returnResult
-
-    #     except sqlite3.Error as er:
-    #         con.rollback()
-    #         returnResult = None
-    #         return returnResult
-
-    #     finally:
-    #         con.close()
-    #         print("Successfully closed connection")
 
     def delete_book_offer(self, bookOfferID, bookID, email):
         try:
@@ -624,11 +589,11 @@ class Book:
 
                 # if user is logged in, hide user books
                 if userEmail is not None:
-                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "%" + bookTitle + "%", "Avaliable"))
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "%" + bookTitle + "%", "Available"))
                 
                 # if no user email is provided when not logged in:
                 else:
-                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), ("%" + bookTitle + "%", "Avaliable"))
+                    cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Title LIKE ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), ("%" + bookTitle + "%", "Available"))
                 rows = cur.fetchall()
                    
                 # if there are book records found:
