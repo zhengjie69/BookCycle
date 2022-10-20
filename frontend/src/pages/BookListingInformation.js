@@ -31,7 +31,7 @@ function BookListingInformation() {
                             {location.state.Price > 0 ? "$" + location.state.Price : null}
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" && location.state.BookStatus === "Avaliable" ?
+                            {location.state.Route === "MyListings" && Authentication === "true" && location.state.BookStatus === "Available" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/ViewOffers', {
                                         state: {
@@ -54,7 +54,7 @@ function BookListingInformation() {
                             <p>{location.state.Condition}</p>
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && location.state.BookStatus === "Avaliable" ?
+                            {location.state.Route === "MyListings" && location.state.BookStatus === "Available" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/EditListings', {
                                         state: {
