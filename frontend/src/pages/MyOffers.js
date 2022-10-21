@@ -10,6 +10,7 @@ export default function MyOffers() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [userOffers, setuserOffers] = useState([]);
     const navigate = useNavigate();
+    const Authentication = localStorage.getItem('Authentication');
     var PendingList = [];
     var AcceptedList = [];
     var RejectedList = [];
@@ -17,18 +18,25 @@ export default function MyOffers() {
     const userEmail = localStorage.getItem('Email');
 
     useEffect(() => {
-        fetch('/apis/user/get_all_user_book_offers?Email=' + userEmail)
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setuserOffers(data);
-
-            },
-                (error) => {
+        if (userEmail !== null && Authentication === "true") {
+            fetch('/apis/user/get_all_user_book_offers?Email=' + userEmail)
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
+                    setuserOffers(data);
+
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+        }
+
+        else {
+            return navigate('/');
+        }
+
     }, [])
 
     if (Array.isArray(userOffers)) {

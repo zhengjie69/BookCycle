@@ -8,6 +8,7 @@ import { SearchBar } from "../components/SearchBar";
 export default function ViewOffers() {
     const location = useLocation();
     const navigate = useNavigate();
+    const Authentication = localStorage.getItem('Authentication');
 
     const userEmail = localStorage.getItem('Email');
 
@@ -18,18 +19,24 @@ export default function ViewOffers() {
     var ListOfAccepted = [];
 
     useEffect(() => {
-        fetch('/apis/user/get_book_offers?BookID=' + location.state.BookID + '&Email=' + userEmail)
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setBookOffers(data);
-
-            },
-                (error) => {
+        if (Authentication === 'true') {
+            fetch('/apis/user/get_book_offers?BookID=' + location.state.BookID + '&Email=' + userEmail)
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
+                    setBookOffers(data);
+
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+        }
+
+        else {
+            return navigate('/');
+        }
     }, [])
 
     if (Array.isArray(bookOffers)) {
@@ -37,18 +44,19 @@ export default function ViewOffers() {
         ListOfAccepted = bookOffers.filter(bookOffers => bookOffers.BookOfferStatus === "Accepted")
     }
 
-
     return (
         <Container>
-            <SearchBar />
-            <div className="d-flex align-items-center justify-content-center mb-4">
-                <img src={location.state.Image} className='img-fluid' alt={location.state.Title} />
-            </div>
-            <div className="d-flex align-items-center justify-content-center mb-4">
-                <Row>
-                    <h2>Offers for "{location.state.Title}"</h2>
-                </Row>
-            </div>
+            {bookOffers.length !== 0 ?
+                <>
+                    <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
+                        <Row>
+                            <h2>Offers for "{location.state.Title}"</h2>
+                        </Row>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center mb-4">
+                        <img src={location.state.Image} className='img-fluid' alt={location.state.Title} />
+                    </div>
+                </> : null}
             <Row>
                 <Col><h4>User</h4></Col>
                 <Col><h4>Offer Price</h4></Col>

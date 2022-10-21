@@ -15,8 +15,10 @@ function BookListingInformation() {
     console.log(location.state.BookStatus)
     return (
         <Container>
-            <SearchBar />
-            <div className="d-flex align-items-center justify-content-center mb-4">
+            {location.state.Route !== "MyListings" && Authentication === "true" ?
+                <SearchBar /> : null
+            }
+            <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
                 <img src={location.state.Image} className='img-fluid' alt={location.state.Title} />
             </div>
             <div className="row justify-content-center">

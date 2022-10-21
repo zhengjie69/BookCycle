@@ -1,14 +1,16 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Container, Form, Col, Row, Button } from "react-bootstrap"
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const EditProfile = () => {
 
+    const Authentication = localStorage.getItem('Authentication');
     const navigate = useNavigate();
+
     const userEmail = localStorage.getItem('Email');
     const location = useLocation();
-    const [Username, setUsername] = useState();
-    const [ContactNumber, setContactNumber] = useState();
+    const [Username, setUsername] = useState('');
+    const [ContactNumber, setContactNumber] = useState('');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -17,20 +19,35 @@ const EditProfile = () => {
 
     const EditProfileData = new FormData();
 
+    useEffect(() => {
+        if (Authentication === "true") {
+            setUsername(location.state.Username);
+            setContactNumber(location.state.ContactNumber);
+        }
+        else {
+            return navigate("/");
+        }
+    }, [Authentication]);
+
     const postUpdatedInformation = async (e) => {
+
+        console.log(ContactNumber);
+        console.log(Username);
 
         setErrorMessages([]);
 
         e.preventDefault();
 
         const UsernameLength = Username ? Username.length : 0;
+        const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
+
         EditProfileData.append('Email', userEmail);
 
         if (isNaN(ContactNumber)) {
             EditProfileData.append('ContactNumber', location.state.ContactNumber);
         }
         else {
-            if (!isNaN(+ContactNumber) && ContactNumber.length === 8) {
+            if (!isNaN(+ContactNumber) && ContactNumberLength === 8) {
                 EditProfileData.append('ContactNumber', ContactNumber);
             }
             else {
@@ -82,7 +99,7 @@ const EditProfile = () => {
                                     </span>
                                 </Form.Label>
                                 <Col xs={10}>
-                                    <Form.Control type="text" placeholder={location.state.Username} value={Username} onChange={e => setUsername(e.target.value)} />
+                                    <Form.Control type="text" placeholder={Username} value={Username} onChange={e => setUsername(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Row>
@@ -106,7 +123,7 @@ const EditProfile = () => {
                                     </span>
                                 </Form.Label>
                                 <Col xs={10}>
-                                    <Form.Control type="text" placeholder={location.state.ContactNumber} value={ContactNumber} onChange={e => setContactNumber(e.target.value)} />
+                                    <Form.Control type="text" placeholder={ContactNumber} value={ContactNumber} onChange={e => setContactNumber(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Row>

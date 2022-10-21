@@ -8,6 +8,7 @@ export default function EditListings() {
 
     const itemLocation = useLocation();
     const navigate = useNavigate();
+    const Authentication = localStorage.getItem('Authentication');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -16,14 +17,14 @@ export default function EditListings() {
     const [LocationDropdown, setLocationDropdown] = useState([]);
     const [ConditionDropdown, setConditionDropdown] = useState([]);
 
-    const [BookTitle, setBookTitle] = useState(itemLocation.state.Title);
-    const [Price, setPrice] = useState(itemLocation.state.Price);
-    const [Description, setDescription] = useState(itemLocation.state.Description);
-    const [Condition, setCondition] = useState(itemLocation.state.Condition);
+    const [BookTitle, setBookTitle] = useState();
+    const [Price, setPrice] = useState();
+    const [Description, setDescription] = useState();
+    const [Condition, setCondition] = useState();
 
-    const [Genre, setGenre] = useState(itemLocation.state.Genre);
+    const [Genre, setGenre] = useState();
     const userEmail = localStorage.getItem('Email');
-    const [Location, setLocation] = useState(itemLocation.state.Location);
+    const [Location, setLocation] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -33,49 +34,63 @@ export default function EditListings() {
     const EditListingFormData = new FormData();
 
     const uploadedImage = (e) => {
-
         console.log(e.target.files[0]);
         EditListingFormData.append('Image', e.target.files[0]);
         console.log(EditListingFormData);
     };
 
     useEffect(() => {
-        fetch('/apis/book/get_all_genres')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setGenreDropdown(data);
-            },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
+        if (Authentication === "true") {
+            setBookTitle(itemLocation.state.Title);
+            setPrice(itemLocation.state.Price);
+            setDescription(itemLocation.state.Description);
+            setCondition(itemLocation.state.Condition);
 
-        fetch('/apis/book/get_all_locations')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setLocationDropdown(data);
-            },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
+            setGenre(itemLocation.state.Genre);
+            setLocation(itemLocation.state.Location);
 
-        fetch('/apis/book/get_all_book_conditions')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setConditionDropdown(data);
-            },
-                (error) => {
+            fetch('/apis/book/get_all_genres')
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
-    }, [])
+                    setGenreDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+
+            fetch('/apis/book/get_all_locations')
+                .then(res => res.json())
+                .then(data => {
+                    setIsLoaded(true);
+                    setLocationDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+
+            fetch('/apis/book/get_all_book_conditions')
+                .then(res => res.json())
+                .then(data => {
+                    setIsLoaded(true);
+                    setConditionDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+        }
+
+        else {
+            return navigate('/');
+        }
+
+    }, [Authentication])
 
     const postEditListings = async (e) => {
 
@@ -99,6 +114,7 @@ export default function EditListings() {
         console.log(itemLocation.state.BookID);
         console.log(Location);
     }
+
     return (
         <Container>
             <div className="d-flex justify-content-center">

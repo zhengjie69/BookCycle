@@ -11,11 +11,12 @@ function MyProfile() {
     const [isLoaded, setIsLoaded] = useState(false);
     const userEmail = localStorage.getItem('Email');
     const [profileInformation, setProfileInformation] = useState([]);
+    const Authentication = localStorage.getItem('Authentication');
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userEmail !== null) {
+        if (userEmail !== null && Authentication === "true") {
             fetch('/apis/user/get_user_profile?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -27,6 +28,9 @@ function MyProfile() {
                         setError(error);
                     }
                 )
+        }
+        else {
+            return navigate('/');
         }
     }, [])
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Container } from "react-bootstrap"
 import Form from "react-bootstrap/Form"
 import Col from 'react-bootstrap/Col'
@@ -8,7 +8,14 @@ import { useNavigate } from "react-router-dom"
 
 const ChangePassword = () => {
 
+    const Authentication = localStorage.getItem('Authentication');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (Authentication !== "true") {
+            return navigate("/");
+        }
+    }, [Authentication]);
 
     const [CurrentPassword, setCurrentPassword] = useState();
     const [NewPassword, setNewPassword] = useState();
@@ -126,6 +133,7 @@ const ChangePassword = () => {
             </Container>
         </div>
     )
+
 };
 
 export default ChangePassword;

@@ -19,6 +19,7 @@ import { SearchResult } from './pages/SearchResult'
 import ViewOffers from './pages/ViewOffers'
 import MyOffers from './pages/MyOffers'
 import TransactionDetails from './pages/TransactionDetails'
+import ErrorPage from './pages/ErrorPage'
 
 //Homepage is App.js, Navbar is NavbarComp.js
 
@@ -35,16 +36,17 @@ root.render(
         <Route exact path='/Register' element={<Register />} />
         <Route exact path='/BookListingInformation' element={<BookListingInformation />} />
         <Route exact path='/SearchResult' element={<SearchResult />} />
-        {isAuthenticated ? <Route exact path='/MyOffers' element={<MyOffers />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyOffers/TransactionDetails' element={<TransactionDetails />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyListings' element={<MyListings />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyListings/NewListings' element={<NewListings />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyListings/EditListings' element={<EditListings />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyProfile' element={<MyProfile />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} /> : null}
-        {isAuthenticated ? <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} /> : null}
-        {isAuthenticated ? <Route exact path='/ForgetPassword' element={<ForgetPassword />} /> : null}
+        <Route exact path='/MyOffers' element={<MyOffers />} />
+        <Route exact path='/MyOffers/TransactionDetails' element={<TransactionDetails />} />
+        <Route exact path='/MyListings' element={<MyListings />} />
+        <Route exact path='/MyListings/NewListings' element={<NewListings />} />
+        <Route exact path='/MyListings/EditListings' element={<EditListings />} />
+        <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} />
+        <Route exact path='/MyProfile' element={<MyProfile />} />
+        <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} />
+        <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
+        <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
+        <Route path='*' element={<ErrorPage />} />
       </Routes>
     </Router>
   </React.StrictMode>

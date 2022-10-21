@@ -13,9 +13,11 @@ function MyListings() {
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
     const userEmail = localStorage.getItem('Email');
+    const Authentication = localStorage.getItem('Authentication');
+
 
     useEffect(() => {
-        if (userEmail !== null) {
+        if (userEmail !== null && Authentication === "true") {
             fetch('/apis/book/get_all_user_books?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -27,6 +29,9 @@ function MyListings() {
                         setError(error);
                     }
                 )
+        }
+        else {
+            return navigate('/');
         }
     }, [])
 

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export default function NewListings() {
 
     const navigate = useNavigate();
+    const Authentication = localStorage.getItem('Authentication');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -29,41 +30,47 @@ export default function NewListings() {
     const NewListingsFormData = new FormData();
 
     useEffect(() => {
-        fetch('/apis/book/get_all_genres')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setGenreDropdown(data);
-            },
-                (error) => {
+        if (Authentication === "true") {
+            fetch('/apis/book/get_all_genres')
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
+                    setGenreDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
 
-        fetch('/apis/book/get_all_locations')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setLocationDropdown(data);
-            },
-                (error) => {
+            fetch('/apis/book/get_all_locations')
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
+                    setLocationDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
 
-        fetch('/apis/book/get_all_book_conditions')
-            .then(res => res.json())
-            .then(data => {
-                setIsLoaded(true);
-                setBookConditionDropdown(data);
-            },
-                (error) => {
+            fetch('/apis/book/get_all_book_conditions')
+                .then(res => res.json())
+                .then(data => {
                     setIsLoaded(true);
-                    setError(error);
-                }
-            )
+                    setBookConditionDropdown(data);
+                },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
+                    }
+                )
+        }
+
+        else {
+            return navigate('/');
+        }
 
     }, [])
 
