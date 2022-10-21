@@ -57,7 +57,12 @@ def create_User():
         print("contactNumber: {}".format(contactNumber))
 
         result = userModel.create_user(username, email, password, contactNumber)
-        return(jsonify(authentication=True, Email=email), 201)
+        if "Error" in result:
+             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating user account", "create_user", result)
+        else:
+
+            role = sharedUserFunctionModel.get_role(email)
+            return(jsonify(authentication=True, Email=email, Role=role), 201)
 
 def login():
     if request.method == "POST":

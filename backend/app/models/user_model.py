@@ -44,8 +44,12 @@ class User:
                         
                         hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
                         con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID))
-                con.commit()
-                return("Successfully created user account")
+                        con.commit()
+                        return("Successfully created user account")
+                    else:
+                        return("Error password cannot be empty")
+                else:
+                    return("Error in Inserting User")
 
         except sqlite3.Error as er:
             con.rollback()
