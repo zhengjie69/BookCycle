@@ -171,10 +171,14 @@ def update_book_details():
         image = request.form.get("Image")
         locationID = request.form.get("LocationID")
 
-
+        if image is not None and image == "null":
+            image = None
         #return(jsonify(bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID)), 200)
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID))
 
+        if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None:
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID))
+        else:
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", "Error required values are empty")
 def delete_book():
     if request.method == "POST":
         bookID = request.form.get("BookID")

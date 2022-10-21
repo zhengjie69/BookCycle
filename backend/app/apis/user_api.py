@@ -63,8 +63,13 @@ def login():
     if request.method == "POST":
         email = request.form.get("Email")
         password = request.form.get("Password")
-        if(sharedUserFunctionModel.login(email, password) == True):            
-            return(jsonify(authentication=True, Email=email), 201)
+        if(sharedUserFunctionModel.login(email, password) == True): 
+
+            role = sharedUserFunctionModel.get_role(email)
+            if role is not None:          
+                return(jsonify(authentication=True, Email=email, Role= role), 201)
+            else:
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Error loggin failed")
         else:
             return(jsonify(message='Invalid Email or Password'), 401)
 

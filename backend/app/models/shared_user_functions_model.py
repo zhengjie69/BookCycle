@@ -94,6 +94,34 @@ class Shared_User_Functions:
     def reset_password():
         pass
 
+    def get_role(self,email):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+
+                # fetches all users from User table
+                cur.execute("SELECT b.RoleName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ?".format(self.tablename, self.roleTableName), (email,))
+                rows = cur.fetchall()
+                   
+                # gets the role if a role is found
+                if len(rows) == 1:
+                    return(rows[0][0])
+                else:
+                    return(None) 
+
+        except:
+            con.rollback()
+            return(None)
+      
+        finally:
+            con.close()
+            print(None)
 
     def get_user_profile(self, email):
         try:

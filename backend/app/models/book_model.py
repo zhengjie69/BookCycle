@@ -117,7 +117,7 @@ class Book:
                         cur = con.cursor()
 
                         # fetches the bookstatus id for the status Avaliable
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookStatusName = ?".format(self.bookstatustablename), ("Avaliable",))
+                        cur.execute("SELECT BookStatusID FROM {} WHERE BookStatusName = ?".format(self.bookstatustablename), ("Available",))
                         result = cur.fetchall()
                         bookStatusID = result[0][0]
 
