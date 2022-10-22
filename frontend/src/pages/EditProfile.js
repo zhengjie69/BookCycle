@@ -9,8 +9,8 @@ const EditProfile = () => {
 
     const userEmail = localStorage.getItem('Email');
     const location = useLocation();
-    const [Username, setUsername] = useState('');
-    const [ContactNumber, setContactNumber] = useState('');
+    const [Username, setUsername] = useState();
+    const [ContactNumber, setContactNumber] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -39,7 +39,7 @@ const EditProfile = () => {
         e.preventDefault();
 
         const UsernameLength = Username ? Username.length : 0;
-        const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
+        const ContactNumberLength = ContactNumber ? ContactNumber.toString().length : 0;
 
         EditProfileData.append('Email', userEmail);
 
