@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Col, Row, Container } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
-import AcceptOfferModal from "../components/AcceptOfferModal";
+import AcceptOfferModal from "../../components/AcceptOfferModal";
 
 export default function ViewOffers() {
     const location = useLocation();
