@@ -32,6 +32,7 @@ const EditProfile = () => {
     const postUpdatedInformation = async (e) => {
 
         console.log(ContactNumber);
+        console.log(ContactNumber.toString().length);
         console.log(Username);
 
         setErrorMessages([]);
@@ -43,16 +44,23 @@ const EditProfile = () => {
 
         EditProfileData.append('Email', userEmail);
 
-        if (isNaN(ContactNumber)) {
+        if (ContactNumberLength === 0) {
+            console.log("Entered nil as input");
             EditProfileData.append('ContactNumber', location.state.ContactNumber);
         }
-        else {
-            if (!isNaN(+ContactNumber) && ContactNumberLength === 8) {
+        else if (!isNaN(+ContactNumber)) {
+            if (ContactNumberLength === 8) {
+                console.log("Entered a valid number");
                 EditProfileData.append('ContactNumber', ContactNumber);
             }
             else {
-                errors.push("Please enter a valid phone number");
+                console.log("Entered a invalid number length");
+                errors.push("Please enter a valid phone number length");
             }
+        }
+        else {
+            console.log("Entered a invalid number");
+            errors.push("Please enter a valid phone number");
         }
 
         if (UsernameLength === 0) {
