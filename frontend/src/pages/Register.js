@@ -31,6 +31,7 @@ function Register() {
 
         RegisterFormData.append('Username', Username);
         const PasswordLength = Password ? Password.length : 0;
+        const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
 
         if (ValidateEmail(Email) === true) {
             RegisterFormData.append('Email', Email)
@@ -49,7 +50,7 @@ function Register() {
             errors.push("Please enter the same password and confirm password.");
         }
 
-        if (!isNaN(+ContactNumber) && ContactNumber.length === 8) {
+        if (!isNaN(+ContactNumber) && ContactNumberLength === 8) {
             RegisterFormData.append('ContactNumber', ContactNumber)
         }
         else {

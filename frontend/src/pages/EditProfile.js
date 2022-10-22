@@ -66,6 +66,9 @@ const EditProfile = () => {
         if (UsernameLength === 0) {
             EditProfileData.append('Username', location.state.Username);
         }
+        else if (Username.match(/\W/)) {
+            errors.push("Please do not enter special characters to your username");
+        }
         else {
             EditProfileData.append('Username', Username);
         }
