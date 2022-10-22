@@ -1,12 +1,21 @@
 import React from 'react';
-import { Row } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const ErrorPage = () => {
     return (
-        <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
-            <Row><h1>Error 404!</h1></Row>
-            <Row><h2>Page Not Found</h2></Row>
-        </div>
+        <Container>
+            <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
+                <Row xs="auto">
+                    <Col><h1>Error 404</h1></Col>
+                </Row>
+            </div>
+            <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
+                <Row xs="auto">
+                    <Col><h2>Page Not Found</h2></Col>
+                </Row>
+            </div>
+        </Container>
+
     );
 }
 
