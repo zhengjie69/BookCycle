@@ -9,13 +9,14 @@ import OfferBookModal from '../components/OfferBookModal'
 
 function BookListingInformation() {
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
     const location = useLocation();
     const navigate = useNavigate();
 
     console.log(location.state.BookStatus)
     return (
         <Container>
-            {location.state.Route !== "MyListings" && Authentication === "true" ?
+            {location.state.Route !== "MyListings" && Authentication === "true" && Role === "User" ?
                 <SearchBar /> : null
             }
             <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
@@ -33,7 +34,7 @@ function BookListingInformation() {
                             {location.state.Price > 0 ? "$" + location.state.Price : null}
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" && location.state.BookStatus === "Available" ?
+                            {location.state.Route === "MyListings" && Authentication === "true" && Role === "User" && location.state.BookStatus === "Available" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/ViewOffers', {
                                         state: {
@@ -43,7 +44,7 @@ function BookListingInformation() {
                                         }
                                     });
                                 }}>View Offers</Button> : <b>{location.state.BookStatus}</b>}
-                            {location.state.Route !== "MyListings" && Authentication === "true" ?
+                            {location.state.Route !== "MyListings" && Authentication === "true" && Role === "User" ?
                                 <OfferBookModal /> : null
                             }
                             {location.state.Route !== "MyListings" && Authentication === null ?
@@ -56,7 +57,7 @@ function BookListingInformation() {
                             <p>{location.state.Condition}</p>
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && location.state.BookStatus === "Available" ?
+                            {location.state.Route === "MyListings" && location.state.BookStatus === "Available" && Authentication === "true" && Role === "User" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/EditListings', {
                                         state: {
@@ -97,7 +98,7 @@ function BookListingInformation() {
                     </Row>
                     <Row>
                         <Col md={{ span: 3, offset: 5 }} xs={10} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" ? <DeleteBookModal /> : null}
+                            {location.state.Route === "MyListings" && Authentication === "true" && Role === "User" ? <DeleteBookModal /> : null}
                         </Col>
                     </Row>
                 </table>

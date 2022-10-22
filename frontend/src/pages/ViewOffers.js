@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Col, Row, Container } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import AcceptOfferModal from "../components/AcceptOfferModal";
-import { SearchBar } from "../components/SearchBar";
-
 
 export default function ViewOffers() {
     const location = useLocation();
     const navigate = useNavigate();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
     const userEmail = localStorage.getItem('Email');
 
@@ -19,7 +18,7 @@ export default function ViewOffers() {
     var ListOfAccepted = [];
 
     useEffect(() => {
-        if (Authentication === 'true') {
+        if (Authentication === 'true' && Role === "User") {
             fetch('/apis/user/get_book_offers?BookID=' + location.state.BookID + '&Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {

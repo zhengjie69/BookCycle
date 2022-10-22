@@ -9,6 +9,7 @@ export default function EditListings() {
     const itemLocation = useLocation();
     const navigate = useNavigate();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -40,7 +41,7 @@ export default function EditListings() {
     };
 
     useEffect(() => {
-        if (Authentication === "true") {
+        if (Authentication === "true" && Role === "User") {
             setBookTitle(itemLocation.state.Title);
             setPrice(itemLocation.state.Price);
             setDescription(itemLocation.state.Description);

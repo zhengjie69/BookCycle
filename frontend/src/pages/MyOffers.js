@@ -11,6 +11,8 @@ export default function MyOffers() {
     const [userOffers, setuserOffers] = useState([]);
     const navigate = useNavigate();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
+
     var PendingList = [];
     var AcceptedList = [];
     var RejectedList = [];
@@ -18,7 +20,7 @@ export default function MyOffers() {
     const userEmail = localStorage.getItem('Email');
 
     useEffect(() => {
-        if (userEmail !== null && Authentication === "true") {
+        if (userEmail !== null && Authentication === "true" && Role === "User") {
             fetch('/apis/user/get_all_user_book_offers?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {

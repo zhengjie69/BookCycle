@@ -41,6 +41,7 @@ const Login = () => {
         if (res.status === 201) {
             localStorage.setItem('Authentication', data.authentication);
             localStorage.setItem('Email', data.Email);
+            localStorage.setItem('Role', data.Role);
             handleClose();
             navigate('/');
             window.location.reload(false);

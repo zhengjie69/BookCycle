@@ -6,6 +6,7 @@ export default function NewListings() {
 
     const navigate = useNavigate();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -30,7 +31,7 @@ export default function NewListings() {
     const NewListingsFormData = new FormData();
 
     useEffect(() => {
-        if (Authentication === "true") {
+        if (Authentication === "true" && Role === "User") {
             fetch('/apis/book/get_all_genres')
                 .then(res => res.json())
                 .then(data => {

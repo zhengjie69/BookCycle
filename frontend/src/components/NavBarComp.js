@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 const NavBarComp = () => {
     const navigate = useNavigate();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
     function LogOut() {
         localStorage.removeItem('Authentication');
@@ -25,12 +26,12 @@ const NavBarComp = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-auto">
-                        {Authentication === "true" ?
+                        {Authentication === "true" && Role === "User" ?
                             <LinkContainer to="/MyOffers">
                                 <Nav.Link>My Offers</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" ?
+                        {Authentication === "true" && Role === "User" ?
                             <LinkContainer to="/MyListings">
                                 <Nav.Link>My Listings</Nav.Link>
                             </LinkContainer> : null

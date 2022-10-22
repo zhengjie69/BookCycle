@@ -6,6 +6,7 @@ function TransactionDetails() {
 
     const location = useLocation();
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
     const navigate = useNavigate();
 
     const [error, setError] = useState(null);
@@ -14,7 +15,7 @@ function TransactionDetails() {
     const [Transaction, setTransaction] = useState([]);
 
     useEffect(() => {
-        if (Authentication === "true") {
+        if (Authentication === "true" && Role === "User") {
             fetch('/apis/user/get_transaction_details?TransactionID=' + location.state.TransactionID)
                 .then(res => res.json())
                 .then(data => {

@@ -14,10 +14,11 @@ function MyListings() {
     const navigate = useNavigate();
     const userEmail = localStorage.getItem('Email');
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
 
     useEffect(() => {
-        if (userEmail !== null && Authentication === "true") {
+        if (userEmail !== null && Authentication === "true" && Role === "User") {
             fetch('/apis/book/get_all_user_books?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
