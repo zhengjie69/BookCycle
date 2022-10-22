@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import { useNavigate } from "react-router-dom"
+import SessionTimeoutModal from "../../components/SessionTimeoutModal"
 
 const ChangePassword = () => {
 
@@ -91,6 +92,9 @@ const ChangePassword = () => {
     return (
         <div className="mt-4">
             <Container>
+                {Authentication === "true" ?
+                    <SessionTimeoutModal /> : null
+                }
                 <div className="d-flex justify-content-center">
                     <h1>Change Password</h1>
                 </div>

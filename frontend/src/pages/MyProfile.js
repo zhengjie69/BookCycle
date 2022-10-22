@@ -4,6 +4,7 @@ import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
+import SessionTimeoutModal from '../components/SessionTimeoutModal'
 
 function MyProfile() {
 
@@ -12,6 +13,7 @@ function MyProfile() {
     const userEmail = localStorage.getItem('Email');
     const [profileInformation, setProfileInformation] = useState([]);
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
 
     const navigate = useNavigate();
 
@@ -37,6 +39,9 @@ function MyProfile() {
     return (
         <div className="mt-4">
             <Container>
+                {Authentication === "true" ?
+                    <SessionTimeoutModal /> : null
+                }
                 <div className="d-flex justify-content-center">
                     <div className="row">
                         {Array.isArray(profileInformation) ?
@@ -73,18 +78,19 @@ function MyProfile() {
                                     </Table>
                                     <Table borderless>
                                         <tbody>
-                                            <tr className="d-flex justify-content-center">
-                                                <td>
-                                                    <Button onClick={() => {
-                                                        navigate('/MyProfile/EditProfile', {
-                                                            state: {
-                                                                Username: profileInformation.Username,
-                                                                ContactNumber: profileInformation.ContactNumber,
-                                                            }
-                                                        });
-                                                    }}>Edit Profile</Button>
-                                                </td>
-                                            </tr>
+                                            {Role === "User" ?
+                                                <tr className="d-flex justify-content-center">
+                                                    <td>
+                                                        <Button onClick={() => {
+                                                            navigate('/MyProfile/EditProfile', {
+                                                                state: {
+                                                                    Username: profileInformation.Username,
+                                                                    ContactNumber: profileInformation.ContactNumber,
+                                                                }
+                                                            });
+                                                        }}>Edit Profile</Button>
+                                                    </td>
+                                                </tr> : null}
                                             <tr className="d-flex justify-content-center">
                                                 <td>
                                                     <LinkContainer to="/MyProfile/ChangePassword">

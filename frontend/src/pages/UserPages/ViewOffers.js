@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Row, Container } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import AcceptOfferModal from "../../components/AcceptOfferModal";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
 export default function ViewOffers() {
     const location = useLocation();
@@ -45,6 +46,9 @@ export default function ViewOffers() {
 
     return (
         <Container>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             {bookOffers.length !== 0 ?
                 <>
                     <div className="d-flex align-items-center justify-content-center mb-4 mt-4">

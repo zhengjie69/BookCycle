@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, FloatingLabel, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Form } from "react-bootstrap";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
 
 export default function EditListings() {
@@ -118,6 +119,9 @@ export default function EditListings() {
 
     return (
         <Container>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             <div className="d-flex justify-content-center">
                 <h1>Edit Listing</h1>
             </div>

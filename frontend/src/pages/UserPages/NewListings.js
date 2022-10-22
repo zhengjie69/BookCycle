@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Form, Button, FloatingLabel, InputGroup } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
+import SessionTimeoutModal from '../../components/SessionTimeoutModal';
 
 export default function NewListings() {
 
@@ -125,6 +126,9 @@ export default function NewListings() {
     return (
         <div className="mt-4">
             <Container>
+                {Authentication === "true" ?
+                    <SessionTimeoutModal /> : null
+                }
                 <div className="d-flex justify-content-center">
                     <h1>New Listings</h1>
                 </div>

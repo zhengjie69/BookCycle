@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react"
 import { Container, Form, Col, Row, Button } from "react-bootstrap"
 import { useLocation, useNavigate } from 'react-router-dom'
+import SessionTimeoutModal from "../components/SessionTimeoutModal";
 
 const EditProfile = () => {
 
     const Authentication = localStorage.getItem('Authentication');
+    const Role = localStorage.getItem('Role');
     const navigate = useNavigate();
 
     const userEmail = localStorage.getItem('Email');
@@ -20,7 +22,7 @@ const EditProfile = () => {
     const EditProfileData = new FormData();
 
     useEffect(() => {
-        if (Authentication === "true") {
+        if (Authentication === "true" && Role === "User") {
             setUsername(location.state.Username);
             setContactNumber(location.state.ContactNumber);
         }
@@ -97,6 +99,9 @@ const EditProfile = () => {
     return (
         <div className='mt-4'>
             <Container>
+                {Authentication === "true" ?
+                    <SessionTimeoutModal /> : null
+                }
                 <div className="d-flex justify-content-center mb-2">
                     <h1>Edit Profile</h1>
                 </div>

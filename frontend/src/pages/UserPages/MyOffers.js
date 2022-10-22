@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import EditOfferModal from "../../components/EditOfferModal";
 import DeleteOfferModal from "../../components/DeleteOfferModal";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
 export default function MyOffers() {
 
@@ -49,6 +50,9 @@ export default function MyOffers() {
 
     return (
         <Container>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             <div className="d-flex align-items-center justify-content-center mb-4">
                 <Row>
                     <h1>My Offers</h1>

@@ -6,6 +6,7 @@ import { LoginAlert } from '../components/LoginAlert'
 import { SearchBar } from '../components/SearchBar'
 import DeleteBookModal from '../components/DeleteBookModal'
 import OfferBookModal from '../components/OfferBookModal'
+import SessionTimeoutModal from '../components/SessionTimeoutModal'
 
 function BookListingInformation() {
     const Authentication = localStorage.getItem('Authentication');
@@ -16,6 +17,9 @@ function BookListingInformation() {
     console.log(location.state.BookStatus)
     return (
         <Container>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             {location.state.Route !== "MyListings" && Authentication === "true" && Role === "User" ?
                 <SearchBar /> : null
             }

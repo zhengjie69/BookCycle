@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap';
 import { Row, Button, Card } from 'react-bootstrap';
 import { SearchBar } from './components/SearchBar';
 import { renderMatches, useNavigate } from 'react-router-dom';
+import SessionTimeoutModal from './components/SessionTimeoutModal';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
   const [items, setItems] = useState([]);
   const navigate = useNavigate();
   const userEmail = localStorage.getItem('Email');
+  const Authentication = localStorage.getItem('Authentication');
 
   useEffect(() => {
     fetch('/apis/book/search_book?Email=' + userEmail)
@@ -31,6 +33,10 @@ function App() {
   function bookByCategories(BookGenre) {
     return (
       <>
+        {Authentication === "true" ?
+          <SessionTimeoutModal /> : null
+        }
+
         <div className="col d-flex justify-content-start mb-2">
           <Row><h3><b>{BookGenre}</b></h3></Row>
         </div>

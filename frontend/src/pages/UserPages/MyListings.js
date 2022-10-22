@@ -5,6 +5,7 @@ import Card from 'react-bootstrap/Card'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
+import SessionTimeoutModal from '../../components/SessionTimeoutModal';
 
 function MyListings() {
 
@@ -38,6 +39,9 @@ function MyListings() {
 
     return (
         <div className='mt-4 d-flex justify-content-center'>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             <Container>
                 <div className="d-flex justify-content-center">
                     <LinkContainer to="/MyListings/NewListings">

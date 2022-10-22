@@ -13,6 +13,7 @@ const NavBarComp = () => {
     function LogOut() {
         localStorage.removeItem('Authentication');
         localStorage.removeItem('Email');
+        localStorage.removeItem('Role');
         navigate('/')
         window.location.reload(false);
     }

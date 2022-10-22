@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
 function TransactionDetails() {
 
@@ -35,6 +36,9 @@ function TransactionDetails() {
 
     return (
         <Container>
+            {Authentication === "true" ?
+                <SessionTimeoutModal /> : null
+            }
             <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
                 <h1>Transaction Details</h1>
             </div>
