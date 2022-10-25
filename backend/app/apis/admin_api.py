@@ -31,9 +31,9 @@ def return_result(ipAddress, actionDescription, functionCalled, result):
         return(jsonify(result), 201)
 
 def search_user():
-    if request.method == "POST":
-        adminEmail = request.form.get("AdminEmail")
-        userEmail = request.form.get("UserEmail")
+    if request.method == "GET":
+        adminEmail = request.args.get("AdminEmail")
+        userEmail = request.args.get("UserEmail")
 
         # checks if the email calling the api is a Admin email, if it is, call the required functions
         if adminModel.validate_admin(adminEmail):

@@ -81,8 +81,8 @@ class Admin:
 
                 cur = con.cursor()
 
-                # fetches all users role account from User table, query is exact, not LIKE
-                cur.execute("SELECT a.Username, a.Email, a.ContactNumber, b.AccountStatusName FROM {} AS a INNER JOIN {} AS b ON a.AccountStatusID = b.AccountStatusID WHERE b.AccountStatusName = ? AND a.Email = ?".format(self.userTablename, self.accountStatusTableName),("User", userEmail))
+                # fetches the matching user role account from User table, query is exact, not LIKE
+                cur.execute("SELECT a.Username, a.Email, a.ContactNumber, C.AccountStatusName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID INNER JOIN {} AS c ON a.AccountStatusID = c.AccountStatusID WHERE b.RoleName = ? AND a.Email = ?".format(self.userTablename, self.roleTableName, self.accountStatusTableName),("User", userEmail))
                 rows = cur.fetchall()
                    
                 # if the user is found:

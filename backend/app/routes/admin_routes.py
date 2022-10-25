@@ -4,7 +4,7 @@ from ..apis.admin_api import *
 admin = Blueprint('admin', __name__)
 
 # 'http://localhost:5000/apis/admin/search_user'
-admin.route('/search_user', methods=['POST'])(search_user)
+admin.route('/search_user', methods=['GET'])(search_user)
 
 # 'http://localhost:5000/apis/admin/delete_user_book'
 admin.route('/delete_user_book', methods=['POST'])(delete_user_book)
