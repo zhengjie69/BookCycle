@@ -40,7 +40,9 @@ function SessionTimeoutModal() {
      * This function will extend current user session.
      */
     const extendSession = () => {
-        setIdleModal(false)
+        clearTimeout(idleEvent);
+        clearTimeout(idleLogoutEvent);
+        setIdleModal(false);
     }
 
 

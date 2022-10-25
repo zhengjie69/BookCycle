@@ -20,6 +20,8 @@ import ViewOffers from './pages/UserPages/ViewOffers'
 import MyOffers from './pages/UserPages/MyOffers'
 import TransactionDetails from './pages/UserPages/TransactionDetails'
 import ErrorPage from './pages/ErrorPage'
+import ManageUsers from './pages/AdminPages/ManageUsers'
+import UsersResult from './pages/AdminPages/UsersResult'
 
 //Homepage is App.js, Navbar is NavbarComp.js
 
@@ -36,17 +38,27 @@ root.render(
         <Route exact path='/Register' element={<Register />} />
         <Route exact path='/BookListingInformation' element={<BookListingInformation />} />
         <Route exact path='/SearchResult' element={<SearchResult />} />
+        <Route path='*' element={<ErrorPage />} />
+
+        {/* Common Routes */}
+        <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
+        <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
+        <Route exact path='/MyProfile' element={<MyProfile />} />
+
+        {/* User Routes */}
         <Route exact path='/MyOffers' element={<MyOffers />} />
         <Route exact path='/MyOffers/TransactionDetails' element={<TransactionDetails />} />
         <Route exact path='/MyListings' element={<MyListings />} />
         <Route exact path='/MyListings/NewListings' element={<NewListings />} />
         <Route exact path='/MyListings/EditListings' element={<EditListings />} />
         <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} />
-        <Route exact path='/MyProfile' element={<MyProfile />} />
         <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} />
-        <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
-        <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
-        <Route path='*' element={<ErrorPage />} />
+
+
+        {/* Admin Routes */}
+        <Route exact path='/ManageUsers' element={<ManageUsers />} />
+        <Route exact path='/ManageUsers/UsersResult' element={<UsersResult />} />
+
       </Routes>
     </Router>
   </React.StrictMode>

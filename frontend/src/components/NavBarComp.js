@@ -37,6 +37,16 @@ const NavBarComp = () => {
                                 <Nav.Link>My Listings</Nav.Link>
                             </LinkContainer> : null
                         }
+                        {Authentication === "true" && Role === "Admin" ?
+                            <LinkContainer to="/ManageBooks">
+                                <Nav.Link>Manage Book</Nav.Link>
+                            </LinkContainer> : null
+                        }
+                        {Authentication === "true" && Role === "Admin" ?
+                            <LinkContainer to="/ManageUsers">
+                                <Nav.Link>Manage Users</Nav.Link>
+                            </LinkContainer> : null
+                        }
                         {Authentication === "true" ?
                             <LinkContainer to="/MyProfile">
                                 <Nav.Link>My Profile</Nav.Link>

@@ -33,10 +33,6 @@ function App() {
   function bookByCategories(BookGenre) {
     return (
       <>
-        {Authentication === "true" ?
-          <SessionTimeoutModal /> : null
-        }
-
         <div className="col d-flex justify-content-start mb-2">
           <Row><h3><b>{BookGenre}</b></h3></Row>
         </div>
@@ -83,6 +79,9 @@ function App() {
       <header className="App-header">
         <Container>
           <SearchBar />
+          {Authentication === "true" ?
+            <SessionTimeoutModal /> : null
+          }
           {bookByCategories("Fiction")}
           {bookByCategories("Non-Fiction")}
           {bookByCategories("Mystery")}
