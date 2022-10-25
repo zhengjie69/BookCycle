@@ -56,7 +56,7 @@ function TransactionDetails() {
                         <Col xs={4}><b>Phone Number:</b></Col>
                         <Col xs={8}>{Transaction.OwnerPhoneNumber}</Col>
                     </Row>
-                </div> : <p>404 Error</p>
+                </div>
             </div>
         </Container >
     );
