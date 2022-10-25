@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Container, Form, Col, Row, Button } from "react-bootstrap"
 import { useLocation, useNavigate } from 'react-router-dom'
-import SessionTimeoutModal from "../components/SessionTimeoutModal";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
 const EditProfile = () => {
 

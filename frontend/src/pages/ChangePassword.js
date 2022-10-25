@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import { useNavigate } from "react-router-dom"
-import SessionTimeoutModal from "../../components/SessionTimeoutModal"
+import SessionTimeoutModal from "../components/SessionTimeoutModal"
 
 const ChangePassword = () => {
 
