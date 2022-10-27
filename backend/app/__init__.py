@@ -2,6 +2,7 @@ from flask import Flask
 from .routes.user_routes import user
 from .routes.book_routes import book
 from .routes.admin_routes import admin
+from .routes.super_admin_routes import superadmin
 import sqlite3
 import os, traceback
 import bcrypt
@@ -251,6 +252,7 @@ def create_app(test_config=None):
     app.register_blueprint(user, url_prefix='/apis/user/')
     app.register_blueprint(book, url_prefix='/apis/book/')
     app.register_blueprint(admin, url_prefix='/apis/admin/')
+    app.register_blueprint(superadmin, url_prefix='/apis/superadmin/')
 
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
