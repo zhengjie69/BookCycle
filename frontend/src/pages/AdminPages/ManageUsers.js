@@ -88,11 +88,11 @@ export default function ManageUsers() {
                 {Authentication === "true" ?
                     <SessionTimeoutModal /> : null
                 }
-                <Row>
-                    <Col></Col>
-                    <Col xs lg="3" className="justify-content-center"><h1>Manage Users</h1></Col>
-                    <Col></Col>
-                </Row>
+                <div className="d-flex align-items-center justify-content-center mb-4">
+                    <Row>
+                        <h1>Manage Users</h1>
+                    </Row>
+                </div>
                 <div className="row h-100 justify-content-center align-items-center">
                     <Form className="mt-4 me-3" onSubmit={postUserSearch}>
                         <Row>

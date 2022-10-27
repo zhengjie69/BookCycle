@@ -66,14 +66,15 @@ function MyProfile() {
                                                 </td>
                                                 <td>{userEmail}</td>
                                             </tr>
-                                            <tr>
-                                                <td className="d-flex justify-content-center">
-                                                    <span className="material-symbols-outlined">
-                                                        chat
-                                                    </span>
-                                                </td>
-                                                <td>{profileInformation.ContactNumber}</td>
-                                            </tr>
+                                            {Role === "User" ?
+                                                <tr>
+                                                    <td className="d-flex justify-content-center">
+                                                        <span className="material-symbols-outlined">
+                                                            chat
+                                                        </span>
+                                                    </td>
+                                                    <td>{profileInformation.ContactNumber}</td>
+                                                </tr> : null}
                                         </tbody>
                                     </Table>
                                     <Table borderless>

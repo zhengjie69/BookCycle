@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Container, Form, Col, Row, Button } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
-export default function ManageBooks() {
+export default function ManageAdmin() {
 
     const Role = localStorage.getItem('Role');
     const Authentication = localStorage.getItem('Authentication');
-    const AdminEmail = localStorage.getItem('Email');
+    const SuperAdminEmail = localStorage.getItem('Email');
     const navigate = useNavigate();
 
-    const [UserEmail, setUserEmail] = useState();
+    const [AdminEmail, setAdminEmail] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
-    const UserResultData = new FormData();
+    const AdminResultData = new FormData();
 
     let errors = [];
 
@@ -24,37 +25,37 @@ export default function ManageBooks() {
     }
 
     useEffect(() => {
-        if (Authentication !== "true" || Role !== "Admin") {
+        if (Authentication !== "true" || Role !== "SuperAdmin") {
             return navigate('/');
         }
     }, [])
 
 
-    const postUserSearch = async (e) => {
+    const postAdminSearch = async (e) => {
 
         e.preventDefault();
 
         setErrorMessages([]);
 
-        const UserEmailLength = UserEmail ? UserEmail.length : 0;
+        const AdminEmailLength = AdminEmail ? AdminEmail.length : 0;
 
-        if (UserEmailLength !== 0 && isValidEmail(UserEmail)) {
-            UserResultData.append('UserEmail', UserEmail);
-            UserResultData.append('AdminEmail', AdminEmail);
+        if (AdminEmailLength !== 0 && isValidEmail(AdminEmail)) {
+            AdminResultData.append('AdminEmail', AdminEmail);
+            AdminResultData.append('SuperAdminEmail', SuperAdminEmail);
 
-            const res = await fetch('/apis/admin/search_user', {
+            const res = await fetch('/apis/superadmin/search_admin', {
                 method: "POST",
-                body: UserResultData
+                body: AdminResultData
             });
 
             const data = await res.json();
 
-            console.log(data[0].ContactNumber);
-
             if (data[0].ContactNumber !== undefined && data[0].AccountStatus !== undefined && data[0].Username !== undefined) {
-                navigate('/ManageBooks/ManageBooksResult', {
+                navigate('/ManageAdmin/ManageAdminResult', {
                     state: {
-                        UserEmail: UserEmail,
+                        AdminEmail: AdminEmail,
+                        Username: data[0].Username,
+                        AccountStatus: data[0].AccountStatus,
                         Username: data[0].Username
                     }
                 });
@@ -74,12 +75,6 @@ export default function ManageBooks() {
         }
     }
 
-    useEffect(() => {
-        if (Authentication !== "true" && Role !== "Admin") {
-            navigate('/');
-        }
-    }, [])
-
     return (
         <div className="mt-5 pt-5">
             <Container>
@@ -88,15 +83,15 @@ export default function ManageBooks() {
                 }
                 <div className="d-flex align-items-center justify-content-center mb-4">
                     <Row>
-                        <h1>Manage Books</h1>
+                        <h1>Manage Administrators</h1>
                     </Row>
                 </div>
                 <div className="row h-100 justify-content-center align-items-center">
-                    <Form className="mt-4 me-3" onSubmit={postUserSearch}>
+                    <Form className="mt-4 me-3" onSubmit={postAdminSearch}>
                         <Row>
                             <Form.Group as={Row} className="mb-3">
                                 <Col xs={11}>
-                                    <Form.Control type="text" placeholder="Search For User (Using Email)" value={UserEmail} onChange={e => setUserEmail(e.target.value)} />
+                                    <Form.Control type="text" placeholder="Search For Administrator (Using Email)" value={AdminEmail} onChange={e => setAdminEmail(e.target.value)} />
                                 </Col>
                                 <Col xs={1}>
                                     <Button variant="primary" type="submit">
@@ -113,6 +108,11 @@ export default function ManageBooks() {
                             }) : null}
                         </Row>
                     </Form>
+                </div>
+                <div className="d-flex align-items-center justify-content-center mt-4">
+                    <LinkContainer to="/CreateAdmin">
+                        <Button>Create Administrator</Button>
+                    </LinkContainer>
                 </div>
             </Container>
         </div>
