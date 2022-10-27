@@ -23,7 +23,7 @@ export function SearchResult() {
     const [MaxPrice, setMaxPrice] = useState("null");
     const userEmail = localStorage.getItem('Email');
 
-    const Authentication = location.getItem('Authentication');
+    const Authentication = localStorage.getItem('Authentication');
 
     useEffect(() => {
         console.log(location.state.SearchKey)
