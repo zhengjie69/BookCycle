@@ -5,7 +5,7 @@ import DisableUserModal from "../../components/DisableUserModal";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import EnableUserModal from "../../components/EnableUserModal";
 
-export default function UsersResult() {
+export default function ManageUsersResult() {
     const location = useLocation();
     const navigate = useNavigate();
 

@@ -7,6 +7,7 @@ import { SearchBar } from '../components/SearchBar'
 import DeleteBookModal from '../components/DeleteBookModal'
 import OfferBookModal from '../components/OfferBookModal'
 import SessionTimeoutModal from '../components/SessionTimeoutModal'
+import AdminDeleteBookModal from '../components/AdminDeleteBookModal'
 
 function BookListingInformation() {
     const Authentication = localStorage.getItem('Authentication');
@@ -103,6 +104,9 @@ function BookListingInformation() {
                     <Row>
                         <Col md={{ span: 3, offset: 5 }} xs={10} className="mb-2 mt-2">
                             {location.state.Route === "MyListings" && Authentication === "true" && Role === "User" ? <DeleteBookModal /> : null}
+                        </Col>
+                        <Col md={{ span: 3, offset: 5 }} xs={10} className="mb-2 mt-2">
+                            {location.state.Route === "ManageBooksResult" && Authentication === "true" && Role === "Admin" ? <AdminDeleteBookModal /> : null}
                         </Col>
                     </Row>
                 </table>

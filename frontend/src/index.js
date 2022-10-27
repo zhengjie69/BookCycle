@@ -21,8 +21,9 @@ import MyOffers from './pages/UserPages/MyOffers'
 import TransactionDetails from './pages/UserPages/TransactionDetails'
 import ErrorPage from './pages/ErrorPage'
 import ManageUsers from './pages/AdminPages/ManageUsers'
-import UsersResult from './pages/AdminPages/UsersResult'
-
+import ManageUsersResult from './pages/AdminPages/ManageUsersResult'
+import ManageBooks from './pages/AdminPages/ManageBooks'
+import ManageBooksResult from './pages/AdminPages/ManageBooksResult'
 //Homepage is App.js, Navbar is NavbarComp.js
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -57,7 +58,9 @@ root.render(
 
         {/* Admin Routes */}
         <Route exact path='/ManageUsers' element={<ManageUsers />} />
-        <Route exact path='/ManageUsers/UsersResult' element={<UsersResult />} />
+        <Route exact path='/ManageUsers/ManageUsersResult' element={<ManageUsersResult />} />
+        <Route exact path='/ManageBooks' element={<ManageBooks />} />
+        <Route exact path='/ManageBooks/ManageBooksResult' element={<ManageBooksResult />} />
 
       </Routes>
     </Router>

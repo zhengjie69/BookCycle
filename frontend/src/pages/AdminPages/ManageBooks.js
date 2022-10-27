@@ -3,7 +3,7 @@ import { Container, Form, Col, Row, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 
-export default function ManageUsers() {
+export default function ManageBooks() {
 
     const Role = localStorage.getItem('Role');
     const Authentication = localStorage.getItem('Authentication');
@@ -52,11 +52,9 @@ export default function ManageUsers() {
             console.log(data[0].ContactNumber);
 
             if (data[0].ContactNumber !== undefined && data[0].AccountStatus !== undefined && data[0].Username !== undefined) {
-                navigate('/ManageUsers/ManageUsersResult', {
+                navigate('/ManageBooks/ManageBooksResult', {
                     state: {
                         UserEmail: UserEmail,
-                        ContactNumber: data[0].ContactNumber,
-                        AccountStatus: data[0].AccountStatus,
                         Username: data[0].Username
                     }
                 });
@@ -90,7 +88,7 @@ export default function ManageUsers() {
                 }
                 <Row>
                     <Col></Col>
-                    <Col xs lg="3" className="justify-content-center"><h1>Manage Users</h1></Col>
+                    <Col xs lg="3" className="justify-content-center"><h1>Manage Books</h1></Col>
                     <Col></Col>
                 </Row>
                 <div className="row h-100 justify-content-center align-items-center">
