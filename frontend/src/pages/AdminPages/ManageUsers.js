@@ -23,6 +23,13 @@ export default function ManageUsers() {
         return /\S+@\S+\.\S+/.test(email);
     }
 
+    useEffect(() => {
+        if (Authentication === "true" && Role !== "Admin") {
+            return navigate('/');
+        }
+    }, [])
+
+
     const postUserSearch = async (e) => {
 
         e.preventDefault();
