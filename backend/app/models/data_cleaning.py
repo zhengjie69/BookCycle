@@ -6,7 +6,13 @@ def data_cleaning(userTextInput):
     cleanString = re.sub(r'[^\w]', ' ', userTextInput)
     return cleanString
 
-
+def isstring(userTextInput):
+    try:
+        float(userTextInput)
+        return True
+    except ValueError:
+        return False
+        
 def isemail(email):
 
     # Make a regular expression
