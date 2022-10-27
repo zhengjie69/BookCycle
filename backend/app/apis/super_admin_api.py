@@ -51,6 +51,19 @@ def create_admin_account():
         else:
             return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating admin account", "create_admin_account", "Error User does not have permission"))
 
+def search_admin():
+    if request.method == "POST":
+        adminEmail = request.form.get("AdminEmail")
+        superAdminEmail = request.form.get("SuperAdminEmail")
+
+        # checks if the email calling the api is a Admin email, if it is, call the required functions
+        if superadminModel.validate_super_admin(superAdminEmail):
+            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "SuperAdmin searching admin", "search_admin", superadminModel.search_admin(adminEmail)))
+        else:
+            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "SuperAdmin searching admin", "search_admin", "Error User does not have permission"))
+
+
+
 def delete_admin_account():
         if request.method == "POST":
         

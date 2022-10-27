@@ -76,6 +76,38 @@ class SuperAdmin:
             con.close()
             print("Successfully closed connection")
 
+    def search_admin(self, adminEmail):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+
+                # fetches the matching admin role account from User table, query is exact, not LIKE
+                cur.execute("SELECT a.Username, a.Email, a.ContactNumber, C.AccountStatusName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID INNER JOIN {} AS c ON a.AccountStatusID = c.AccountStatusID WHERE b.RoleName = ? AND a.Email = ?".format(self.userTablename, self.roleTableName, self.accountStatusTableName),("Admin", adminEmail))
+                rows = cur.fetchall()
+                   
+                # if the user is found:
+                if len(rows) == 1:
+                    
+                    dataList = []
+                    tempdict = {'Username': rows[0][0], 'Email': rows[0][1], 'ContactNumber': rows[0][2], 'AccountStatus': rows[0][3]}
+                    dataList.append(tempdict)
+                    return(dataList)
+                else:
+                    return("Error no matching account found") 
+
+        except:
+            con.rollback()
+            return("Error in searching account")
+      
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
     def delete_admin_account(self, adminEmail):
         try:
