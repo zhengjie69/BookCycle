@@ -4,6 +4,7 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import EditOfferModal from "../../components/EditOfferModal";
 import DeleteOfferModal from "../../components/DeleteOfferModal";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function MyOffers() {
 
@@ -11,17 +12,17 @@ export default function MyOffers() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [userOffers, setuserOffers] = useState([]);
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
     var PendingList = [];
     var AcceptedList = [];
     var RejectedList = [];
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     useEffect(() => {
-        if (userEmail !== null && Authentication === "true" && Role === "User") {
+        if (userEmail !== null && Authentication && Role === "User") {
             fetch('/apis/user/get_all_user_book_offers?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -50,7 +51,7 @@ export default function MyOffers() {
 
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <div className="d-flex align-items-center justify-content-center mb-4">

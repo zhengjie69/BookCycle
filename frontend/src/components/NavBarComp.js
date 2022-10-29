@@ -4,16 +4,18 @@ import { Nav, Navbar, Button } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import Login from './Login'
 import { useNavigate } from 'react-router-dom'
+import secureLocalStorage from "react-secure-storage";
 
 const NavBarComp = () => {
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
+    const Email = secureLocalStorage.getItem('Email');
 
     function LogOut() {
-        localStorage.removeItem('Authentication');
-        localStorage.removeItem('Email');
-        localStorage.removeItem('Role');
+        secureLocalStorage.removeItem('Authentication');
+        secureLocalStorage.removeItem('Email');
+        secureLocalStorage.removeItem('Role');
         navigate('/')
         window.location.reload(false);
     }
@@ -27,38 +29,38 @@ const NavBarComp = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-auto">
-                        {Authentication === "true" && Role === "User" ?
+                        {Authentication && Role === "User" ?
                             <LinkContainer to="/MyOffers">
                                 <Nav.Link>My Offers</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" && Role === "User" ?
+                        {Authentication && Role === "User" ?
                             <LinkContainer to="/MyListings">
                                 <Nav.Link>My Listings</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" && Role === "Admin" ?
+                        {Authentication && Role === "Admin" ?
                             <LinkContainer to="/ManageBooks">
                                 <Nav.Link>Manage Books</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" && Role === "Admin" ?
+                        {Authentication && Role === "Admin" ?
                             <LinkContainer to="/ManageUsers">
                                 <Nav.Link>Manage Users</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" && Role === "SuperAdmin" ?
+                        {Authentication && Role === "SuperAdmin" ?
                             <LinkContainer to="/ManageAdmin">
                                 <Nav.Link>Manage Administrators</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === "true" ?
+                        {Authentication ?
                             <LinkContainer to="/MyProfile">
                                 <Nav.Link>My Profile</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication === null ? <Login /> : null}
-                        {Authentication === "true" ?
+                        {!Authentication ? <Login /> : null}
+                        {Authentication ?
                             <Button variant='primary' to='/' onClick={LogOut}> Logout</Button> : null
                         }
                         {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">

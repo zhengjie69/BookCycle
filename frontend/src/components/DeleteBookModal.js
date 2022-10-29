@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useLocation, useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function DeleteBookModal() {
     const [show, setShow] = useState(false);
@@ -23,11 +24,8 @@ export default function DeleteBookModal() {
 
         e.preventDefault();
 
-        const userEmail = localStorage.getItem('Email');
+        const userEmail = secureLocalStorage.getItem('Email');
         const book_id = location.state.BookID;
-
-        console.log(book_id);
-        console.log(userEmail);
 
         DeleteBookData.append('BookID', book_id);
         DeleteBookData.append('Email', userEmail);

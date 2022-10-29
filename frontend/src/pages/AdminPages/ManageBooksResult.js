@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Card, Button, Row } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageBooksResult() {
     const location = useLocation();
@@ -11,15 +12,15 @@ export default function ManageBooksResult() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [userBooks, setUserBooks] = useState([]);
 
-    const adminEmail = localStorage.getItem('Email');
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const adminEmail = secureLocalStorage.getItem('Email');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
     const [Username, setUsername] = useState();
 
 
     useEffect(() => {
-        if (adminEmail !== null && Authentication === "true" && Role === "Admin") {
+        if (adminEmail !== null && Authentication && Role === "Admin") {
 
             setUsername(location.state.Username);
 
@@ -42,7 +43,7 @@ export default function ManageBooksResult() {
 
     return (
         <div className='mt-4 d-flex justify-content-center'>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <Container>

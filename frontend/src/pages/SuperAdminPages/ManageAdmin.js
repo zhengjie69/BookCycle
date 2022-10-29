@@ -3,12 +3,13 @@ import { Container, Form, Col, Row, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageAdmin() {
 
-    const Role = localStorage.getItem('Role');
-    const Authentication = localStorage.getItem('Authentication');
-    const SuperAdminEmail = localStorage.getItem('Email');
+    const Role = secureLocalStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const SuperAdminEmail = secureLocalStorage.getItem('Email');
     const navigate = useNavigate();
 
     const [AdminEmail, setAdminEmail] = useState();
@@ -25,7 +26,7 @@ export default function ManageAdmin() {
     }
 
     useEffect(() => {
-        if (Authentication !== "true" || Role !== "SuperAdmin") {
+        if (!Authentication || Role !== "SuperAdmin") {
             return navigate('/');
         }
     }, [])
@@ -78,7 +79,7 @@ export default function ManageAdmin() {
     return (
         <div className="mt-5 pt-5">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex align-items-center justify-content-center mb-4">

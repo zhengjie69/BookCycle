@@ -4,13 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DisableUserModal from "../../components/DisableUserModal";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import EnableUserModal from "../../components/EnableUserModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageUsersResult() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const Authentication = localStorage.getItem("Authentication");
-    const Role = localStorage.getItem("Role");
+    const Authentication = secureLocalStorage.getItem("Authentication");
+    const Role = secureLocalStorage.getItem("Role");
 
     const [UserEmail, setUserEmail] = useState('');
     const [Username, setUsername] = useState('');
@@ -18,7 +19,7 @@ export default function ManageUsersResult() {
     const [AccountStatus, setAccountStatus] = useState('');
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "Admin") {
+        if (Authentication && Role === "Admin") {
             setUserEmail(location.state.UserEmail);
             setUsername(location.state.Username);
             setContactNumber(location.state.ContactNumber);
@@ -32,7 +33,7 @@ export default function ManageUsersResult() {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center align-items-center">
@@ -74,10 +75,10 @@ export default function ManageUsersResult() {
                                 <td>{AccountStatus}</td>
                             </tr>
                         </Table>
-                        {AccountStatus == "Active" ?
+                        {AccountStatus === "Active" ?
                             <DisableUserModal UserEmail={UserEmail} Username={Username} /> : null
                         }
-                        {AccountStatus == "Disabled" ?
+                        {AccountStatus === "Disabled" ?
                             <EnableUserModal UserEmail={UserEmail} Username={Username} /> : null
                         }
                     </div>

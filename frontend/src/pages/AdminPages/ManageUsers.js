@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Container, Form, Col, Row, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageUsers() {
 
-    const Role = localStorage.getItem('Role');
-    const Authentication = localStorage.getItem('Authentication');
-    const AdminEmail = localStorage.getItem('Email');
+    const Role = secureLocalStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const AdminEmail = secureLocalStorage.getItem('Email');
     const navigate = useNavigate();
 
     const [UserEmail, setUserEmail] = useState();
@@ -24,7 +25,7 @@ export default function ManageUsers() {
     }
 
     useEffect(() => {
-        if (Authentication === "true" && Role !== "Admin") {
+        if (!Authentication && Role !== "Admin") {
             return navigate('/');
         }
     }, [])
@@ -76,16 +77,10 @@ export default function ManageUsers() {
         }
     }
 
-    useEffect(() => {
-        if (Authentication !== "true" && Role !== "Admin") {
-            navigate('/');
-        }
-    }, [])
-
     return (
         <div className="mt-5 pt-5">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex align-items-center justify-content-center mb-4">

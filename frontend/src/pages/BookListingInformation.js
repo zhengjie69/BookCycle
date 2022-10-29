@@ -8,20 +8,20 @@ import DeleteBookModal from '../components/DeleteBookModal'
 import OfferBookModal from '../components/OfferBookModal'
 import SessionTimeoutModal from '../components/SessionTimeoutModal'
 import AdminDeleteBookModal from '../components/AdminDeleteBookModal'
+import secureLocalStorage from "react-secure-storage";
 
 function BookListingInformation() {
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
     const location = useLocation();
     const navigate = useNavigate();
 
-    console.log(location.state.BookStatus)
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
-            {location.state.Route !== "MyListings" && Authentication === "true" && Role === "User" ?
+            {location.state.Route !== "MyListings" && Authentication && Role === "User" ?
                 <SearchBar /> : null
             }
             <div className="d-flex align-items-center justify-content-center mb-4 mt-4">
@@ -39,7 +39,7 @@ function BookListingInformation() {
                             {location.state.Price > 0 ? "$" + location.state.Price : null}
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" && Role === "User" && location.state.BookStatus === "Available" ?
+                            {location.state.Route === "MyListings" && Authentication && Role === "User" && location.state.BookStatus === "Available" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/ViewOffers', {
                                         state: {
@@ -49,10 +49,10 @@ function BookListingInformation() {
                                         }
                                     });
                                 }}>View Offers</Button> : <b>{location.state.BookStatus}</b>}
-                            {location.state.Route !== "MyListings" && Authentication === "true" && Role === "User" ?
+                            {location.state.Route !== "MyListings" && Authentication && Role === "User" ?
                                 <OfferBookModal /> : null
                             }
-                            {location.state.Route !== "MyListings" && Authentication === null ?
+                            {location.state.Route !== "MyListings" && !Authentication ?
                                 <LoginAlert /> : null
                             }
                         </Col>
@@ -62,7 +62,7 @@ function BookListingInformation() {
                             <p>{location.state.Condition}</p>
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={5} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && location.state.BookStatus === "Available" && Authentication === "true" && Role === "User" ?
+                            {location.state.Route === "MyListings" && location.state.BookStatus === "Available" && Authentication && Role === "User" ?
                                 <Button onClick={() => {
                                     navigate('/MyListings/EditListings', {
                                         state: {
@@ -103,10 +103,10 @@ function BookListingInformation() {
                     </Row>
                     <Row>
                         <Col md={{ span: 3, offset: 5 }} xs={10} className="mb-2 mt-2">
-                            {location.state.Route === "MyListings" && Authentication === "true" && Role === "User" ? <DeleteBookModal /> : null}
+                            {location.state.Route === "MyListings" && Authentication && Role === "User" ? <DeleteBookModal /> : null}
                         </Col>
                         <Col md={{ span: 3, offset: 5 }} xs={10} className="mb-2 mt-2">
-                            {location.state.Route === "ManageBooksResult" && Authentication === "true" && Role === "Admin" ? <AdminDeleteBookModal /> : null}
+                            {location.state.Route === "ManageBooksResult" && Authentication && Role === "Admin" ? <AdminDeleteBookModal /> : null}
                         </Col>
                     </Row>
                 </table>

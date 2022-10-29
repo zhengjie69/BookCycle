@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import SessionTimeoutModal from '../../components/SessionTimeoutModal';
+import secureLocalStorage from "react-secure-storage";
 
 function MyListings() {
 
@@ -13,13 +14,13 @@ function MyListings() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
-    const userEmail = localStorage.getItem('Email');
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const userEmail = secureLocalStorage.getItem('Email');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
 
     useEffect(() => {
-        if (userEmail !== null && Authentication === "true" && Role === "User") {
+        if (userEmail !== null && Authentication && Role === "User") {
             fetch('/apis/book/get_all_user_books?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -39,7 +40,7 @@ function MyListings() {
 
     return (
         <div className='mt-4 d-flex justify-content-center'>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <Container>

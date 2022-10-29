@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useLocation, useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function DisableUserModal({ UserEmail, Username }) {
     const [show, setShow] = useState(false);
@@ -13,7 +14,7 @@ export default function DisableUserModal({ UserEmail, Username }) {
 
     const DisableUserData = new FormData();
 
-    const AdminEmail = localStorage.getItem('Email');
+    const AdminEmail = secureLocalStorage.getItem('Email');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -23,9 +24,6 @@ export default function DisableUserModal({ UserEmail, Username }) {
     const postDisableUser = async (e) => {
 
         e.preventDefault();
-
-        console.log(AdminEmail);
-        console.log(UserEmail);
 
         DisableUserData.append('Email', AdminEmail);
         DisableUserData.append('UserEmail', UserEmail);

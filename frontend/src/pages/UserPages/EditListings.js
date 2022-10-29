@@ -3,14 +3,15 @@ import { Container, FloatingLabel, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Form } from "react-bootstrap";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 
 export default function EditListings() {
 
     const itemLocation = useLocation();
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -25,7 +26,6 @@ export default function EditListings() {
     const [Condition, setCondition] = useState();
 
     const [Genre, setGenre] = useState();
-    const userEmail = localStorage.getItem('Email');
     const [Location, setLocation] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
@@ -42,7 +42,7 @@ export default function EditListings() {
     };
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "User") {
+        if (Authentication && Role === "User") {
             setBookTitle(itemLocation.state.Title);
             setPrice(itemLocation.state.Price);
             setDescription(itemLocation.state.Description);
@@ -92,7 +92,7 @@ export default function EditListings() {
             return navigate('/');
         }
 
-    }, [Authentication])
+    }, [])
 
     const postEditListings = async (e) => {
 
@@ -119,7 +119,7 @@ export default function EditListings() {
 
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <div className="d-flex justify-content-center">

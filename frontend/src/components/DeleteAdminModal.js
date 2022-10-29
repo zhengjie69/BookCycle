@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useLocation, useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function DeleteAdminModal({ AdminEmail, Username }) {
     const [show, setShow] = useState(false);
@@ -13,7 +14,7 @@ export default function DeleteAdminModal({ AdminEmail, Username }) {
 
     const DeleteAdminData = new FormData();
 
-    const SuperAdminEmail = localStorage.getItem('Email');
+    const SuperAdminEmail = secureLocalStorage.getItem('Email');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);

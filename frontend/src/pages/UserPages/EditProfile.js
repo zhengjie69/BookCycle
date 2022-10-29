@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react"
 import { Container, Form, Col, Row, Button } from "react-bootstrap"
 import { useLocation, useNavigate } from 'react-router-dom'
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 const EditProfile = () => {
 
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
     const navigate = useNavigate();
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
     const location = useLocation();
     const [Username, setUsername] = useState();
     const [ContactNumber, setContactNumber] = useState();
@@ -22,14 +23,14 @@ const EditProfile = () => {
     const EditProfileData = new FormData();
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "User") {
+        if (Authentication && Role === "User") {
             setUsername(location.state.Username);
             setContactNumber(location.state.ContactNumber);
         }
         else {
             return navigate("/");
         }
-    }, [Authentication]);
+    }, []);
 
     const postUpdatedInformation = async (e) => {
 
@@ -88,7 +89,7 @@ const EditProfile = () => {
 
             const data = await res.json();
 
-            if (res.status === 200) {
+            if (res.status === 201) {
                 navigate('/MyProfile');
                 window.location.reload(false);
             }
@@ -99,7 +100,7 @@ const EditProfile = () => {
     return (
         <div className='mt-4'>
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center mb-2">

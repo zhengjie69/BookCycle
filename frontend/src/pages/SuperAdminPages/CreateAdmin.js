@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Form, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function CreateAdmin() {
 
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem("Authentication");
-    const SuperAdminEmail = localStorage.getItem("Email");
-    const Role = localStorage.getItem("Role");
+    const Authentication = secureLocalStorage.getItem("Authentication");
+    const SuperAdminEmail = secureLocalStorage.getItem("Email");
+    const Role = secureLocalStorage.getItem("Role");
 
     const [AdminUsername, setAdminUsername] = useState();
     const [AdminEmail, setAdminEmail] = useState();
@@ -23,7 +25,7 @@ export default function CreateAdmin() {
     const CreateAdminFormData = new FormData();
 
     useEffect(() => {
-        if (Authentication !== "true" || Role !== "SuperAdmin") {
+        if (!Authentication || Role !== "SuperAdmin") {
             return navigate('/');
         }
     }, [])
@@ -140,6 +142,9 @@ export default function CreateAdmin() {
 
     return (
         <Container>
+            {Authentication ?
+                <SessionTimeoutModal /> : null
+            }
             <div className="d-flex align-items-center justify-content-center mt-4">
                 <Row>
                     <h1>Create Admin</h1>

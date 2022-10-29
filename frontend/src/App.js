@@ -5,6 +5,7 @@ import { Row, Button, Card } from 'react-bootstrap';
 import { SearchBar } from './components/SearchBar';
 import { renderMatches, useNavigate } from 'react-router-dom';
 import SessionTimeoutModal from './components/SessionTimeoutModal';
+import secureLocalStorage from "react-secure-storage";
 
 function App() {
 
@@ -12,8 +13,8 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
   const navigate = useNavigate();
-  const userEmail = localStorage.getItem('Email');
-  const Authentication = localStorage.getItem('Authentication');
+  const userEmail = secureLocalStorage.getItem('Email');
+  const Authentication = secureLocalStorage.getItem('Authentication');
 
   useEffect(() => {
     fetch('/apis/book/search_book?Email=' + userEmail)
@@ -79,7 +80,7 @@ function App() {
       <header className="App-header">
         <Container>
           <SearchBar />
-          {Authentication === "true" ?
+          {Authentication ?
             <SessionTimeoutModal /> : null
           }
           {bookByCategories("Fiction")}

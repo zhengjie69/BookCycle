@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -39,9 +40,9 @@ const Login = () => {
         const data = await res.json();
 
         if (res.status === 201) {
-            localStorage.setItem('Authentication', data.authentication);
-            localStorage.setItem('Email', data.Email);
-            localStorage.setItem('Role', data.Role);
+            secureLocalStorage.setItem("Authentication", data.authentication);
+            secureLocalStorage.setItem("Email", data.Email);
+            secureLocalStorage.setItem("Role", data.Role);
             handleClose();
             navigate('/');
             window.location.reload(false);

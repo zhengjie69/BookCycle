@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 function TransactionDetails() {
 
     const location = useLocation();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
     const navigate = useNavigate();
 
     const [error, setError] = useState(null);
@@ -16,7 +17,7 @@ function TransactionDetails() {
     const [Transaction, setTransaction] = useState([]);
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "User") {
+        if (Authentication && Role === "User") {
             fetch('/apis/user/get_transaction_details?TransactionID=' + location.state.TransactionID)
                 .then(res => res.json())
                 .then(data => {
@@ -36,7 +37,7 @@ function TransactionDetails() {
 
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <div className="d-flex align-items-center justify-content-center mb-4 mt-4">

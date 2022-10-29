@@ -4,20 +4,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import DeleteAdminModal from "../../components/DeleteAdminModal";
 import DisableAdminModal from "../../components/DisableAdminModal"
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageAdminResult() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const Authentication = localStorage.getItem("Authentication");
-    const Role = localStorage.getItem("Role");
+    const Authentication = secureLocalStorage.getItem("Authentication");
+    const Role = secureLocalStorage.getItem("Role");
 
     const [AdminEmail, setAdminEmail] = useState('');
     const [Username, setUsername] = useState('');
     const [AccountStatus, setAccountStatus] = useState('');
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "SuperAdmin") {
+        if (Authentication && Role === "SuperAdmin") {
             setAdminEmail(location.state.AdminEmail);
             setUsername(location.state.Username);
             setAccountStatus(location.state.AccountStatus);
@@ -30,7 +31,7 @@ export default function ManageAdminResult() {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center align-items-center">

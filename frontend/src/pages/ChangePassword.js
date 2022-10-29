@@ -6,22 +6,23 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import { useNavigate } from "react-router-dom"
 import SessionTimeoutModal from "../components/SessionTimeoutModal"
+import secureLocalStorage from "react-secure-storage";
 
 const ChangePassword = () => {
 
-    const Authentication = localStorage.getItem('Authentication');
+    const Authentication = secureLocalStorage.getItem('Authentication');
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (Authentication !== "true") {
+        if (!Authentication) {
             return navigate("/");
         }
-    }, [Authentication]);
+    }, []);
 
     const [CurrentPassword, setCurrentPassword] = useState();
     const [NewPassword, setNewPassword] = useState();
     const [ConfirmNewPassword, setConfirmNewPassword] = useState();
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -70,7 +71,7 @@ const ChangePassword = () => {
 
             const data = await res.json();
 
-            if (res.status === 200) {
+            if (res.status === 201) {
 
                 const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
@@ -92,7 +93,7 @@ const ChangePassword = () => {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center">
