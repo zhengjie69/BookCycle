@@ -1,6 +1,10 @@
 from operator import contains
 import os
 from flask import jsonify, request, current_app
+import random
+import string
+
+from app.models.data_cleaning import *
 from ..models.book_model import Book
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -15,6 +19,32 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def generate_filename(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
+# helper function to check for the image file in storage
+def find_image(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+    return None
+
+def validate_filter(filterID):
+    # validate the filter id
+        if filterID is not None and filterID == "null":
+            filterID = None
+        
+        # if Filter id is not a integer, set to none, else convert value to int and set to variable
+        elif filterID is not None and filterID != "null" and isint(filterID):
+            filterID = int(filterID)
+        
+        else:
+            filterID = None
+        
+        return filterID
 # function to log and return result
 # note that all result that is an error should be a string containing the word "Error" at the start
 # for ipAddress, if ngix is used for production, request.environ.get('HTTP_X_REAL_IP', request.remote_addr) should be used to get ip
@@ -75,27 +105,46 @@ def create_book():
         locationID = request.form.get("LocationID")
         bookConditionID = request.form.get("BookConditionID")
 
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if image.filename == '':
-            return (jsonify("No selected image"), 200)
+        # checks if the input is null or empty
+        if title is not None and price is not None and description is not None and genreID is not None and email is not None and image is not None and locationID is not None and bookConditionID is not None:
+            
+            # validates if the data is in the right type
+            if isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isemail(email) and isint(locationID) and isint(bookConditionID):
 
-        # if there is a image uploaded and the uploaded image format is accepted 
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            print(filename)
-            if bookmodel.create_book(title, price, description, genreID, email, filename, locationID, bookConditionID):
-                current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-                image.save(os.path.join(current_dir, filename))
-                
-                #return(jsonify("Successfully Created Book"), 201)
-                return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Successfully Created Book"))
+                # If the user does not select a file, the browser submits an
+                # empty file without a filename.
+                if image.filename == '':
+                    return (jsonify("No selected image"), 200)
+
+                # if there is a image uploaded and the uploaded image format is accepted 
+                if image and allowed_file(image.filename):
+                    #filename = secure_filename(image.filename)
+
+                    # retrieves the file extension
+                    imageExtension = image.filename.split(".")[1]
+                    filename = generate_filename(8) + "." + imageExtension
+
+                    print(filename)
+                    result = bookmodel.create_book(title, price, description, genreID, email, filename, locationID, bookConditionID)
+                    
+                    # if the book listing is successfully created, insert uploaded image into storage
+                    if "Error" not in result:
+                        current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                        # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                        image.save(os.path.join(current_dir, filename))
+                        
+                        #return(jsonify("Successfully Created Book"), 201)
+                        return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Successfully Created Book"))
+                    else:
+                        return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Error failed to create Book, please try again"))
+                else:
+                    #return(jsonify("Invalid File Type, Please only upload files with .jpg, .png"), 401)
+                    return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Error creating a book", "create_book", "Error , invalid File Type, Please only upload files with .jpg, .png"))
+            
             else:
-                return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Error failed to create Book"))
+                return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Error creating a book", "create_book", "Error invalid input found"))        
         else:
-            #return(jsonify("Invalid File Type, Please only upload files with .jpg, .png"), 401)
-            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Error creating a book", "create_book", "Error , invalid File Type, Please only upload files with .jpg, .png"))
+            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Error creating a book", "create_book", "Error fields cannot be left blank"))
 
 def search_book():
     if request.method == "GET":
@@ -108,57 +157,68 @@ def search_book():
         minPriceFilter = request.args.get("MinPriceFilter")
         maxPriceFilter = request.args.get("MaxPriceFilter")
 
+        # validate the booktitle
         if bookTitle is not None and bookTitle == "null":
             bookTitle = None
+        
+        elif bookTitle is not None and bookTitle != "null":
+            bookTitle = data_cleaning_with_space(bookTitle)
+        
+        else:
+            bookTitle = None
 
+        # validate the user email
         if userEmail is not None and userEmail == "null":
             userEmail = None
-        
-        if genreFilter is not None and genreFilter == "null":
-            genreFilter = None
 
-        if locationFilter is not None and locationFilter == "null":
-            locationFilter = None
+        elif userEmail is not None and userEmail != "null" and isemail(userEmail):
+            userEmail = userEmail
         
-        if bookConditionFilter is not None and bookConditionFilter == "null":
-            bookConditionFilter = None
+        else:
+            userEmail = None
         
+        # sets the values if it is a valid filter id
+        genreFilter = validate_filter(genreFilter)
+        locationFilter = validate_filter(locationFilter)
+        bookConditionFilter = validate_filter(bookConditionFilter)
+
+        
+
+        # validate the minPriceFilter 
         if minPriceFilter is not None and minPriceFilter == "null":
             minPriceFilter = None
+        
+        # if minPriceFilter is not a integer, set to none, else convert value to int and set to variable
+        elif minPriceFilter is not None and minPriceFilter != "null" and isfloat(minPriceFilter):
+            minPriceFilter = int(minPriceFilter)
+        
+        else:
+            minPriceFilter = None
 
+        # validate the maxPriceFilter 
         if maxPriceFilter is not None and maxPriceFilter == "null":
-            maxPriceFilter = None    
+            maxPriceFilter = None
+
+        # if maxPriceFilter is not a integer, set to none, else convert value to int and set to variable
+        elif maxPriceFilter is not None and maxPriceFilter != "null" and isfloat(maxPriceFilter):
+            maxPriceFilter = int(maxPriceFilter)
+        
+        else:
+            maxPriceFilter = None
+
+
         # checks if the result is an error result
         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_books", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
 
-def get_all_available_books():
-    if request.method == "GET":
-
-        userEmail = request.args.get("Email")
-        genreFilter = request.args.get("GenreFilter")
-        locationFilter = request.args.get("LocationFilter")
-        bookConditionFilter = request.args.get("BookConditionFilter")
-        minPriceFilter = request.args.get("MinPriceFilter")
-        maxPriceFilter = request.args.get("MaxPriceFilter")
-
-        # checks if the result is an error result
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all avaliable books", "get_all_available_books", bookmodel.get_all_available_books(userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
 
 def get_all_user_books():
     if request.method == "GET":
         email = request.args.get("Email")
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", bookmodel.get_all_user_books(email))
 
-def search_book_by_title():
-    if request.method == "GET":
-
-        userEmail = request.args.get("Email")
-        bookTitle = request.args.get("Title")
-
-        #result = bookmodel.search_book_by_title(userEmail, bookTitle)
-
-        # checks if the result is an error result
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Searching book by title", "search_book_by_title", bookmodel.search_book_by_title(userEmail, bookTitle))
+        if email is not None and isemail(email):
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", bookmodel.get_all_user_books(email))
+        else:
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", "Error invalid input found")
 
 
 def update_book_details():
@@ -168,22 +228,67 @@ def update_book_details():
         price = request.form.get("Price")
         description = request.form.get("Description")
         genreID = request.form.get("GenreID")
-        image = request.form.get("Image")
+        image = request.files['Image']
         locationID = request.form.get("LocationID")
 
         if image is not None and image == "null":
             image = None
-        #return(jsonify(bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID)), 200)
+        
 
+        # checks if the input is null or empty
         if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None:
-            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID))
+
+            if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID):
+                
+                # generates the new image name and gets the old image name for deletion below
+                newImageName = generate_filename(8)
+                oldImageName = bookmodel.get_book_image_name(bookID)
+                result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID)
+
+                # uploads the image into storage if update is successful and the file upload is not none
+                if "Error" not in result and image is not None:
+
+                    # if there is a image uploaded and the uploaded image format is accepted 
+                    if image and allowed_file(image.filename):
+                        
+                        # if a new image is uploaded, old image is deleted before adding new image
+                        current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                        
+
+                        # searches for the old image in the file system
+                        # if no old image, upload the new image
+                        if find_image(oldImageName, current_dir):
+
+                            os.remove(os.path.join(current_dir, oldImageName))
+                            image.save(os.path.join(current_dir, newImageName))
+
+                        else:
+                            image.save(os.path.join(current_dir, newImageName))
+
+                        # current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                        # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                
+                else:
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", result)
+            
+            else:
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", "Error invalid input found")
+
         else:
             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", "Error required values are empty")
+
 def delete_book():
     if request.method == "POST":
         bookID = request.form.get("BookID")
         ownerEmail = request.form.get("Email")
         #return(jsonify(bookmodel.delete_book(bookID, ownerEmail)), 200)
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", bookmodel.delete_book(bookID, ownerEmail))
 
+        if bookID is not None and ownerEmail is not None:
+
+            if isint(bookID) and isemail(ownerEmail):
+
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", bookmodel.delete_book(bookID, ownerEmail))
+            
+            else:
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", "Error invalid input found")
 

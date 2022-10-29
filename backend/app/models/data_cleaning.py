@@ -1,18 +1,27 @@
 import re
 
-def data_cleaning(userTextInput):
+def data_cleaning_without_space(userTextInput):
 
     # matches and replaces anything that's not alphanumeric or underscore
-    cleanString = re.sub(r'[^\w]', ' ', userTextInput)
+    cleanString = re.sub(r'[^a-zA-Z0-9]+', '', userTextInput)
+    return cleanString
+
+def data_cleaning_with_space(userTextInput):
+
+    # matches and replaces anything that's not alphanumeric or underscore
+    cleanString = re.sub(r'[^a-zA-Z0-9]+', ' ', userTextInput)
     return cleanString
 
 def isstring(userTextInput):
     try:
-        float(userTextInput)
+        str(userTextInput)
+        if userTextInput == "":
+            return False
+
         return True
     except ValueError:
         return False
-        
+
 def isemail(email):
 
     # Make a regular expression
@@ -28,6 +37,20 @@ def isemail(email):
         print("Invalid Email")
         return False
 
+def isvalidpassword(password):
+
+    # Make a regular expression
+    # for validating an Email
+    regex = r'[A-Za-z0-9@#$%^&+!=]+$'
+
+    # pass the regular expression
+    # and the string into the fullmatch() method
+    if(re.fullmatch(regex, password)):
+        print("Valid Password")
+        return True
+    else:
+        print("Invalid Password")
+        return False
 
 def isfloat(num):
         try:

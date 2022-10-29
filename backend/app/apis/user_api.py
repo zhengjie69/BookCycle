@@ -55,14 +55,14 @@ def create_User():
         password = request.form.get("Password")
         contactNumber = request.form.get("ContactNumber")
 
-        # checks if the data is empty or not
-        if username is not None and email is not None and password is not None and contactNumber is not None:
+        # checks if the data is empty or not and are strings
+        if username is not None and email is not None and password is not None and contactNumber is not None and isstring(username) and isstring(email) and isstring(password) and isstring(contactNumber):
 
             # checks if the email is valid and contact Number is all numbers and length of contact number is 8 and if the email length exceeds SMTP limit (RFC 2821)
-            if len(str(username)) <= 12 and isemail(email) and len(email) < 254 and len(str(password)) >= 8 and len(str(password)) <= 25 and isint(contactNumber) and len(str(contactNumber)) == 8:
+            if len(str(username)) <= 12 and isemail(email) and len(email) < 254 and len(str(password)) >= 8 and len(str(password)) <= 25 and isvalidpassword(password) and isint(contactNumber) and len(str(contactNumber)) == 8:
 
 
-                result = userModel.create_user(username, email, password, contactNumber)
+                result = userModel.create_user(data_cleaning_without_space(username), email, password, contactNumber)
                 if "Error" in result:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating user account", "create_user", result)
                 else:
