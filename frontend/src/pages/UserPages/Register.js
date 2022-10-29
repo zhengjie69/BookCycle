@@ -52,7 +52,6 @@ function Register() {
 
 
         const UsernameLength = Username ? Username.length : 0;
-        const PasswordLength = Password ? Password.length : 0;
         const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
 
         console.log(Username);
