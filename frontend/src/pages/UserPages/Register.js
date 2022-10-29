@@ -54,12 +54,6 @@ function Register() {
         const UsernameLength = Username ? Username.length : 0;
         const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
 
-        console.log(Username);
-        console.log(Email);
-        console.log(Password);
-        console.log(ConfirmPassword);
-        console.log(ContactNumber);
-
         if (UsernameLength <= 12 && UsernameLength > 3) {
             if (containsSpecialChars(Username)) {
                 errors.push("Please do not use special characters in your username.");
