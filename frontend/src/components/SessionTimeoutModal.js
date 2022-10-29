@@ -8,8 +8,8 @@ function SessionTimeoutModal() {
     const [idleModal, setIdleModal] = useState(false);
     const navigate = useNavigate();
 
-    let idleTimeout = 1000 * 60 * 1;  //1 minute
-    let idleLogout = 1000 * 60 * 2; //2 Minutes
+    let idleTimeout = 1000 * 60 * 15;  //15 minute
+    let idleLogout = 1000 * 60 * 30; //30 Minutes
     let idleEvent;
     let idleLogoutEvent;
 

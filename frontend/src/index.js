@@ -26,6 +26,7 @@ import ManageBooks from './pages/AdminPages/ManageBooks'
 import ManageBooksResult from './pages/AdminPages/ManageBooksResult'
 import ManageAdmin from './pages/SuperAdminPages/ManageAdmin'
 import ManageAdminResult from './pages/SuperAdminPages/ManageAdminResult'
+import CreateAdmin from './pages/SuperAdminPages/CreateAdmin'
 //Homepage is App.js, Navbar is NavbarComp.js
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -67,6 +68,7 @@ root.render(
         {/* Super Admin Routes */}
         <Route exact path='/ManageAdmin' element={<ManageAdmin />} />
         <Route exact path='/ManageAdmin/ManageAdminResult' element={<ManageAdminResult />} />
+        <Route exact path='/CreateAdmin' element={<CreateAdmin />} />
 
       </Routes>
     </Router>
