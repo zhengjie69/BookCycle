@@ -9,6 +9,7 @@ export default function NewListings() {
     const navigate = useNavigate();
     const Authentication = secureLocalStorage.getItem('Authentication');
     const Role = secureLocalStorage.getItem('Role');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -19,10 +20,9 @@ export default function NewListings() {
     const [BookTitle, setBookTitle] = useState();
     const [Price, setPrice] = useState();
     const [Description, setDescription] = useState();
-    const [Condition, setCondition] = useState('1');
-    const [GenreID, setGenreID] = useState('1');
-    const userEmail = secureLocalStorage.getItem('Email');
-    const [LocationID, setLocationID] = useState('1');
+    const [Condition, setCondition] = useState('');
+    const [GenreID, setGenreID] = useState('');
+    const [LocationID, setLocationID] = useState('');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -34,6 +34,11 @@ export default function NewListings() {
 
     useEffect(() => {
         if (Authentication && Role === "User") {
+
+            setGenreID('1');
+            setCondition('1');
+            setLocationID('1');
+
             fetch('/apis/book/get_all_genres')
                 .then(res => res.json())
                 .then(data => {
@@ -90,7 +95,7 @@ export default function NewListings() {
         console.log(Price);
         console.log(BookTitle);
         console.log(Description);
-        console.log(GenreID);
+        console.log(typeof (GenreID));
         console.log(LocationID);
         console.log(Condition);
 
@@ -110,6 +115,8 @@ export default function NewListings() {
         const data = await res.json();
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
+        console.log(trimmedResponseMessage);
 
         if (res.status === 201) {
             console.log(trimmedResponseMessage);
@@ -144,7 +151,7 @@ export default function NewListings() {
                             <Form.Select required aria-label="Floating label select condition" >
                                 {Array.isArray(genreDropdown) ?
                                     genreDropdown.map(genreDropdown => (
-                                        <option value={genreDropdown.GenreID}>{genreDropdown.GenreName}</option>)) : null
+                                        <option value={genreDropdown.GenreID.toString()}>{genreDropdown.GenreName}</option>)) : null
                                 }
                             </Form.Select>
                         </Form.Group>
@@ -153,7 +160,7 @@ export default function NewListings() {
                             <Form.Select aria-label="Floating label select location" >
                                 {Array.isArray(bookConditionDropdown) ?
                                     bookConditionDropdown.map(bookConditionDropdown => (
-                                        <option value={bookConditionDropdown.BookConditionID}>{bookConditionDropdown.BookConditionName}</option>)) : null
+                                        <option value={bookConditionDropdown.BookConditionID.toString()}>{bookConditionDropdown.BookConditionName}</option>)) : null
                                 }
                             </Form.Select>
                         </Form.Group>
@@ -178,7 +185,7 @@ export default function NewListings() {
                                 <Form.Select aria-label="Floating label select location" >
                                     {Array.isArray(locationDropdown) ?
                                         locationDropdown.map(locationDropdown => (
-                                            <option value={locationDropdown.LocationID}>{locationDropdown.LocationName}</option>)) : null
+                                            <option value={locationDropdown.LocationID.toString()}>{locationDropdown.LocationName}</option>)) : null
                                     }
                                 </Form.Select>
                             </FloatingLabel>
