@@ -463,7 +463,7 @@ class Book:
                 cur = con.cursor()
 
                 #fetches the books the user has created
-                cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, a.GenreID, b.GenreName, c.LocationName, d.BookConditionName, e.BookStatusName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (email,))
+                cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, a.GenreID, b.GenreName, a.LocationID, c.LocationName, a.BookConditionID, d.BookConditionName, e.BookStatusName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (email,))
                 rows = cur.fetchall()
                    
                 # if there are book records, fetches the status, genre and builds the image  url for front end use
@@ -478,7 +478,7 @@ class Book:
                         imgurl = "http://127.0.0.1:5000" + fileurl
 
                         # creates a dictonary for each book record and inserts into a list for return
-                        roledict = roledict = {'BookID': records[0], 'Title': records[1], 'Price': records[2], 'Description': records[3], 'Image': imgurl, 'GenreID': records[5], 'Genre': records[6], 'Location': records[7], 'BookCondition': records[8], 'BookStatus': records[9]}
+                        roledict = roledict = {'BookID': records[0], 'Title': records[1], 'Price': records[2], 'Description': records[3], 'Image': imgurl, 'GenreID': records[5], 'Genre': records[6],'LocationID': records[7], 'Location': records[8],'BookConditionID': records[9], 'BookCondition': records[10], 'BookStatus': records[11]}
                         returnData.append(roledict)
                     return(returnData)
                 else:
