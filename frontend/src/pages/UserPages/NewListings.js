@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Form, Button, FloatingLabel, InputGroup } from 'react-bootstrap'
+import { Container, Form, Button, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import SessionTimeoutModal from '../../components/SessionTimeoutModal';
 import secureLocalStorage from "react-secure-storage";
@@ -16,6 +16,7 @@ export default function NewListings() {
     const [genreDropdown, setGenreDropdown] = useState([]);
     const [locationDropdown, setLocationDropdown] = useState([]);
     const [bookConditionDropdown, setBookConditionDropdown] = useState([]);
+    const [bookImage, setBookImage] = useState([]);
 
     const [BookTitle, setBookTitle] = useState();
     const [Price, setPrice] = useState();
@@ -82,22 +83,9 @@ export default function NewListings() {
 
     }, [])
 
-    const uploadedImage = (e) => {
-        console.log(e.target.files[0]);
-        NewListingsFormData.append('Image', e.target.files[0]);
-        console.log(NewListingsFormData);
-    };
-
     const postNewListings = async (e) => {
 
         e.preventDefault();
-
-        console.log(Price);
-        console.log(BookTitle);
-        console.log(Description);
-        console.log(typeof (GenreID));
-        console.log(LocationID);
-        console.log(Condition);
 
         NewListingsFormData.append("Price", Price);
         NewListingsFormData.append("Title", BookTitle);
@@ -106,11 +94,16 @@ export default function NewListings() {
         NewListingsFormData.append("Email", userEmail);
         NewListingsFormData.append("LocationID", LocationID);
         NewListingsFormData.append("BookConditionID", Condition);
+        NewListingsFormData.append("Image", bookImage);
 
         const res = await fetch('/apis/book/create_book', {
             method: "POST",
             body: NewListingsFormData
         });
+
+        for (var pair of NewListingsFormData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
 
         const data = await res.json();
 
@@ -177,23 +170,24 @@ export default function NewListings() {
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBookImage">
                             <Form.Label>Book Image: </Form.Label>
-                            <Form.Control required type="file" onChange={e => uploadedImage(e)} />
+                            <Form.Control required type="file" onChange={e => setBookImage(e.target.files[0])} />
                             <Form.Text className="text-muted">Upload Profile Picture (image format must be png, jpg, or jpeg).</Form.Text>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formLocation" value={LocationID} onChange={e => setLocationID(e.target.value)}>
-                            <FloatingLabel controlId="floatingSelectLocation" label="Location">
-                                <Form.Select aria-label="Floating label select location" >
-                                    {Array.isArray(locationDropdown) ?
-                                        locationDropdown.map(locationDropdown => (
-                                            <option value={locationDropdown.LocationID.toString()}>{locationDropdown.LocationName}</option>)) : null
-                                    }
-                                </Form.Select>
-                            </FloatingLabel>
+                            <Form.Label>Location:</Form.Label>
+                            <Form.Select aria-label="Floating label select location" >
+                                {Array.isArray(locationDropdown) ?
+                                    locationDropdown.map(locationDropdown => (
+                                        <option value={locationDropdown.LocationID.toString()}>{locationDropdown.LocationName}</option>)) : null
+                                }
+                            </Form.Select>
                         </Form.Group>
                         <div className="d-flex justify-content-center mb-3">
-                            {showErrors ? errorMessages.map((item, index) => {
-                                return <ul key={index}>{item}</ul>;
-                            }) : null}
+                            <Row>
+                                {showErrors ? errorMessages.map((item, index) => {
+                                    return <ul key={index}>{item}</ul>;
+                                }) : null}
+                            </Row>
                         </div>
                         <div className="d-flex justify-content-center mb-3">
                             <Button variant="primary" type="submit">
