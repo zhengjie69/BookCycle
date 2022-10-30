@@ -13,6 +13,7 @@ import EditProfile from './pages/UserPages/EditProfile'
 import ChangePassword from './pages/ChangePassword'
 import BookListingInformation from './pages/BookListingInformation'
 import ForgetPassword from './pages/ForgetPassword'
+import ResetPage from './pages/ResetPage'
 import Register from './pages/UserPages/Register'
 import EditListings from './pages/UserPages/EditListings'
 import { SearchResult } from './pages/SearchResult'
@@ -47,6 +48,7 @@ root.render(
         {/* Common Routes */}
         <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
         <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
+        <Route exact path='/ForgetResetPassword/:resetCode' element={<ResetPage />} />
         <Route exact path='/MyProfile' element={<MyProfile />} />
 
         {/* User Routes */}

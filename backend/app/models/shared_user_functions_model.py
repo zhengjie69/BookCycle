@@ -1,7 +1,8 @@
 import sqlite3
 from flask import current_app, url_for
 import bcrypt
-
+import jwt
+import time
 
 class Shared_User_Functions:
 
@@ -91,8 +92,37 @@ class Shared_User_Functions:
             print("Successfully closed connection")
 
 
-    def reset_password():
-        pass
+    def reset_password(self,email,password):
+        try:
+
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print("Opened database successfully")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+
+
+                cur = con.cursor()
+
+                newHashPassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+                con.execute("UPDATE {} SET Password = ? WHERE Email = ?".format(self.tablename),
+                                    (newHashPassword, email))
+                con.commit()
+                returnMessage = "Password Successfully Changed"
+
+
+
+
+                return returnMessage
+        except sqlite3.Error as er:
+            print(er)
+            con.rollback()
+            return ("Error in Updating Password")
+
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
     def get_role(self,email):
         try:
@@ -158,3 +188,47 @@ class Shared_User_Functions:
         finally:
             con.close()
             print("Successfully closed connection")
+
+    def verifyEmailExists(self, email):
+        try:
+
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print("Opened database successfully")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+
+                # fetches all users from User table
+                cur.execute("SELECT Email FROM {} WHERE Email = ?".format(self.tablename),
+                            (email,))
+                rows = cur.fetchall()
+                # goes through the list to create a list with dict inside
+                if len(rows) > 0:
+                    print("Email Valid")
+                    return True
+                else:
+                    return ("No matching email in database")
+
+        except:
+            con.rollback()
+            return ("Error in fetching selected email")
+
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
+    def get_reset_token(self,email, expires=30):
+        times = time.time()
+        return jwt.encode({'reset_password': email, 'exp': times + expires}, key=("TESTINGKEY"))
+
+    def verify_reset_token(self,token):
+        try:
+            username = jwt.decode(token, key=("TESTINGKEY"),algorithms=['HS256']),['reset_password']
+        except Exception as e:
+            print(e)
+
+
+
+        return username[0]['reset_password']
