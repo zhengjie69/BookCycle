@@ -237,12 +237,16 @@ def update_book_details():
             price = request.form.get("Price")
             description = request.form.get("Description")
             genreID = request.form.get("GenreID")
-            image = request.files['Image']
+            #image = request.files['Image']
             locationID = request.form.get("LocationID")
             bookConditionID = request.form.get("BookConditionID")
 
-            if image is not None and image == "null":
+            if "Image" in request.files:
+                image = request.files['Image']
+            else:
                 image = None
+
+
             
 
             # checks if the input is null or empty
@@ -253,8 +257,11 @@ def update_book_details():
                     # generates the new image name and gets the old image name for deletion below
                     newImageName = generate_filename(8)
                     oldImageName = bookmodel.get_book_image_name(bookID)
-                    result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID, bookConditionID)
 
+                    if image is not None:
+                        result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID, bookConditionID)
+                    else:
+                        result = bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID, bookConditionID)
                     # uploads the image into storage if update is successful and the file upload is not none
                     if "Error" not in result and image is not None:
 
@@ -278,8 +285,8 @@ def update_book_details():
                             # current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
                             # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
                     
-                    else:
-                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", result)
+                    
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", result)
                 
                 else:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update book details", "update_book_details", "Error invalid input found")

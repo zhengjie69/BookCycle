@@ -692,14 +692,20 @@ class Book:
                 con.execute("PRAGMA foreign_keys = 1")
 
                 cur = con.cursor()
-                cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookID, bookconditionID))
-                #rows = cur.fetchall()
-                #print(rows)
+
+                if image is not None:
+                    cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookconditionID, bookID))
+                
+                else:
+                    cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, locationID, bookconditionID, bookID))
+                
+
                 con.commit()
                 return("successfully updated")
 
         except sqlite3.Error as er:
             con.rollback()
+            print(er)
             return("Error in updating book")
 
         finally:
