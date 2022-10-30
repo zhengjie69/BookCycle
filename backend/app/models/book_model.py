@@ -682,7 +682,7 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def update_book_details(self, bookID, title, price, description, genreID, image, locationID):
+    def update_book_details(self, bookID, title, price, description, genreID, image, locationID, bookconditionID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
@@ -692,7 +692,7 @@ class Book:
                 con.execute("PRAGMA foreign_keys = 1")
 
                 cur = con.cursor()
-                cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ? WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookID))
+                cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookID, bookconditionID))
                 #rows = cur.fetchall()
                 #print(rows)
                 con.commit()

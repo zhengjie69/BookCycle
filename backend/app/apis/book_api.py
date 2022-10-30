@@ -239,20 +239,21 @@ def update_book_details():
             genreID = request.form.get("GenreID")
             image = request.files['Image']
             locationID = request.form.get("LocationID")
+            bookConditionID = request.form.get("BookConditionID")
 
             if image is not None and image == "null":
                 image = None
             
 
             # checks if the input is null or empty
-            if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None:
+            if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None and bookConditionID is not None:
 
-                if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID):
+                if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID) and isint(bookConditionID):
                     
                     # generates the new image name and gets the old image name for deletion below
                     newImageName = generate_filename(8)
                     oldImageName = bookmodel.get_book_image_name(bookID)
-                    result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID)
+                    result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID, bookConditionID)
 
                     # uploads the image into storage if update is successful and the file upload is not none
                     if "Error" not in result and image is not None:
