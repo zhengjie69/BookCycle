@@ -40,9 +40,9 @@ def isemail(email):
 def isvalidpassword(password):
 
     # Make a regular expression
-    # for validating an Email
-    regex = r'[A-Za-z0-9@#$%^&+!=]+$'
-
+    # for validating password
+    regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*?[#?!@$%^&*-])(?!.* ).{8,25}$"
+    
     # pass the regular expression
     # and the string into the fullmatch() method
     if(re.fullmatch(regex, password)):
