@@ -112,7 +112,7 @@ export default function EditListings() {
         EditListingFormData.append("LocationID", Location);
 
         if (BookImage === undefined) {
-            EditListingFormData.append("Image", null)
+            //EditListingFormData.append("Image", null)
         }
         else {
             EditListingFormData.append("Image", BookImage);
