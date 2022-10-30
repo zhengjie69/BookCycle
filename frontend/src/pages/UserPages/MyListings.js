@@ -69,12 +69,15 @@ function MyListings() {
                                                     state: {
                                                         BookID: item.BookID,
                                                         Condition: item.BookCondition,
+                                                        ConditionID: item.BookConditionID,
                                                         Title: item.Title,
                                                         Price: item.Price,
                                                         Description: item.Description,
                                                         Image: item.Image,
                                                         Genre: item.Genre,
+                                                        GenreID: item.GenreID,
                                                         Location: item.Location,
+                                                        LocationID: item.LocationID,
                                                         BookStatus: item.BookStatus,
                                                         Route: "MyListings"
                                                     }

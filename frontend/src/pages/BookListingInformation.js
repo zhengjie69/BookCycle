@@ -70,11 +70,14 @@ function BookListingInformation() {
                                             BookID: location.state.BookID,
                                             Price: location.state.Price,
                                             Genre: location.state.Genre,
+                                            GenreID: location.state.GenreID,
                                             Image: location.state.Image,
                                             Location: location.state.Location,
+                                            LocationID: location.state.LocationID,
                                             Description: location.state.Description,
                                             BookStatus: location.state.BookStatus,
-                                            Condition: location.state.Condition
+                                            Condition: location.state.Condition,
+                                            ConditionID: location.state.ConditionID
                                         }
                                     });
                                 }}>Edit Listings</Button> : null}

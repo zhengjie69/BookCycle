@@ -109,15 +109,11 @@ export default function NewListings() {
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        console.log(trimmedResponseMessage);
-
         if (res.status === 201) {
-            console.log(trimmedResponseMessage);
-            navigate('/');
+            navigate('/MyListings');
             window.location.reload(false);
         }
         else {
-            console.log(trimmedResponseMessage);
             errors.push(trimmedResponseMessage);
             setShowErrors({ showErrors: true });
             setErrorMessages(errors);
@@ -171,7 +167,7 @@ export default function NewListings() {
                         <Form.Group className="mb-3" controlId="formBookImage">
                             <Form.Label>Book Image: </Form.Label>
                             <Form.Control required type="file" onChange={e => setBookImage(e.target.files[0])} />
-                            <Form.Text className="text-muted">Upload Profile Picture (image format must be png, jpg, or jpeg).</Form.Text>
+                            <Form.Text className="text-muted">Image format must be png, jpg, or jpeg.</Form.Text>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formLocation" value={LocationID} onChange={e => setLocationID(e.target.value)}>
                             <Form.Label>Location:</Form.Label>
