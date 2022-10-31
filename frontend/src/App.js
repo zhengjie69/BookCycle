@@ -16,6 +16,7 @@ function App() {
   const userEmail = secureLocalStorage.getItem('Email');
   const Authentication = secureLocalStorage.getItem('Authentication');
 
+  //To fetch all books other than user's book
   useEffect(() => {
     fetch('/apis/book/search_book?Email=' + userEmail)
       .then(res => res.json())
