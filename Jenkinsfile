@@ -4,14 +4,9 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                echo 'Test'
+                echo 'Test' 
+		echo 'Web Hook test'
             }
         }
-		stage('OWASP DependencyCheck') {
-			      steps {
-				            dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency-Check'
-			      }
-		}
-	}
+    }
 }
-
