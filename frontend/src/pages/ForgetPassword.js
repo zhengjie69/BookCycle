@@ -4,29 +4,49 @@ import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import {useState} from 'react';
 
+function ValidateEmail(email) {
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+            return true;
+        }
+        return false;
+}
 
 function ForgetPassword() {
     const navigate = useNavigate()
     const [Email, setEmail] = useState();
+    const [errorMessages, setErrorMessages] = useState([]);
+    const [showErrors, setShowErrors] = useState(false);
     const resetPasswordDetails = new FormData();
+    let errors = [];
+
 
     const postForgetPassword = async (e) => {
-
-         resetPasswordDetails.append('Email', Email)
+        if (ValidateEmail(Email) === true) {
+            resetPasswordDetails.append('Email', Email)
+         }
+         else {
+            errors.push("Please enter a valid email.");
+         }
          e.preventDefault();
+         if (errors.length > 0) {
+            setShowErrors({ showErrors: true });
+            setErrorMessages(errors);
+         }
+          else {
+             setShowErrors({ showErrors: false });
 
-         const res = await fetch('/apis/user/forget_password_reset', {
-            method: "POST",
-            body: resetPasswordDetails
-        });
+             const res = await fetch('/apis/user/forget_password_reset', {
+                 method: "POST",
+                 body: resetPasswordDetails
+             });
 
-        if (res.status === 201)
-        {
+             if (res.status === 201) {
 
-            navigate('/');
-            window.location.reload(false);
+                 navigate('/');
+                 window.location.reload(false);
 
-        }
+             }
+         }
     }
     return (
         <Container>
@@ -58,6 +78,13 @@ function ForgetPassword() {
                         </LinkContainer>
                     </Col>
                 </Row>
+            </div>
+            <div className="d-flex align-items-center justify-content-center mt-4">
+                        <Row>
+                            {showErrors ? errorMessages.map((item, index) => {
+                                return <ul key={index}>{item}</ul>;
+                            }) : null}
+                        </Row>
             </div>
             </form>
         </Container >

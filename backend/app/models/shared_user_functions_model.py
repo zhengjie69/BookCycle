@@ -228,6 +228,7 @@ class Shared_User_Functions:
             username = jwt.decode(token, key=("TESTINGKEY"),algorithms=['HS256']),['reset_password']
         except Exception as e:
             print(e)
+            return "Invalid"
 
 
 

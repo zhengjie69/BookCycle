@@ -359,8 +359,8 @@ def verify_reset_password(token):
     args = request.view_args['token']
     username = sharedUserFunctionModel.verify_reset_token(args)
     if request.method == "GET":
-        if not username:
-            return (jsonify(message='OKK'), 404)
+        if username == "Invalid":
+            return (jsonify(message='Token Expired'), 404)
 
         return (jsonify(message='OKK'), 201)
 
