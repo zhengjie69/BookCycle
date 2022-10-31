@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_mail import Mail
+from flask_jwt_extended import JWTManager
 from .routes.user_routes import user
 from .routes.book_routes import book
 from .routes.admin_routes import admin
@@ -6,6 +8,10 @@ from .routes.super_admin_routes import superadmin
 import sqlite3
 import os, traceback
 import bcrypt
+
+
+jwt = JWTManager()
+mail = Mail()
 
 def convertToBinaryData(filename):
     # Convert digital data to binary format
@@ -16,6 +22,14 @@ def hash_Password(password):
 
     hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     return hashpassword
+
+def mailSetup():
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = "kopickosongml@gmail.com"
+    MAIL_PASSWORD = "hEXRsOjFENbBkrcQEZS!"
+    SECRET_KEY = 'secretkey'
 
 def sqlite_database_setup():
     try:
@@ -247,16 +261,26 @@ def sqlite_database_setup():
 
 def create_app(test_config=None):
     # create and configure the app
-    sqlite_database_setup()
     app = Flask(__name__, instance_relative_config=True)
+    sqlite_database_setup()
+
     app.register_blueprint(user, url_prefix='/apis/user/')
     app.register_blueprint(book, url_prefix='/apis/book/')
     app.register_blueprint(admin, url_prefix='/apis/admin/')
     app.register_blueprint(superadmin, url_prefix='/apis/superadmin/')
 
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USERNAME'] = 'kopickosongml@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'vamjmxizezesorpg'
+    app.config['MAIL_USE_SSL'] = True
+    app.config['SECRET_KEY'] = 'secretkey'
+
+
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+    jwt.init_app(app)
+    mail.init_app(app)
     return app
 
-    

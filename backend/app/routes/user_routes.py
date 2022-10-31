@@ -47,3 +47,10 @@ user.route('/get_transaction_details', methods=['GET'])(get_transaction_details)
 
 # 'http://localhost:5000/apis/user/get_all_user_transactions'
 user.route('/get_all_user_transactions', methods=['GET'])(get_all_user_transactions)
+
+# 'http://localhost:5000/apis/user/forget_password_reset'
+user.route('/forget_password_reset',methods=['GET','POST'])(forget_password_reset)
+
+# 'http://localhost:5000/apis/user/forget_password_reset'
+user.route('/ForgetResetPassword/<token>',methods=['GET','POST'])(verify_reset_password)
+

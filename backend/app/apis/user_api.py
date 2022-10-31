@@ -1,4 +1,5 @@
-from flask import jsonify, request
+from flask import jsonify, request,render_template
+from flask_mail import Message
 from ..models.user_model import User
 from ..models.book_model import Book
 from ..models.shared_user_functions_model import Shared_User_Functions
@@ -171,8 +172,12 @@ def get_book_offers():
 
             # checks if the input is null or empty and is valid
             if bookID is not None and isint(bookID) and ownerEmail is not None and isemail(ownerEmail) and userTableName is not None:
+
                 
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting book offers", "get_book_offers", bookModel.get_book_offers(bookID, ownerEmail, userTableName))
+
+
+
             
             else:
                 
@@ -308,11 +313,11 @@ def get_all_user_transactions():
 
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email):
-                
+
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transactions(email))
             
             else:
-                
+
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get all user transcations made by selected user email", "get_all_user_transcations", "Error fields cannot be left blank and must be valid inputs")
 
         except Exception as ex:
@@ -320,3 +325,49 @@ def get_all_user_transactions():
                 logMessage = "Exception Error " + str(ex)
                 return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when getting all user transcations made by selected user email", "get_all_user_transcations", logMessage)
                 return jsonify("Something went wrong, please try again later"), 401                    
+
+
+
+
+
+def forget_password_reset():
+    if request.method == "POST":
+        email = request.form.get("Email")
+        if (sharedUserFunctionModel.verifyEmailExists(email) == True):
+            token = sharedUserFunctionModel.get_reset_token(email)
+            send_email(email,token)
+            return (jsonify(message='OKK'), 201)
+        else:
+            print("NOTOK")
+            return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
+
+
+def send_email(email,generatedtoken):
+
+    from app import mail
+    sender = 'kopickosongml@gmail.com'
+    recipients = [email]
+    msg = Message()
+    msg.subject = "Password Recovery"
+    msg.recipients = recipients
+    msg.sender = sender
+    msg.body = "You have requested for a password change, click on the link to reset your password now. "+"http://localhost:3000/ForgetResetPassword/"+generatedtoken
+
+    mail.send(msg)
+
+def verify_reset_password(token):
+    args = request.view_args['token']
+    username = sharedUserFunctionModel.verify_reset_token(args)
+    if request.method == "GET":
+        if not username:
+            return (jsonify(message='OKK'), 404)
+
+        return (jsonify(message='OKK'), 201)
+
+    if request.method == "POST":
+
+        newpassword = request.form.get("Password")
+        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating user password",
+                             "update_password",
+                             sharedUserFunctionModel.reset_password(username,newpassword))
+

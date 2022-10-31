@@ -207,6 +207,6 @@ class User:
             con.close()
             print("Successfully closed connection")
 
-        
-        
+
+
         
