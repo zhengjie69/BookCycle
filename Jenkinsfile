@@ -5,6 +5,7 @@ pipeline {
         stage('Build') { 
             steps {
                 echo 'Test'
+		sh 'npm install'
             }
         }
 	stage('OWASP DependencyCheck') {
