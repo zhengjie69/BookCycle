@@ -5,7 +5,8 @@ from ..models.book_model import Book
 from ..models.shared_user_functions_model import Shared_User_Functions
 from ..models.data_cleaning import *
 from .api_logger import *
-
+import requests
+import json
 
 userModel = User()
 bookModel = Book()
@@ -371,3 +372,20 @@ def verify_reset_password(token):
                              "update_password",
                              sharedUserFunctionModel.reset_password(username,newpassword))
 
+
+def verify_captcha():
+    if request.method == "POST":
+        captchattoken = request.form.get("Token")               #retrieve token from ForgetPassword.js
+        secretkey = "6LdYjMwiAAAAAMhJ35HRw06NwAxQO9JZqPpMUqQ5"  #captcha secret key to validate
+        captchapayload = {'response': captchattoken, 'secret': secretkey}   # create the payload to sent request for captcha validation
+
+        response = requests.post("https://www.google.com/recaptcha/api/siteverify",captchapayload)  #captcha validation
+        captcharesponse_text = json.loads(response.text)
+
+
+        if (captcharesponse_text['success'] == True):
+            return {'message':['true']}
+
+        else:
+            print("CAPTCHA NOT OK")
+            return {jsonify({'message':['false']})}

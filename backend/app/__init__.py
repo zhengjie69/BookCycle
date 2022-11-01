@@ -8,10 +8,12 @@ from .routes.super_admin_routes import superadmin
 import sqlite3
 import os, traceback
 import bcrypt
+from flask_recaptcha import ReCaptcha
 
 
 jwt = JWTManager()
 mail = Mail()
+recaptcha = ReCaptcha()
 
 def convertToBinaryData(filename):
     # Convert digital data to binary format
@@ -263,7 +265,8 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     sqlite_database_setup()
-
+    app.config['RECAPTCHA_SITE_KEY'] = '6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB'
+    app.config['RECAPTCHA_SECRET_KEY'] = '6LdYjMwiAAAAAMhJ35HRw06NwAxQO9JZqPpMUqQ5'
     app.register_blueprint(user, url_prefix='/apis/user/')
     app.register_blueprint(book, url_prefix='/apis/book/')
     app.register_blueprint(admin, url_prefix='/apis/admin/')
@@ -280,6 +283,7 @@ def create_app(test_config=None):
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+    recaptcha.init_app(app)
     jwt.init_app(app)
     mail.init_app(app)
     return app

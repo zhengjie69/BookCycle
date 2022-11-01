@@ -230,6 +230,5 @@ class Shared_User_Functions:
             print(e)
             return "Invalid"
 
-
-
         return username[0]['reset_password']
+

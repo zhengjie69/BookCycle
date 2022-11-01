@@ -34,9 +34,9 @@ function ResetPage() {
         const res = await fetch('/apis/user/ForgetResetPassword/'+(JSON.stringify(resetCode)).replace(/\"/g, ""), {
             method: "GET",
         });
-        if (res.status === 404)
+        if (res.ok == false)
         {
-              navigate('/');
+              navigate('/*');
               window.location.reload(false);
         }
 

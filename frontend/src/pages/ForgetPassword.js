@@ -1,8 +1,10 @@
-import React, {useEffect} from 'react'
+import React, {useEffect,useRef} from 'react'
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import {useState} from 'react';
+import ReCAPTCHA from "react-google-recaptcha"
+
 
 function ValidateEmail(email) {
         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
@@ -12,22 +14,48 @@ function ValidateEmail(email) {
 }
 
 function ForgetPassword() {
+
     const navigate = useNavigate()
     const [Email, setEmail] = useState();
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
     const resetPasswordDetails = new FormData();
+    const captchaTokenForm = new FormData();
+    const captchaRef = useRef(null);
+
+
+
     let errors = [];
 
 
+
     const postForgetPassword = async (e) => {
+
+         // const token = captchaRef.current.getValue();
+         // captchaRef.current.reset();
+         e.preventDefault();
+         const captchares = await captchaRef.current.getValue();
+         captchaRef.current.reset();
+         captchaTokenForm.append('Token',captchares)
+         const capres = await fetch('/apis/user/forget_password_reset_captcha', {
+                 method: "POST",
+                 body: captchaTokenForm
+         });
+         if (capres.ok == false)
+         {
+             console.log(capres.ok)
+              errors.push("Please complete captcha validation")
+         }
+
+
+
         if (ValidateEmail(Email) === true) {
             resetPasswordDetails.append('Email', Email)
          }
          else {
             errors.push("Please enter a valid email.");
          }
-         e.preventDefault();
+
          if (errors.length > 0) {
             setShowErrors({ showErrors: true });
             setErrorMessages(errors);
@@ -67,6 +95,19 @@ function ForgetPassword() {
                         </Form.Group>
                     </Row>
                 </Form>
+            </div>
+
+            <div align={"center"}>
+
+
+                    <ReCAPTCHA
+                    sitekey="6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB"
+                    render="explicit"
+                    ref={captchaRef}
+
+                    />
+
+
             </div>
             <div className="d-flex justify-content-center mt-2 mb-4">
                 <Row>

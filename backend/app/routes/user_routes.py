@@ -54,3 +54,5 @@ user.route('/forget_password_reset',methods=['GET','POST'])(forget_password_rese
 # 'http://localhost:5000/apis/user/forget_password_reset'
 user.route('/ForgetResetPassword/<token>',methods=['GET','POST'])(verify_reset_password)
 
+# 'http://localhost:5000/apis/user/forget_password_reset_captcha'
+user.route('/forget_password_reset_captcha',methods=['GET','POST'])(verify_captcha)
