@@ -5,11 +5,15 @@ from .routes.user_routes import user
 from .routes.book_routes import book
 from .routes.admin_routes import admin
 from .routes.super_admin_routes import superadmin
+from .models.user_model import *
 import sqlite3
 import os, traceback
 import bcrypt
 from flask_recaptcha import ReCaptcha
+import logging
+from flask.logging import default_handler
 
+from flask_session import Session
 
 jwt = JWTManager()
 mail = Mail()
@@ -261,6 +265,7 @@ def sqlite_database_setup():
     finally:
         con.close()
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -277,13 +282,26 @@ def create_app(test_config=None):
     app.config['MAIL_USERNAME'] = 'kopickosongml@gmail.com'
     app.config['MAIL_PASSWORD'] = 'vamjmxizezesorpg'
     app.config['MAIL_USE_SSL'] = True
-    app.config['SECRET_KEY'] = 'secretkey'
 
+
+    #app.config['SECRET_KEY'] = 'secretkey'
+    userModel = User()
+    app.config['SECRET_KEY'] = userModel.get_key()
+    
 
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     recaptcha.init_app(app)
+
+    app.config["SESSION_PERMANENT"] = False
+    app.config["SESSION_TYPE"] = "filesystem"
+
+    Session(app)
+    #log = logging.getLogger('werkzeug')
+    #log.setLevel(logging.ERROR)
+    #logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+
     jwt.init_app(app)
     mail.init_app(app)
     return app

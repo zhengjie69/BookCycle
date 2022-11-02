@@ -1,2 +1,6 @@
 Flask==2.2.2
 bcrypt==4.0.0
+Flask-Mail
+Flask-JWT-Extended
+pyjwt
+flask_recaptcha

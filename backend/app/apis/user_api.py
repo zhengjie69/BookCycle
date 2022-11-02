@@ -1,4 +1,4 @@
-from flask import jsonify, request,render_template
+from flask import jsonify, request,render_template, session
 from flask_mail import Message
 from ..models.user_model import User
 from ..models.book_model import Book
@@ -7,6 +7,7 @@ from ..models.data_cleaning import *
 from .api_logger import *
 import requests
 import json
+
 
 userModel = User()
 bookModel = Book()
@@ -47,6 +48,7 @@ def create_User():
             logMessage = "Exception Error " + str(ex)
             return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when creating user", "create_user", logMessage)
             return jsonify("Error Something went wrong, please try again later"), 401
+
 def login():
     if request.method == "POST":
 
@@ -61,7 +63,8 @@ def login():
 
                     role = sharedUserFunctionModel.get_role(email)
                     if role is not None: 
-                        return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Successfully logged in")         
+                        return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Successfully logged in")
+                        session["email"] = email
                         return(jsonify(authentication=True, Email=email, Role= role), 201)
                     else:
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Error login failed")
@@ -76,11 +79,31 @@ def login():
             return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when logging in", "login", logMessage)
             return jsonify("Something went wrong, please try again later"), 401
 
-def get_user_profile():
-    if request.method == "GET":
+def logout():
+    if request.method == "POST":
 
         try:
-            email = request.args.get("Email")
+
+            if session.get("email") is not None:
+                session.clear()
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Logging out", "logout", "Successfully logged out")
+            
+            else:
+                return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to log out", "logout", "Error Not logged in"))
+
+        except Exception as ex:
+            # logs the error log and returns a error message
+            logMessage = "Exception Error " + str(ex)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when logging out", "logout", logMessage)
+            return jsonify("Something went wrong, please try again later"), 401
+        
+
+def get_user_profile():
+    if request.method == "GET":
+        
+        try:
+            #email = request.args.get("Email")
+            email = session.get("email")
 
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email):
@@ -123,7 +146,8 @@ def update_profile():
      if request.method == "POST":
 
         try:
-            email = request.form.get("Email")
+            #email = request.form.get("Email")
+            email = session.get("email")
             username = request.form.get("Username")
             contactNumber = request.form.get("ContactNumber")
 
@@ -147,13 +171,19 @@ def send_book_offer():
     if request.method == "POST":
         try:         
             bookID = request.form.get("BookID")
-            offererEmail = request.form.get("Email")
+            #offererEmail = request.form.get("Email")
+            offererEmail = session.get("email")
             offer = request.form.get("Offer")
 
             # checks if the input is null or empty and is valid
             if bookID is not None and isint(bookID) and offererEmail is not None and isemail(offererEmail) and offer is not None and isfloat(offer):
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.send_book_offer(bookID, offer, offererEmail))
+                
+                # verifies if the role is User, as only users can send_book_offer
+                if userModel.get_role(offererEmail) == "User":
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.send_book_offer(bookID, offer, offererEmail))
 
+                else:
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to send book offer", "send_book_offer", "Error user not authroized")
             else:
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to send book offer", "send_book_offer", "Error fields cannot be left blank and must be valid inputs")
         
@@ -168,7 +198,8 @@ def get_book_offers():
 
         try:         
             bookID = request.args.get("BookID")
-            ownerEmail = request.args.get("Email")
+            #ownerEmail = request.args.get("Email")
+            ownerEmail = session.get("email")
             userTableName = userModel.get_tablename()
 
             # checks if the input is null or empty and is valid
@@ -194,7 +225,8 @@ def get_all_user_book_offers():
     if request.method == "GET":
 
         try: 
-            email = request.args.get("Email")
+            #email = request.args.get("Email")
+            email = session.get("email")
             userTableName = userModel.get_tablename()
             transactionsTableName = userModel.get_transactionsTableName()
 
@@ -218,11 +250,18 @@ def accept_book_offer():
 
         try:
             bookOfferID = request.form.get("BookOfferID")
-            ownerEmail = request.form.get("Email")
+            #ownerEmail = request.args.get("Email")
+            ownerEmail = session.get("email")
 
             # checks if the input is null or empty and is valid
             if bookOfferID is not None and isint(bookOfferID) and ownerEmail is not None and isemail(ownerEmail):
-                result = bookModel.accept_book_offer(bookOfferID, ownerEmail)
+
+                # verifies if the role is User, as only users can accept_book_offer
+                if userModel.get_role(ownerEmail) == "User":
+                    result = bookModel.accept_book_offer(bookOfferID, ownerEmail)
+                
+                else:
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to accept book offer", "accept_book_offer", "Error user not authroized")
 
                 # checks if the book offer is successfully accepted, if successful, create transaction record
                 if type(result) == str and "Error" in result:
@@ -245,11 +284,13 @@ def edit_book_offer():
 
         try:
             bookOfferID = request.form.get("BookOfferID")
-            offererEmail = request.form.get("Email")
+            #offererEmail = request.form.get("Email")
+            offererEmail = session.get("email")
             newOffer = request.form.get("Offer")
 
             # checks if the input is null or empty and is valid
             if bookOfferID is not None and isint(bookOfferID) and offererEmail is not None and isemail(offererEmail) and newOffer is not None and isfloat(newOffer):
+                
                 
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Editing book offer", "edit_book_offer", bookModel.edit_book_offer(bookOfferID, offererEmail, newOffer))
             
@@ -268,16 +309,22 @@ def delete_book_offer():
 
         try:
             bookOfferID = request.form.get("BookOfferID")
-            offererEmail = request.form.get("Email")
+            offererEmail = session.get("email")
+            #offererEmail = request.form.get("Email")
 
             # checks if the input is null or empty and is valid
             if bookOfferID is not None and isint(bookOfferID) and offererEmail is not None and isemail(offererEmail):
+
+                if userModel.get_role(offererEmail) == "User":
                 
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
-            
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
+                
+                else:
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book offer", "delete_book_offer", "Error user not authroized")
+                    
             else:
                 
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to book offer", "delete_book_offer", "Error fields cannot be left blank and must be valid inputs")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book offer", "delete_book_offer", "Error fields cannot be left blank and must be valid inputs")
         
         except Exception as ex:
             # logs the error log and returns a error message
@@ -290,11 +337,16 @@ def get_transaction_details():
 
             try:
                 transactionID = request.args.get("TransactionID")
+                email = session.get("email")
 
-                # checks if the input is null or empty and is valid
-                if transactionID is not None and isint(transactionID):
+                # checks if the input is null or empty and is valid and a session is active
+                if transactionID is not None and isint(transactionID) and email is not None and isemail(email):
+                    
+                    if userModel.get_role(email) == "User":
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation details of a specific transcation", "get_transaction_details", userModel.get_transaction_details(transactionID))
 
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation details of a specific transcation", "get_transaction_details", userModel.get_transaction_details(transactionID))
+                    else:
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get transcation details of a specific transcation", "get_transaction_details", "Error user not authroized")
 
                 else:
 
@@ -310,16 +362,17 @@ def get_all_user_transactions():
      if request.method == "GET":
 
         try:
-            email = request.args.get("Email")
+            #email = request.args.get("Email")
+            email = session.get("email")
 
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email):
-
+                
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transactions(email))
             
             else:
 
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get all user transcations made by selected user email", "get_all_user_transcations", "Error fields cannot be left blank and must be valid inputs")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get all user transcations made by selected user email", "get_all_user_transcations", "Error user not authroized")
 
         except Exception as ex:
                 # logs the error log and returns a error message

@@ -12,6 +12,9 @@ user.route('/create_user', methods=['POST'])(create_User)
 # 'http://localhost:5000/apis/user/login'
 user.route('/login', methods=['POST'])(login)
 
+# 'http://localhost:5000/apis/user/logout'
+user.route('/logout', methods=['POST'])(logout)
+
 # 'http://localhost:5000/apis/user/get_user_profile'
 user.route('/get_user_profile', methods=['GET'])(get_user_profile)
 

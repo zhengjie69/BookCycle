@@ -682,7 +682,7 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def update_book_details(self, bookID, title, price, description, genreID, image, locationID, bookconditionID):
+    def update_book_details(self, bookID, email, tableName, title, price, description, genreID, image, locationID, bookconditionID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
@@ -693,19 +693,26 @@ class Book:
 
                 cur = con.cursor()
 
-                if image is not None:
-                    cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookconditionID, bookID))
+                cur.execute("SELECT COUNT(b.BookID) FROM {} AS a INNER JOIN {} AS b ON a.Email = b.Email WHERE b.BookID = ? AND a.Email = ?".format(tableName, self.tablename), (bookID,email))
+                result = cur.fetchall()
+
+                # checks if the book belongs to the user, if it does proceed to update
+                if len(result) == 1 and result[0][0] == 1:
+
+                    if image is not None:
+                        cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookconditionID, bookID))
+                    
+                    else:
+                        cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, locationID, bookconditionID, bookID))
                 
                 else:
-                    cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, locationID, bookconditionID, bookID))
-                
-
+                    return("Error in updating book")
+                    
                 con.commit()
                 return("successfully updated")
 
         except sqlite3.Error as er:
             con.rollback()
-            print(er)
             return("Error in updating book")
 
         finally:

@@ -15,7 +15,40 @@ class User:
         return self.tablename
 
     def get_transactionsTableName(self):
-        return self.transactionsTableName    
+        return self.transactionsTableName
+
+    def get_role(self, email):
+        try:
+            if email is not None:
+                with sqlite3.connect(self.dbname + ".db") as con:
+                    print ("Opened database successfully")
+                    
+                    # this command forces sqlite to enforce the foreign key rules set  for the tables
+                    con.execute("PRAGMA foreign_keys = 1")
+
+                    
+                    cur = con.cursor()
+
+                    # checks if the username is already used in the db
+                    cur.execute("SELECT b.RoleName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ?".format(self.tablename, self.roleTableName), (email,))
+                    result = cur.fetchall()
+
+                    if len(result) == 1:
+                        usernamecount = result[0][0]
+                        return usernamecount
+                    
+                    else:
+                        return "Error fetching role"
+            
+            else:
+                return "Error fetching role"
+
+            
+        except Exception as ex:
+            return("Error fetching role")
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
     def create_user(self, username, email, password, contactNumber):
         try:
@@ -207,6 +240,35 @@ class User:
             con.close()
             print("Successfully closed connection")
 
+    def get_key(self):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+                
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+                cur.execute("SELECT Password FROM {} WHERE Email = ?".format(self.tablename), ("superadmin@gmail.com",))
+                resultRows = cur.fetchall()
+
+                if resultRows is not None and len(resultRows) == 1:
+                    
+                    return (resultRows[0][0])
+                else:
+                    return(None)
+
+        except sqlite3.Error as er:
+            con.rollback()
+            return(None)
+        
+        except Exception as ex:
+            return(None)
+      
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
 
         

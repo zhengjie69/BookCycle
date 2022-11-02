@@ -1,13 +1,15 @@
 import os
-from flask import jsonify, request, current_app
+from flask import jsonify, request, current_app, session
 import random
 import string
 
 from app.models.data_cleaning import *
 from ..models.book_model import Book
+from ..models.user_model import User
 from .api_logger import *
 
 bookmodel = Book()
+usermodel = User()
 
 # helper function to check for allowed files for upload
 def allowed_file(filename):
@@ -88,7 +90,8 @@ def create_book():
             price = request.form.get("Price")
             description = request.form.get("Description")
             genreID = request.form.get("GenreID")
-            email = request.form.get("Email")
+            #email = request.form.get("Email")
+            email = session.get("email")
             image = request.files['Image']
             locationID = request.form.get("LocationID")
             bookConditionID = request.form.get("BookConditionID")
@@ -98,38 +101,44 @@ def create_book():
                 
                 # validates if the data is in the right type
                 if isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isemail(email) and isint(locationID) and isint(bookConditionID):
+                    
+                    # verifies if the role is User, as only users can create book
+                    if usermodel.get_role(email) == "User":
+                        # If the user does not select a file, the browser submits an
+                        # empty file without a filename.
+                        if image.filename == '':
+                            return (jsonify("No selected image"), 200)
 
-                    # If the user does not select a file, the browser submits an
-                    # empty file without a filename.
-                    if image.filename == '':
-                        return (jsonify("No selected image"), 200)
+                        # if there is a image uploaded and the uploaded image format is accepted 
+                        if image and allowed_file(image.filename):
 
-                    # if there is a image uploaded and the uploaded image format is accepted 
-                    if image and allowed_file(image.filename):
+                            # retrieves the file extension
+                            imageExtension = image.filename.split(".")[1]
+                            filename = generate_filename(8) + "." + imageExtension
 
-                        # retrieves the file extension
-                        imageExtension = image.filename.split(".")[1]
-                        filename = generate_filename(8) + "." + imageExtension
-
-                        print(filename)
-                        result = bookmodel.create_book(title, price, description, genreID, email, filename, locationID, bookConditionID)
-                        
-                        # if the book listing is successfully created, insert uploaded image into storage
-                        if "Error" not in result:
-                            current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                            # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-                            image.save(os.path.join(current_dir, filename))
+                            print(filename)
+                            result = bookmodel.create_book(title, price, description, genreID, email, filename, locationID, bookConditionID)
                             
-                            #return(jsonify("Successfully Created Book"), 201)
-                            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Successfully Created Book"))
+                            # if the book listing is successfully created, insert uploaded image into storage
+                            if "Error" not in result:
+                                current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                                # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                                image.save(os.path.join(current_dir, filename))
+                                
+                                #return(jsonify("Successfully Created Book"), 201)
+                                return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Creating a book", "create_book", "Successfully Created Book"))
+                            else:
+                                return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error failed to create Book, please try again"))
                         else:
-                            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error failed to create Book, please try again"))
+                            #return(jsonify("Invalid File Type, Please only upload files with .jpg, .png"), 401)
+                            return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error , invalid File Type, Please only upload files with .jpg, .png"))
+                    
                     else:
-                        #return(jsonify("Invalid File Type, Please only upload files with .jpg, .png"), 401)
-                        return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error , invalid File Type, Please only upload files with .jpg, .png"))
+                        return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error user not authroized"))
                 
                 else:
                     return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error invalid input found"))        
+            
             else:
                 return(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create a book", "create_book", "Error fields cannot be left blank"))
         
@@ -143,7 +152,8 @@ def search_book():
     if request.method == "GET":
         try:
             bookTitle = request.args.get("BookTitle")
-            userEmail = request.args.get("Email")
+            #userEmail = request.args.get("Email")
+            userEmail = session.get("email")
             genreFilter = request.args.get("GenreFilter")
             locationFilter = request.args.get("LocationFilter")
             bookConditionFilter = request.args.get("BookConditionFilter")
@@ -199,7 +209,8 @@ def search_book():
             else:
                 maxPriceFilter = None
 
-
+            print("session email is")
+            print(session.get("email"))
             # checks if the result is an error result
             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_books", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
         
@@ -216,8 +227,21 @@ def get_all_user_books():
         try:
             email = request.args.get("Email")
 
-            if email is not None and isemail(email):
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", bookmodel.get_all_user_books(email))
+            if email is not None and isemail(email) and session.get("email") is not None:
+
+                # verifies if the role is User or admin, as only users and admins can get all user books and only User books can be fetched
+                
+                print("rows")
+                print(usermodel.get_role(session.get("email")))
+                print(usermodel.get_role(email))
+                if usermodel.get_role(session.get("email")) == "User" or usermodel.get_role(session.get("email")) == "Admin" and usermodel.get_role(email) == "User":
+
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", bookmodel.get_all_user_books(email))
+
+                else:
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to fetch all user books", "get_all_user_books", "Error user not authroized")
+
+            
             else:
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to fetch all user books", "get_all_user_books", "Error invalid input found")
 
@@ -240,6 +264,7 @@ def update_book_details():
             #image = request.files['Image']
             locationID = request.form.get("LocationID")
             bookConditionID = request.form.get("BookConditionID")
+            email = session.get("email")
 
             if "Image" in request.files:
                 image = request.files['Image']
@@ -250,47 +275,52 @@ def update_book_details():
             
 
             # checks if the input is null or empty
-            if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None and bookConditionID is not None:
+            if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None and bookConditionID is not None and email is not None:
+                
+                # 
+                if usermodel.get_role(email) == "User":
+                    if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID) and isint(bookConditionID) and isemail(email):
+                        
+                        # generates the new image name and gets the old image name for deletion below
+                        newImageName = generate_filename(8)
+                        oldImageName = bookmodel.get_book_image_name(bookID)
+                        tableName = usermodel.get_tablename()
 
-                if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID) and isint(bookConditionID):
+                        if image is not None:
+                            result = bookmodel.update_book_details(bookID, email, tableName, title, price, description, genreID, newImageName, locationID, bookConditionID)
+                        else:
+                            result = bookmodel.update_book_details(bookID, email, tableName, title, price, description, genreID, image, locationID, bookConditionID)
+                        # uploads the image into storage if update is successful and the file upload is not none
+                        if "Error" not in result and image is not None:
+
+                            # if there is a image uploaded and the uploaded image format is accepted 
+                            if image and allowed_file(image.filename):
+                                
+                                # if a new image is uploaded, old image is deleted before adding new image
+                                current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                                
+
+                                # searches for the old image in the file system
+                                # if no old image, upload the new image
+                                if find_image(oldImageName, current_dir):
+
+                                    os.remove(os.path.join(current_dir, oldImageName))
+                                    image.save(os.path.join(current_dir, newImageName))
+
+                                else:
+                                    image.save(os.path.join(current_dir, newImageName))
+
+                                # current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                                # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                        
+                        
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", result)
                     
-                    # generates the new image name and gets the old image name for deletion below
-                    newImageName = generate_filename(8)
-                    oldImageName = bookmodel.get_book_image_name(bookID)
-
-                    if image is not None:
-                        result = bookmodel.update_book_details(bookID, title, price, description, genreID, newImageName, locationID, bookConditionID)
                     else:
-                        result = bookmodel.update_book_details(bookID, title, price, description, genreID, image, locationID, bookConditionID)
-                    # uploads the image into storage if update is successful and the file upload is not none
-                    if "Error" not in result and image is not None:
-
-                        # if there is a image uploaded and the uploaded image format is accepted 
-                        if image and allowed_file(image.filename):
-                            
-                            # if a new image is uploaded, old image is deleted before adding new image
-                            current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                            
-
-                            # searches for the old image in the file system
-                            # if no old image, upload the new image
-                            if find_image(oldImageName, current_dir):
-
-                                os.remove(os.path.join(current_dir, oldImageName))
-                                image.save(os.path.join(current_dir, newImageName))
-
-                            else:
-                                image.save(os.path.join(current_dir, newImageName))
-
-                            # current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                            # image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-                    
-                    
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating book details", "update_book_details", result)
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update book details", "update_book_details", "Error invalid input found")
                 
                 else:
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update book details", "update_book_details", "Error invalid input found")
-
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update book details", "update_book_details", "Error user not authroized")
             else:
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update book details", "update_book_details", "Error required values are empty")
         
@@ -306,31 +336,41 @@ def delete_book():
         try:
             bookID = request.form.get("BookID")
             ownerEmail = request.form.get("Email")
+            email = session.get("email")
 
             if bookID is not None and ownerEmail is not None:
 
                 if isint(bookID) and isemail(ownerEmail):
+                    
+                    # if the logged in email is a User or Admin and the owneremail has a User role
+                    if usermodel.get_role(email) == "User" or usermodel.get_role(email) == "Admin" and usermodel.get_role(ownerEmail) == "User":
 
-                    # gets the image name before deletion
-                    imagename = bookmodel.get_book_image_name(bookID)
+                        # gets the image name before deletion
+                        imagename = bookmodel.get_book_image_name(bookID)
 
-                    result = bookmodel.delete_book(bookID, ownerEmail)
+                        result = bookmodel.delete_book(bookID, ownerEmail)
 
-                    # prepares to delete the image from storage if record is successfully deleted
-                    if "Error" not in result:
+                        # prepares to delete the image from storage if record is successfully deleted
+                        if "Error" not in result:
 
-                        print("image name is")
-                        print(imagename)
-                        current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                        # searches for the image in the file system
-                        # if found, delete the image
-                        if find_image(imagename, current_dir):
-                            os.remove(os.path.join(current_dir, imagename))
+                            print("image name is")
+                            print(imagename)
+                            current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                            # searches for the image in the file system
+                            # if found, delete the image
+                            if find_image(imagename, current_dir):
+                                os.remove(os.path.join(current_dir, imagename))
 
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", result)
-                
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", result)
+                    
+                    else:
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book", "delete_book", "Error user not authroized")
+
                 else:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book", "delete_book", "Error invalid input found")
+
+            else:
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book", "delete_book", "Error invalid input found")
         
         except Exception as ex:
             # logs the error log and returns a error message

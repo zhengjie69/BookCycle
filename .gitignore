@@ -9,6 +9,7 @@ pyvenv.cfg
 /backend/app/__pycache__
 /backend/database.db
 /backend/venv
+/backend/app/flask_session
 /backend/app/static/BookImages
 /backend/app/apis/__pycache__
 /backend/app/models/__pycache__
