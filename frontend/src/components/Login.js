@@ -50,7 +50,7 @@ const Login = () => {
         else {
             setShowErrors({ showErrors: true });
             setErrorMessages(errors);
-            errors.push("Password or Email is entered wrongly");
+            errors.push("Password or Email is entered Wrongly.");
         }
 
 
@@ -94,7 +94,7 @@ const Login = () => {
                             </Row>
                             <div className="d-flex justify-content-center">
                                 {showErrors ? errorMessages.map((item, index) => {
-                                    return <ul key={index}>{item}</ul>;
+                                    return <ul style={{color:"red"}} key={index}>{item}</ul>;
                                 }) : null}
                             </div>
                             <div className="d-flex justify-content-center">
