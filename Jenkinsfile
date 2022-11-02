@@ -1,13 +1,10 @@
 pipeline {
     agent any
 	
-    tools {nodejs "nodejs"}
-	
     stages {
         stage('Build') { 
             steps {
-                echo 'Run NPM Install'
-		sh 'npm install'
+                echo 'Test'
             }
         }
 	stage('OWASP DependencyCheck') {
