@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Container, Form, Col, Row, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import secureLocalStorage from "react-secure-storage";
+import ReCAPTCHA from "react-google-recaptcha";
 
 function Register() {
 
@@ -17,6 +18,8 @@ function Register() {
 
     let errors = [];
 
+    const captchaTokenForm = new FormData();
+    const captchaRef = useRef(null);
     const RegisterFormData = new FormData();
 
     function ValidateEmail(email) {
@@ -50,6 +53,20 @@ function Register() {
         setErrorMessages([]);
 
         e.preventDefault();
+
+        sessionStorage.removeItem("reload");
+
+        const captchares = await captchaRef.current.getValue();
+        captchaRef.current.reset();
+        captchaTokenForm.append('Token', captchares)
+        const capres = await fetch('/apis/user/forget_password_reset_captcha', {
+            method: "POST",
+            body: captchaTokenForm
+        });
+        if (capres.ok == false) {
+            console.log(capres.ok)
+            errors.push("Please complete captcha validation")
+        }
 
 
         const UsernameLength = Username ? Username.length : 0;
@@ -201,6 +218,13 @@ function Register() {
                             </Col>
                         </Form.Group>
                     </Row>
+                    <div align={"center"} className="mb-3">
+                        <ReCAPTCHA
+                            sitekey="6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB"
+                            render="explicit"
+                            ref={captchaRef}
+                        />
+                    </div>
                     <div className="d-flex justify-content-center">
                         <Button variant="primary" type="submit">
                             Register
