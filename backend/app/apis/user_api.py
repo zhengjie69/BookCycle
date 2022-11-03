@@ -85,7 +85,7 @@ def logout():
     if request.method == "POST":
 
         try:
-
+            email = request.form.get("Email")
             if session.get("email") is not None:
                 session.clear()
                 return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Logging out", "logout", "Successfully logged out")
