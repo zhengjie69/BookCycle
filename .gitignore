@@ -6,6 +6,7 @@
 /lib/
 **/lib/
 pyvenv.cfg
+/beckend/record.log
 /beckend/record.log.encrypted
 /backend/app/__pycache__
 /backend/database.db
