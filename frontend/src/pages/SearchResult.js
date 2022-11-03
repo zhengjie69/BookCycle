@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Container, Form, Row, Col, Card, FloatingLabel } from "react-bootstrap"
 import { SearchBar } from "../components/SearchBar";
 import SessionTimeoutModal from "../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export function SearchResult() {
 
@@ -21,9 +22,9 @@ export function SearchResult() {
     const [LocationID, setLocationID] = useState("null");
     const [MinPrice, setMinPrice] = useState("null");
     const [MaxPrice, setMaxPrice] = useState("null");
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
-    const Authentication = location.getItem('Authentication');
+    const Authentication = secureLocalStorage.getItem('Authentication');
 
     useEffect(() => {
         console.log(location.state.SearchKey)
@@ -144,7 +145,7 @@ export function SearchResult() {
         return (
             <>
                 <div className="d-flex justify-content-center">
-                    {Authentication === "true" ?
+                    {Authentication ?
                         <SessionTimeoutModal /> : null
                     }
                     <Row xs="auto">

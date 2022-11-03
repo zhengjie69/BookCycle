@@ -9,6 +9,7 @@ pyvenv.cfg
 /backend/app/__pycache__
 /backend/database.db
 /backend/venv
+/backend/flask_session
 /backend/app/static/BookImages
 /backend/app/apis/__pycache__
 /backend/app/models/__pycache__
@@ -46,3 +47,4 @@ pyvenv.cfg
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.exe

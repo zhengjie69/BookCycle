@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import secureLocalStorage from "react-secure-storage";
 
-export default function EnableUserModal({ UserEmail, Username }) {
+export default function DeleteAdminModal({ AdminEmail, Username }) {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -12,33 +12,33 @@ export default function EnableUserModal({ UserEmail, Username }) {
 
     const navigate = useNavigate();
 
-    const EnableUserData = new FormData();
+    const DeleteAdminData = new FormData();
 
-    const AdminEmail = secureLocalStorage.getItem('Email');
+    const SuperAdminEmail = secureLocalStorage.getItem('Email');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
     let errors = [];
 
-    const postEnableUser = async (e) => {
+    const postDisableAdmin = async (e) => {
 
         e.preventDefault();
 
-        EnableUserData.append('Email', AdminEmail);
-        EnableUserData.append('UserEmail', UserEmail);
+        DeleteAdminData.append('superAdminEmail', SuperAdminEmail);
+        DeleteAdminData.append('AdminEmail', AdminEmail);
 
-        const res = await fetch('/apis/admin/enable_user_account', {
+        const res = await fetch('/apis/superadmin/delete_admin_account', {
             method: "POST",
-            body: EnableUserData
+            body: DeleteAdminData
         });
 
         const data = await res.json();
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        if (trimmedResponseMessage === "successfully enabled account") {
-            navigate('/ManageUsers');
+        if (trimmedResponseMessage === "Successfully deleted") {
+            navigate('/ManageAdmin');
             window.location.reload(false);
         }
         else {
@@ -50,20 +50,20 @@ export default function EnableUserModal({ UserEmail, Username }) {
 
     return (
         <>
-            <Button variant="success" onClick={handleShow}>
-                Enable
+            <Button variant="danger" onClick={handleShow}>
+                Delete
             </Button>
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Are you sure you want to enable {Username}?</Modal.Title>
+                    <Modal.Title>Are you sure you want to delete {Username}?</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{showErrors ? errorMessages.map((item, index) => {
                     return <b><p key={index}>{item}</p></b>;
                 }) : null}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={postEnableUser}>
-                        Enable
+                    <Button variant="danger" onClick={postDisableAdmin}>
+                        Delete
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Close

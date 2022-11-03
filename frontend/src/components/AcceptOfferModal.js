@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 const AcceptOfferModal = ({ BookOfferID }) => {
     const [show, setShow] = useState(false);
@@ -10,7 +11,7 @@ const AcceptOfferModal = ({ BookOfferID }) => {
 
     const navigate = useNavigate();
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
     const AcceptOfferData = new FormData();
 
     const [errorMessages, setErrorMessages] = useState([]);
@@ -21,9 +22,6 @@ const AcceptOfferModal = ({ BookOfferID }) => {
     const postOffer = async (e) => {
 
         e.preventDefault();
-
-        console.log(BookOfferID);
-        console.log(userEmail);
 
         AcceptOfferData.append('BookOfferID', BookOfferID);
         AcceptOfferData.append('Email', userEmail);

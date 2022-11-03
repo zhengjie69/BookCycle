@@ -13,6 +13,7 @@ import EditProfile from './pages/UserPages/EditProfile'
 import ChangePassword from './pages/ChangePassword'
 import BookListingInformation from './pages/BookListingInformation'
 import ForgetPassword from './pages/ForgetPassword'
+import ResetPage from './pages/ResetPage'
 import Register from './pages/UserPages/Register'
 import EditListings from './pages/UserPages/EditListings'
 import { SearchResult } from './pages/SearchResult'
@@ -23,6 +24,13 @@ import ErrorPage from './pages/ErrorPage'
 import ManageUsers from './pages/AdminPages/ManageUsers'
 import UsersResult from './pages/AdminPages/UsersResult'
 import OTP from './pages/OTP'
+import ManageUsersResult from './pages/AdminPages/ManageUsersResult'
+import ManageBooks from './pages/AdminPages/ManageBooks'
+import ManageBooksResult from './pages/AdminPages/ManageBooksResult'
+import ManageAdmin from './pages/SuperAdminPages/ManageAdmin'
+import ManageAdminResult from './pages/SuperAdminPages/ManageAdminResult'
+import CreateAdmin from './pages/SuperAdminPages/CreateAdmin'
+
 //Homepage is App.js, Navbar is NavbarComp.js
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -43,6 +51,7 @@ root.render(
         {/* Common Routes */}
         <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
         <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
+        <Route exact path='/ForgetResetPassword/:resetCode' element={<ResetPage />} />
         <Route exact path='/MyProfile' element={<MyProfile />} />
         <Route exact path='/OTP' element={<OTP />} />
 
@@ -58,7 +67,14 @@ root.render(
 
         {/* Admin Routes */}
         <Route exact path='/ManageUsers' element={<ManageUsers />} />
-        <Route exact path='/ManageUsers/UsersResult' element={<UsersResult />} />
+        <Route exact path='/ManageUsers/ManageUsersResult' element={<ManageUsersResult />} />
+        <Route exact path='/ManageBooks' element={<ManageBooks />} />
+        <Route exact path='/ManageBooks/ManageBooksResult' element={<ManageBooksResult />} />
+
+        {/* Super Admin Routes */}
+        <Route exact path='/ManageAdmin' element={<ManageAdmin />} />
+        <Route exact path='/ManageAdmin/ManageAdminResult' element={<ManageAdminResult />} />
+        <Route exact path='/CreateAdmin' element={<CreateAdmin />} />
 
       </Routes>
     </Router>

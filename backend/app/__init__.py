@@ -1,10 +1,24 @@
 from flask import Flask
+from flask_mail import Mail
+from flask_jwt_extended import JWTManager
 from .routes.user_routes import user
 from .routes.book_routes import book
 from .routes.admin_routes import admin
+from .routes.super_admin_routes import superadmin
+from .models.user_model import *
 import sqlite3
 import os, traceback
 import bcrypt
+from flask_recaptcha import ReCaptcha
+
+import logging
+from flask.logging import default_handler
+
+from flask_session import Session
+
+jwt = JWTManager()
+mail = Mail()
+recaptcha = ReCaptcha()
 
 def convertToBinaryData(filename):
     # Convert digital data to binary format
@@ -15,6 +29,14 @@ def hash_Password(password):
 
     hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     return hashpassword
+
+def mailSetup():
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = "kopickosongml@gmail.com"
+    MAIL_PASSWORD = "hEXRsOjFENbBkrcQEZS!"
+    SECRET_KEY = 'secretkey'
 
 def sqlite_database_setup():
     try:
@@ -96,7 +118,8 @@ def sqlite_database_setup():
                 con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("test2","test2@gmail.com", hash_Password("test2"), 96543231, 1, 1) )
                 con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("test3","test3@gmail.com", hash_Password("test3"), 12345678, 1, 1) )
                 con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("admin","admin@gmail.com", hash_Password("admin"), 00000000, 2, 1) )
-            
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("superadmin","superadmin@gmail.com", hash_Password("superadmin"), 00000000, 3, 1) )
+
             # checks if the Genre table is empty, and if empty, insert Genre test data
             cur = cur.execute("SELECT COUNT(*) FROM Genre")
             genreRows = cur.fetchall()
@@ -124,9 +147,68 @@ def sqlite_database_setup():
             
             if locationRows[0][0] == 0:
                 # insert Locations
-                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NE9 Boon King",) )
-                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS15 Yio Chu Kang",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS1 EW24 Jurong East",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS2 Bukit Batok",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS3 Bukit Gombak",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS4 BP1 Choa Chu Kang",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS5 Yew Tee",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS7 Kranji",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS8 Marsiling",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS9 TE2 Woodlands",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS10 Admiralty",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS11 Sembawang",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS12 Canberra",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS13 Yishun",) )
                 con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS14 Khatib",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS15 Yio Chu Kang",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS16 Ang Mo Kio",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS17 CC15 Bishan",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS18 Braddell",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS19 Toa Payoh",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS20 Novena",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS21 DT11 Newton",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS22 Orchard",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS23 Somerset",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS24 NE6 CC1 Dhoby Ghaut",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS25 EW13 City Hall",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS26 EW14 Raffles Place",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS27 CE2 Marina Bay",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("NS28 Marina South Pier",) )
+
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW1 Pasir Ris",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW2 DT32 Tampines",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW3 Simei",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW4 CG Tanah Merah",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW5 Bedok",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW6 Kembangan",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW7 Eunos",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW8 CC9 Paya Lebar",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW9 Aljunied",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW10 Kallang",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW11 Lavender",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW12 DT14 Bugis",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW15 Tanjong Pagar",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW16 NE3 Outram Park",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW17 Tiong Bahru",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW18 Redhill",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW19 Queenstown",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW20 Commonwealth",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW21 CC22 Buona Vista",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW22 Dover",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW23 Clementi",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW25 Chinese Garden",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW26 Lakeside",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW27 Boon Lay",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW28 Pioneer",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW29 Joo Koon",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW30 Gul Circle",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW31 Tuas Crescent",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW32 Tuas West Road",) )
+                con.execute("INSERT INTO Location (LocationName) VALUES (?)",("EW33 Tuas Link",) )
+
+
+                
+                
 
             # checks if the book conditon table is empty, and if empty, insert book condition test data
             cur = cur.execute("SELECT COUNT(*) FROM BookCondition")
@@ -184,17 +266,46 @@ def sqlite_database_setup():
     finally:
         con.close()
 
+
 def create_app(test_config=None):
     # create and configure the app
-    sqlite_database_setup()
     app = Flask(__name__, instance_relative_config=True)
+    sqlite_database_setup()
+    flask_key = '95708a6bdb9148679e01d29975cef0c1'
+    app.config['RECAPTCHA_SITE_KEY'] = '6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB'
+    app.config['RECAPTCHA_SECRET_KEY'] = '6LdYjMwiAAAAAMhJ35HRw06NwAxQO9JZqPpMUqQ5'
+    app.config['FLASK_SECRET_KEY'] = flask_key
     app.register_blueprint(user, url_prefix='/apis/user/')
     app.register_blueprint(book, url_prefix='/apis/book/')
     app.register_blueprint(admin, url_prefix='/apis/admin/')
+    app.register_blueprint(superadmin, url_prefix='/apis/superadmin/')
+
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USERNAME'] = 'kopickosongml@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'vamjmxizezesorpg'
+    app.config['MAIL_USE_SSL'] = True
+
+
+    #app.config['SECRET_KEY'] = 'secretkey'
+    userModel = User()
+    app.config['SECRET_KEY'] = userModel.get_key()
+    
 
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+    recaptcha.init_app(app)
+
+    app.config["SESSION_PERMANENT"] = False
+    app.config["SESSION_TYPE"] = "filesystem"
+
+    Session(app)
+    #log = logging.getLogger('werkzeug')
+    #log.setLevel(logging.ERROR)
+    #logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+
+    jwt.init_app(app)
+    mail.init_app(app)
     return app
 
-    

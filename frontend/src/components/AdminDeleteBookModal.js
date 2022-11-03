@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import secureLocalStorage from "react-secure-storage";
 
-export default function DeleteBookModal() {
+export default function AdminDeleteBookModal() {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -13,26 +13,33 @@ export default function DeleteBookModal() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const DeleteBookData = new FormData();
+    const AdminDeleteBookData = new FormData();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
     let errors = [];
 
-    const postDeleteBook = async (e) => {
+    const postAdminDeleteBook = async (e) => {
 
         e.preventDefault();
 
-        const userEmail = secureLocalStorage.getItem('Email');
+        const adminEmail = secureLocalStorage.getItem('Email');
+        const userEmail = location.state.UserEmail;
         const book_id = location.state.BookID;
+        const username = location.state.Username;
 
-        DeleteBookData.append('BookID', book_id);
-        DeleteBookData.append('Email', userEmail);
+        console.log(book_id);
+        console.log(userEmail);
+        console.log(adminEmail);
 
-        const res = await fetch('/apis/book/delete_book', {
+        AdminDeleteBookData.append('BookID', book_id);
+        AdminDeleteBookData.append('OwnerEmail', userEmail);
+        AdminDeleteBookData.append('Email', adminEmail);
+
+        const res = await fetch('/apis/admin/delete_user_book', {
             method: "POST",
-            body: DeleteBookData
+            body: AdminDeleteBookData
         });
 
         const data = await res.json();
@@ -47,7 +54,12 @@ export default function DeleteBookModal() {
                 setErrorMessages(errors);
             }
             else {
-                navigate('/MyListings');
+                navigate('/ManageBooks/ManageBooksResult', {
+                    state: {
+                        UserEmail: userEmail,
+                        Username: username
+                    }
+                });
                 window.location.reload(false);
             }
         }
@@ -56,7 +68,7 @@ export default function DeleteBookModal() {
     return (
         <>
             <Button variant="danger" onClick={handleShow}>
-                Delete this listing
+                Delete this book
             </Button>
 
             <Modal show={show} onHide={handleClose}>
@@ -67,7 +79,7 @@ export default function DeleteBookModal() {
                     return <b><p key={index}>{item}</p></b>;
                 }) : null}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={postDeleteBook}>
+                    <Button variant="danger" onClick={postAdminDeleteBook}>
                         Delete
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>

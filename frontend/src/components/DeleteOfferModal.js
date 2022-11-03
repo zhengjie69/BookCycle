@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function DeleteOfferModal({ BookOfferID }) {
     const [show, setShow] = useState(false);
@@ -16,16 +17,13 @@ export default function DeleteOfferModal({ BookOfferID }) {
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     let errors = [];
 
     const postDeleteOffer = async (e) => {
 
         e.preventDefault();
-
-        console.log(BookOfferID);
-        console.log(userEmail);
 
         DeleteOfferData.append('BookOfferID', BookOfferID);
         DeleteOfferData.append('Email', userEmail);

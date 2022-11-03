@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Form, Button, FloatingLabel, InputGroup } from 'react-bootstrap'
+import { Container, Form, Button, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import SessionTimeoutModal from '../../components/SessionTimeoutModal';
+import secureLocalStorage from "react-secure-storage";
 
 export default function NewListings() {
 
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [genreDropdown, setGenreDropdown] = useState([]);
     const [locationDropdown, setLocationDropdown] = useState([]);
     const [bookConditionDropdown, setBookConditionDropdown] = useState([]);
+    const [bookImage, setBookImage] = useState([]);
 
     const [BookTitle, setBookTitle] = useState();
     const [Price, setPrice] = useState();
     const [Description, setDescription] = useState();
-    const [Condition, setCondition] = useState('1');
-    const [GenreID, setGenreID] = useState('1');
-    const userEmail = localStorage.getItem('Email');
-    const [LocationID, setLocationID] = useState('1');
+    const [Condition, setCondition] = useState('');
+    const [GenreID, setGenreID] = useState('');
+    const [LocationID, setLocationID] = useState('');
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -32,7 +34,12 @@ export default function NewListings() {
     const NewListingsFormData = new FormData();
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "User") {
+        if (Authentication && Role === "User") {
+
+            setGenreID('1');
+            setCondition('1');
+            setLocationID('1');
+
             fetch('/apis/book/get_all_genres')
                 .then(res => res.json())
                 .then(data => {
@@ -76,22 +83,9 @@ export default function NewListings() {
 
     }, [])
 
-    const uploadedImage = (e) => {
-        console.log(e.target.files[0]);
-        NewListingsFormData.append('Image', e.target.files[0]);
-        console.log(NewListingsFormData);
-    };
-
     const postNewListings = async (e) => {
 
         e.preventDefault();
-
-        console.log(Price);
-        console.log(BookTitle);
-        console.log(Description);
-        console.log(GenreID);
-        console.log(LocationID);
-        console.log(Condition);
 
         NewListingsFormData.append("Price", Price);
         NewListingsFormData.append("Title", BookTitle);
@@ -100,23 +94,26 @@ export default function NewListings() {
         NewListingsFormData.append("Email", userEmail);
         NewListingsFormData.append("LocationID", LocationID);
         NewListingsFormData.append("BookConditionID", Condition);
+        NewListingsFormData.append("Image", bookImage);
 
         const res = await fetch('/apis/book/create_book', {
             method: "POST",
             body: NewListingsFormData
         });
 
+        for (var pair of NewListingsFormData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
         const data = await res.json();
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
         if (res.status === 201) {
-            console.log(trimmedResponseMessage);
-            navigate('/');
+            navigate('/MyListings');
             window.location.reload(false);
         }
         else {
-            console.log(trimmedResponseMessage);
             errors.push(trimmedResponseMessage);
             setShowErrors({ showErrors: true });
             setErrorMessages(errors);
@@ -126,7 +123,7 @@ export default function NewListings() {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center">
@@ -143,7 +140,7 @@ export default function NewListings() {
                             <Form.Select required aria-label="Floating label select condition" >
                                 {Array.isArray(genreDropdown) ?
                                     genreDropdown.map(genreDropdown => (
-                                        <option value={genreDropdown.GenreID}>{genreDropdown.GenreName}</option>)) : null
+                                        <option value={genreDropdown.GenreID.toString()}>{genreDropdown.GenreName}</option>)) : null
                                 }
                             </Form.Select>
                         </Form.Group>
@@ -152,7 +149,7 @@ export default function NewListings() {
                             <Form.Select aria-label="Floating label select location" >
                                 {Array.isArray(bookConditionDropdown) ?
                                     bookConditionDropdown.map(bookConditionDropdown => (
-                                        <option value={bookConditionDropdown.BookConditionID}>{bookConditionDropdown.BookConditionName}</option>)) : null
+                                        <option value={bookConditionDropdown.BookConditionID.toString()}>{bookConditionDropdown.BookConditionName}</option>)) : null
                                 }
                             </Form.Select>
                         </Form.Group>
@@ -169,23 +166,24 @@ export default function NewListings() {
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBookImage">
                             <Form.Label>Book Image: </Form.Label>
-                            <Form.Control required type="file" onChange={e => uploadedImage(e)} />
-                            <Form.Text className="text-muted">Upload Profile Picture (image format must be png, jpg, or jpeg).</Form.Text>
+                            <Form.Control required type="file" onChange={e => setBookImage(e.target.files[0])} />
+                            <Form.Text className="text-muted">Image format must be png, jpg, or jpeg.</Form.Text>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formLocation" value={LocationID} onChange={e => setLocationID(e.target.value)}>
-                            <FloatingLabel controlId="floatingSelectLocation" label="Location">
-                                <Form.Select aria-label="Floating label select location" >
-                                    {Array.isArray(locationDropdown) ?
-                                        locationDropdown.map(locationDropdown => (
-                                            <option value={locationDropdown.LocationID}>{locationDropdown.LocationName}</option>)) : null
-                                    }
-                                </Form.Select>
-                            </FloatingLabel>
+                            <Form.Label>Location:</Form.Label>
+                            <Form.Select aria-label="Floating label select location" >
+                                {Array.isArray(locationDropdown) ?
+                                    locationDropdown.map(locationDropdown => (
+                                        <option value={locationDropdown.LocationID.toString()}>{locationDropdown.LocationName}</option>)) : null
+                                }
+                            </Form.Select>
                         </Form.Group>
                         <div className="d-flex justify-content-center mb-3">
-                            {showErrors ? errorMessages.map((item, index) => {
-                                return <ul key={index}>{item}</ul>;
-                            }) : null}
+                            <Row>
+                                {showErrors ? errorMessages.map((item, index) => {
+                                    return <ul key={index}>{item}</ul>;
+                                }) : null}
+                            </Row>
                         </div>
                         <div className="d-flex justify-content-center mb-3">
                             <Button variant="primary" type="submit">

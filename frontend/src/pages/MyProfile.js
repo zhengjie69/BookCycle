@@ -5,20 +5,21 @@ import Button from 'react-bootstrap/Button'
 import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import SessionTimeoutModal from '../components/SessionTimeoutModal'
+import secureLocalStorage from "react-secure-storage";
 
 function MyProfile() {
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
     const [profileInformation, setProfileInformation] = useState([]);
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userEmail !== null && Authentication === "true") {
+        if (userEmail !== null && Authentication) {
             fetch('/apis/user/get_user_profile?Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -39,7 +40,7 @@ function MyProfile() {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center">
@@ -66,14 +67,15 @@ function MyProfile() {
                                                 </td>
                                                 <td>{userEmail}</td>
                                             </tr>
-                                            <tr>
-                                                <td className="d-flex justify-content-center">
-                                                    <span className="material-symbols-outlined">
-                                                        chat
-                                                    </span>
-                                                </td>
-                                                <td>{profileInformation.ContactNumber}</td>
-                                            </tr>
+                                            {Role === "User" ?
+                                                <tr>
+                                                    <td className="d-flex justify-content-center">
+                                                        <span className="material-symbols-outlined">
+                                                            chat
+                                                        </span>
+                                                    </td>
+                                                    <td>{profileInformation.ContactNumber}</td>
+                                                </tr> : null}
                                         </tbody>
                                     </Table>
                                     <Table borderless>

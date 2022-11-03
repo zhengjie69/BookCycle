@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Container, FloatingLabel, Button } from "react-bootstrap";
+import { Container, FloatingLabel, Button, Form, Row } from "react-bootstrap";
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Form } from "react-bootstrap";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 
 export default function EditListings() {
 
     const itemLocation = useLocation();
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -19,14 +19,14 @@ export default function EditListings() {
     const [LocationDropdown, setLocationDropdown] = useState([]);
     const [ConditionDropdown, setConditionDropdown] = useState([]);
 
+    const [BookID, setBookID] = useState();
     const [BookTitle, setBookTitle] = useState();
+    const [Genre, setGenre] = useState();
+    const [Location, setLocation] = useState();
     const [Price, setPrice] = useState();
     const [Description, setDescription] = useState();
     const [Condition, setCondition] = useState();
-
-    const [Genre, setGenre] = useState();
-    const userEmail = localStorage.getItem('Email');
-    const [Location, setLocation] = useState();
+    const [BookImage, setBookImage] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
@@ -35,21 +35,16 @@ export default function EditListings() {
 
     const EditListingFormData = new FormData();
 
-    const uploadedImage = (e) => {
-        console.log(e.target.files[0]);
-        EditListingFormData.append('Image', e.target.files[0]);
-        console.log(EditListingFormData);
-    };
-
     useEffect(() => {
-        if (Authentication === "true" && Role === "User") {
-            setBookTitle(itemLocation.state.Title);
-            setPrice(itemLocation.state.Price);
-            setDescription(itemLocation.state.Description);
-            setCondition(itemLocation.state.Condition);
+        if (Authentication && Role === "User") {
 
-            setGenre(itemLocation.state.Genre);
-            setLocation(itemLocation.state.Location);
+            setBookID(itemLocation.state.BookID.toString());
+            setBookTitle(itemLocation.state.Title);
+            setPrice(itemLocation.state.Price.toString());
+            setDescription(itemLocation.state.Description);
+            setCondition(itemLocation.state.ConditionID.toString());
+            setGenre(itemLocation.state.GenreID.toString());
+            setLocation(itemLocation.state.LocationID.toString());
 
             fetch('/apis/book/get_all_genres')
                 .then(res => res.json())
@@ -86,40 +81,72 @@ export default function EditListings() {
                         setError(error);
                     }
                 )
+
         }
 
         else {
             return navigate('/');
         }
 
-    }, [Authentication])
+    }, [])
 
     const postEditListings = async (e) => {
 
         e.preventDefault();
 
-        /* Title: location.state.Title,
-            BookID: location.state.BookID,
-            Price: location.state.Price,
-            Genre: location.state.Genre,
-            Image: location.state.Image,
-            Location: location.state.Location,
-            Description: location.state.Description,
-            BookStatus: location.state.BookStatus */
+        // console.log(BookID);
+        // console.log(BookTitle);
+        // console.log(Genre);
+        // console.log(Condition);
+        // console.log(Price);
+        // console.log(Description);
+        // console.log(Location);
+        // console.log(BookImage);
 
-        console.log(BookTitle);
-        console.log(Genre);
-        console.log(Condition);
-        console.log(Price);
-        console.log(Description);
-        console.log(itemLocation.state.Image);
-        console.log(itemLocation.state.BookID);
-        console.log(Location);
+        EditListingFormData.append("BookID", BookID);
+        EditListingFormData.append("Title", BookTitle);
+        EditListingFormData.append("GenreID", Genre);
+        EditListingFormData.append("BookConditionID", Condition);
+        EditListingFormData.append("Price", Price);
+        EditListingFormData.append("Description", Description);
+        EditListingFormData.append("LocationID", Location);
+
+        if (BookImage === undefined) {
+            //EditListingFormData.append("Image", null)
+        }
+        else {
+            EditListingFormData.append("Image", BookImage);
+        }
+
+        //To print the details for form data
+        for (var pair of EditListingFormData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        const res = await fetch('/apis/book/update_book_details', {
+            method: "POST",
+            body: EditListingFormData
+        });
+
+        const data = await res.json();
+
+        const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
+        if (trimmedResponseMessage === "successfully updated") {
+            navigate('/MyListings');
+            window.location.reload(false);
+        }
+        else {
+            errors.push(trimmedResponseMessage);
+            setShowErrors({ showErrors: true });
+            setErrorMessages(errors);
+        }
+
     }
 
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             <div className="d-flex justify-content-center">
@@ -136,15 +163,15 @@ export default function EditListings() {
                         <Form.Select required aria-label="Floating label select condition">
                             {Array.isArray(GenreDropdown) ?
                                 GenreDropdown
-                                    .filter(GenreDropdown => GenreDropdown.GenreName === Genre)
+                                    .filter(GenreDropdown => GenreDropdown.GenreID === Genre)
                                     .map(FilteredGenreDropdown => (
-                                        <option value={FilteredGenreDropdown.GenreID}>{FilteredGenreDropdown.GenreName}</option>)) : null
+                                        <option value={FilteredGenreDropdown.GenreID.toString()}>{FilteredGenreDropdown.GenreName}</option>)) : null
                             }
                             {Array.isArray(GenreDropdown) ?
                                 GenreDropdown
-                                    .filter(GenreDropdown => GenreDropdown.GenreName !== Genre)
+                                    .filter(GenreDropdown => GenreDropdown.GenreID !== Genre)
                                     .map(FilteredGenreDropdown => (
-                                        <option value={FilteredGenreDropdown.GenreID}>{FilteredGenreDropdown.GenreName}</option>)) : null
+                                        <option value={FilteredGenreDropdown.GenreID.toString()}>{FilteredGenreDropdown.GenreName}</option>)) : null
                             }
                         </Form.Select>
                     </Form.Group>
@@ -153,15 +180,15 @@ export default function EditListings() {
                         <Form.Select required aria-label="Floating label select condition" >
                             {Array.isArray(ConditionDropdown) ?
                                 ConditionDropdown
-                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName === itemLocation.state.Condition)
+                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionID === Condition)
                                     .map(FilteredConditionDropdown => (
-                                        <option value={FilteredConditionDropdown.BookConditionID}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
+                                        <option value={FilteredConditionDropdown.BookConditionID.toString()}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
                             }
                             {Array.isArray(ConditionDropdown) ?
                                 ConditionDropdown
-                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionName !== Condition)
+                                    .filter(ConditionDropdown => ConditionDropdown.BookConditionID !== Condition)
                                     .map(FilteredConditionDropdown => (
-                                        <option value={FilteredConditionDropdown.BookConditionID}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
+                                        <option value={FilteredConditionDropdown.BookConditionID.toString()}>{FilteredConditionDropdown.BookConditionName}</option>)) : null
                             }
                         </Form.Select>
                     </Form.Group>
@@ -178,31 +205,33 @@ export default function EditListings() {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBookImage">
                         <Form.Label>Book Image: </Form.Label>
-                        <Form.Control type="file" onChange={e => uploadedImage(e)} />
-                        <Form.Text className="text-muted">Upload Profile Picture (image format must be png, jpg, or jpeg).</Form.Text>
+                        <Form.Control type="file" onChange={e => setBookImage(e.target.files[0])} />
+                        <Form.Text className="text-muted">Image format must be png, jpg, or jpeg.</Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formLocation" value={Location} onChange={e => setLocation(e.target.value)}>
                         <FloatingLabel controlId="floatingSelectLocation" label="Location">
                             <Form.Select aria-label="Floating label select location" >
                                 {Array.isArray(LocationDropdown) ?
                                     LocationDropdown
-                                        .filter(LocationDropdown => LocationDropdown.LocationName === Location)
+                                        .filter(LocationDropdown => LocationDropdown.LocationID === Location)
                                         .map(LocationDropdown => (
-                                            <option value={LocationDropdown.LocationID}>{LocationDropdown.LocationName}</option>)) : null
+                                            <option value={LocationDropdown.LocationID.toString()}>{LocationDropdown.LocationName}</option>)) : null
                                 }
                                 {Array.isArray(LocationDropdown) ?
                                     LocationDropdown
-                                        .filter(LocationDropdown => LocationDropdown.LocationName !== Location)
+                                        .filter(LocationDropdown => LocationDropdown.LocationID !== Location)
                                         .map(LocationDropdown => (
-                                            <option value={LocationDropdown.LocationID}>{LocationDropdown.LocationName}</option>)) : null
+                                            <option value={LocationDropdown.LocationID.toString()}>{LocationDropdown.LocationName}</option>)) : null
                                 }
                             </Form.Select>
                         </FloatingLabel>
                     </Form.Group>
                     <div className="d-flex justify-content-center mb-3">
-                        {showErrors ? errorMessages.map((item, index) => {
-                            return <ul key={index}>{item}</ul>;
-                        }) : null}
+                        <Row>
+                            {showErrors ? errorMessages.map((item, index) => {
+                                return <ul key={index}>{item}</ul>;
+                            }) : null}
+                        </Row>
                     </div>
                     <div className="d-flex justify-content-center mb-3">
                         <Button variant="primary" type="submit">

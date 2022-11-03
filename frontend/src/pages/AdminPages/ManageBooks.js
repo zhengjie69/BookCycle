@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import secureLocalStorage from "react-secure-storage";
 
-export default function ManageUsers() {
+export default function ManageBooks() {
 
     const Role = secureLocalStorage.getItem('Role');
     const Authentication = secureLocalStorage.getItem('Authentication');
@@ -25,7 +25,7 @@ export default function ManageUsers() {
     }
 
     useEffect(() => {
-        if (!Authentication && Role !== "Admin") {
+        if (!Authentication || Role !== "Admin") {
             return navigate('/');
         }
     }, [])
@@ -53,11 +53,9 @@ export default function ManageUsers() {
             console.log(data[0].ContactNumber);
 
             if (data[0].ContactNumber !== undefined && data[0].AccountStatus !== undefined && data[0].Username !== undefined) {
-                navigate('/ManageUsers/ManageUsersResult', {
+                navigate('/ManageBooks/ManageBooksResult', {
                     state: {
                         UserEmail: UserEmail,
-                        ContactNumber: data[0].ContactNumber,
-                        AccountStatus: data[0].AccountStatus,
                         Username: data[0].Username
                     }
                 });
@@ -80,12 +78,12 @@ export default function ManageUsers() {
     return (
         <div className="mt-5 pt-5">
             <Container>
-                {Authentication ?
+                {Authentication === "true" ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex align-items-center justify-content-center mb-4">
                     <Row>
-                        <h1>Manage Users</h1>
+                        <h1>Manage Books</h1>
                     </Row>
                 </div>
                 <div className="row h-100 justify-content-center align-items-center">

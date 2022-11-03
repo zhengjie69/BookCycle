@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Row, Col } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
-import DisableUserModal from "../../components/DisableUserModal";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
-import EnableUserModal from "../../components/EnableUserModal";
+import DeleteAdminModal from "../../components/DeleteAdminModal";
+import DisableAdminModal from "../../components/DisableAdminModal"
+import secureLocalStorage from "react-secure-storage";
 
-export default function UsersResult() {
+export default function ManageAdminResult() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const Authentication = localStorage.getItem("Authentication");
-    const Role = localStorage.getItem("Role");
+    const Authentication = secureLocalStorage.getItem("Authentication");
+    const Role = secureLocalStorage.getItem("Role");
 
-    const [UserEmail, setUserEmail] = useState('');
+    const [AdminEmail, setAdminEmail] = useState('');
     const [Username, setUsername] = useState('');
-    const [ContactNumber, setContactNumber] = useState('');
     const [AccountStatus, setAccountStatus] = useState('');
 
     useEffect(() => {
-        if (Authentication === "true" && Role === "Admin") {
-            setUserEmail(location.state.UserEmail);
+        if (Authentication && Role === "SuperAdmin") {
+            setAdminEmail(location.state.AdminEmail);
             setUsername(location.state.Username);
-            setContactNumber(location.state.ContactNumber);
             setAccountStatus(location.state.AccountStatus);
         }
         else {
@@ -32,11 +31,11 @@ export default function UsersResult() {
     return (
         <div className="mt-4">
             <Container>
-                {Authentication === "true" ?
+                {Authentication ?
                     <SessionTimeoutModal /> : null
                 }
                 <div className="d-flex justify-content-center align-items-center">
-                    <h1>Manage User</h1>
+                    <h1>Manage Administrator</h1>
                 </div>
                 <div className="d-flex justify-content-center align-items-center">
                     <div className="row">
@@ -55,15 +54,7 @@ export default function UsersResult() {
                                         mail
                                     </span>
                                 </td>
-                                <td>{UserEmail}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span className="material-symbols-outlined">
-                                        chat
-                                    </span>
-                                </td>
-                                <td>{ContactNumber}</td>
+                                <td>{AdminEmail}</td>
                             </tr>
                             <tr>
                                 <td>
@@ -74,12 +65,14 @@ export default function UsersResult() {
                                 <td>{AccountStatus}</td>
                             </tr>
                         </Table>
-                        {AccountStatus == "Active" ?
-                            <DisableUserModal UserEmail={UserEmail} Username={Username} /> : null
-                        }
-                        {AccountStatus == "Disabled" ?
-                            <EnableUserModal UserEmail={UserEmail} Username={Username} /> : null
-                        }
+                        <Row>
+                            {AccountStatus === "Active" ?
+                                <DisableAdminModal AdminEmail={AdminEmail} Username={Username} /> : null
+                            }
+                        </Row>
+                        <Row>
+                            <DeleteAdminModal AdminEmail={AdminEmail} Username={Username} />
+                        </Row>
                     </div>
                 </div>
             </Container>

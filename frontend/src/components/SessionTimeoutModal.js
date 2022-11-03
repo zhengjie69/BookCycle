@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 
 function SessionTimeoutModal() {
@@ -8,8 +9,8 @@ function SessionTimeoutModal() {
     const [idleModal, setIdleModal] = useState(false);
     const navigate = useNavigate();
 
-    let idleTimeout = 1000 * 60 * 1;  //1 minute
-    let idleLogout = 1000 * 60 * 2; //2 Minutes
+    let idleTimeout = 1000 * 60 * 15;  //15 minute
+    let idleLogout = 1000 * 60 * 30; //30 Minutes
     let idleEvent;
     let idleLogoutEvent;
 
@@ -52,9 +53,9 @@ function SessionTimeoutModal() {
      */
     const logOut = () => {
         setIdleModal(false);
-        localStorage.removeItem('Authentication');
-        localStorage.removeItem('Email');
-        localStorage.removeItem('Role');
+        secureLocalStorage.removeItem('Authentication');
+        secureLocalStorage.removeItem('Email');
+        secureLocalStorage.removeItem('Role');
         navigate('/')
         window.location.reload(false);
     }

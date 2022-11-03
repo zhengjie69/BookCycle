@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function EditOfferModal({ BookOfferID, BookOfferPrice }) {
     const [show, setShow] = useState(false);
@@ -16,17 +17,13 @@ export default function EditOfferModal({ BookOfferID, BookOfferPrice }) {
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     let errors = [];
 
     const postEditTransaction = async (e) => {
 
         e.preventDefault();
-
-        console.log(BookOfferID);
-        console.log(userEmail);
-        console.log(BookOfferPrice);
 
         const trimmedPriceLength = Price.replace(/ /g, "");
         const PriceLength = trimmedPriceLength ? Price.length : 0;

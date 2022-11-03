@@ -101,39 +101,68 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
+    def get_book_image_name(self, bookID):
+        try:
+        
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+                
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+                cur.execute("SELECT image FROM {}".format(self.tablename))
+                rows = cur.fetchall()
+                   
+                # 
+                if len(rows) == 1:
+                    return(rows[0][0])
+                else:
+                    return("Error no existing image found, please try again later") 
+        except sqlite3.Error as er:
+            con.rollback()
+            return("Error in fetching locations")
+
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
 
     def create_book(self, title, price, description, genreID, email, image, locationID, bookConditionID):
         try:
-
-            # checks if the values are none or "", if all are not, start insertion
-            if title is not None and price is not None and description is not None and genreID is not None and email is not None and image is not None and locationID is not None:
-                if title != "" and price != "" and description != "" and genreID != "" and email != "" and image != "" and locationID != "":
-                    with sqlite3.connect(self.dbname + ".db") as con:
-                        print ("Opened database successfully")
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
                         
-                        # this command forces sqlite to enforce the foreign key rules set  for the tables
-                        con.execute("PRAGMA foreign_keys = 1")
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
 
-                        cur = con.cursor()
+                cur = con.cursor()
+                # checks if the image name exists in the db already
+                cur.execute("SELECT COUNT(Image) FROM {} WHERE Image = ?".format(self.tablename), (image,))
+                result = cur.fetchall()
 
-                        # fetches the bookstatus id for the status Avaliable
-                        cur.execute("SELECT BookStatusID FROM {} WHERE BookStatusName = ?".format(self.bookstatustablename), ("Available",))
-                        result = cur.fetchall()
-                        bookStatusID = result[0][0]
+                # if the image name does not exist in the db, do the insertion
+                if result[0][0] == 0:
 
-                        # inserts the data required for the book into the database
-                        # bookstatus by default is "Avaliable" when first created
-                        cur.execute("INSERT INTO {}(Title, Price, BookStatusID, Description, GenreID, Email, Image, LocationID, BookConditionID) VALUES (?,?,?,?,?,?,?,?,?)".format(self.tablename), (title, price, bookStatusID, description, genreID, email, image, locationID, bookConditionID))
-                        con.commit()
-                        #return("successfully created book")
-                        return True
+                    # fetches the bookstatus id for the status Avaliable
+                    cur.execute("SELECT BookStatusID FROM {} WHERE BookStatusName = ?".format(self.bookstatustablename), ("Available",))
+                    result2 = cur.fetchall()
+                    bookStatusID = result2[0][0]
+
+                    # inserts the data required for the book into the database
+                    # bookstatus by default is "Avaliable" when first created
+                    cur.execute("INSERT INTO {}(Title, Price, BookStatusID, Description, GenreID, Email, Image, LocationID, BookConditionID) VALUES (?,?,?,?,?,?,?,?,?)".format(self.tablename), (title, price, bookStatusID, description, genreID, email, image, locationID, bookConditionID))
+                    con.commit()
+                    return("successfully created book")
+                        
+                else:
+                    return("Error failed to create book listing, try again later")
                 
-            return False
 
         except sqlite3.Error as er:
             con.rollback()
             #return("Error in creating book")
-            return False
+            return "Exception Error " + str(er)
 
         finally:
             con.close()
@@ -175,7 +204,7 @@ class Book:
                 # checks if title is None, if not none build the command for title filter
                 if bookTitle is not None:
 
-                    filteredBookTitle = data_cleaning(bookTitle)
+                    filteredBookTitle = data_cleaning_with_space(bookTitle)
                     # check if the values is not empty string
                     if filteredBookTitle != "":
 
@@ -434,7 +463,7 @@ class Book:
                 cur = con.cursor()
 
                 #fetches the books the user has created
-                cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName, e.BookStatusName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (email,))
+                cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, a.GenreID, b.GenreName, a.LocationID, c.LocationName, a.BookConditionID, d.BookConditionName, e.BookStatusName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (email,))
                 rows = cur.fetchall()
                    
                 # if there are book records, fetches the status, genre and builds the image  url for front end use
@@ -449,7 +478,7 @@ class Book:
                         imgurl = "http://127.0.0.1:5000" + fileurl
 
                         # creates a dictonary for each book record and inserts into a list for return
-                        roledict = roledict = {'BookID': records[0], 'Title': records[1], 'Price': records[2], 'Description': records[3], 'Image': imgurl, 'Genre': records[5], 'Location': records[6], 'BookCondition': records[7], 'BookStatus': records[8]}
+                        roledict = roledict = {'BookID': records[0], 'Title': records[1], 'Price': records[2], 'Description': records[3], 'Image': imgurl, 'GenreID': records[5], 'Genre': records[6],'LocationID': records[7], 'Location': records[8],'BookConditionID': records[9], 'BookCondition': records[10], 'BookStatus': records[11]}
                         returnData.append(roledict)
                     return(returnData)
                 else:
@@ -653,7 +682,7 @@ class Book:
             con.close()
             print("Successfully closed connection")
 
-    def update_book_details(self, bookID, title, price, description, genreID, image, locationID):
+    def update_book_details(self, bookID, email, tableName, title, price, description, genreID, image, locationID, bookconditionID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
@@ -663,9 +692,22 @@ class Book:
                 con.execute("PRAGMA foreign_keys = 1")
 
                 cur = con.cursor()
-                cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ? WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookID))
-                #rows = cur.fetchall()
-                #print(rows)
+
+                cur.execute("SELECT COUNT(b.BookID) FROM {} AS a INNER JOIN {} AS b ON a.Email = b.Email WHERE b.BookID = ? AND a.Email = ?".format(tableName, self.tablename), (bookID,email))
+                result = cur.fetchall()
+
+                # checks if the book belongs to the user, if it does proceed to update
+                if len(result) == 1 and result[0][0] == 1:
+
+                    if image is not None:
+                        cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, Image = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, image, locationID, bookconditionID, bookID))
+                    
+                    else:
+                        cur.execute("UPDATE {} SET Title = ?, Price = ?, Description = ?, GenreID = ?, LocationID = ?, BookConditionID = ?  WHERE BookID = ?".format(self.tablename),(title, price, description, genreID, locationID, bookconditionID, bookID))
+                
+                else:
+                    return("Error in updating book")
+                    
                 con.commit()
                 return("successfully updated")
 

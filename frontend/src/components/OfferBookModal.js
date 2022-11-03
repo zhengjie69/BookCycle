@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
+import secureLocalStorage from "react-secure-storage";
 
 export default function OfferBookModal() {
     const [show, setShow] = useState(false);
@@ -23,12 +24,8 @@ export default function OfferBookModal() {
 
         e.preventDefault();
 
-        const userEmail = localStorage.getItem('Email');
+        const userEmail = secureLocalStorage.getItem('Email');
         const book_id = location.state.BookID;
-
-        console.log(book_id);
-        console.log(userEmail);
-        console.log(Price);
 
         const trimmedPriceLength = Price.replace(/ /g, "");
         const PriceLength = trimmedPriceLength ? Price.length : 0;

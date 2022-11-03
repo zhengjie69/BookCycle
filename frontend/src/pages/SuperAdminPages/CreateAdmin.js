@@ -1,26 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Container, Form, Col, Row, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Form, Col, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import secureLocalStorage from "react-secure-storage";
-import ReCAPTCHA from "react-google-recaptcha";
 
-function Register() {
+export default function CreateAdmin() {
 
     const navigate = useNavigate();
-    const [Username, setUsername] = useState();
-    const [Email, setEmail] = useState();
-    const [Password, setPassword] = useState();
-    const [ConfirmPassword, setConfirmPassword] = useState();
-    const [ContactNumber, setContactNumber] = useState();
+    const Authentication = secureLocalStorage.getItem("Authentication");
+    const SuperAdminEmail = secureLocalStorage.getItem("Email");
+    const Role = secureLocalStorage.getItem("Role");
+
+    const [AdminUsername, setAdminUsername] = useState();
+    const [AdminEmail, setAdminEmail] = useState();
+    const [AdminPassword, setAdminPassword] = useState();
+    const [AdminConfirmPassword, setAdminConfirmPassword] = useState();
+    const [AdminContactNumber, setAdminContactNumber] = useState();
 
     const [errorMessages, setErrorMessages] = useState([]);
     const [showErrors, setShowErrors] = useState(false);
 
     let errors = [];
 
-    const captchaTokenForm = new FormData();
-    const captchaRef = useRef(null);
-    const RegisterFormData = new FormData();
+    const CreateAdminFormData = new FormData();
+
+    useEffect(() => {
+        if (!Authentication || Role !== "SuperAdmin") {
+            return navigate('/');
+        }
+    }, [])
 
     function ValidateEmail(email) {
         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
@@ -34,7 +42,7 @@ function Register() {
         return specialChars.test(str);
     }
 
-    function ValidatePassword(password) {
+    function validatePassword(password) {
         var pattern = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[-+_!@#$%^&*.,?]).+$");
 
         if (!password || password.length === 0 || password.length < 8 || password.length > 25) {
@@ -48,64 +56,51 @@ function Register() {
         }
     }
 
-    const postRegister = async (e) => {
+    const postCreateAdmin = async (e) => {
 
         setErrorMessages([]);
 
         e.preventDefault();
 
-        sessionStorage.removeItem("reload");
+        CreateAdminFormData.append('superAdminEmail', SuperAdminEmail);
 
-        const captchares = await captchaRef.current.getValue();
-        captchaRef.current.reset();
-        captchaTokenForm.append('Token', captchares)
-        const capres = await fetch('/apis/user/forget_password_reset_captcha', {
-            method: "POST",
-            body: captchaTokenForm
-        });
-        if (capres.ok == false) {
-            console.log(capres.ok)
-            errors.push("Please complete captcha validation")
-        }
+        const AdminUsernameLength = AdminUsername ? AdminUsername.length : 0;
+        const AdminContactNumberLength = AdminContactNumber ? AdminContactNumber.toString().length : 0;
 
-
-        const UsernameLength = Username ? Username.length : 0;
-        const ContactNumberLength = ContactNumber ? ContactNumber.length : 0;
-
-        if (UsernameLength <= 12 && UsernameLength > 3) {
-            if (containsSpecialChars(Username)) {
+        if (AdminUsernameLength <= 12 && AdminUsernameLength > 3) {
+            if (containsSpecialChars(AdminUsername)) {
                 errors.push("Please do not use special characters in your username.");
             }
             else {
-                RegisterFormData.append('Username', Username);
+                CreateAdminFormData.append('Username', AdminUsername);
             }
         }
         else {
             errors.push("Please enter a valid username with a length of minumum 4 and maximum 12.");
         }
 
-        if (ValidateEmail(Email) === true) {
-            RegisterFormData.append('Email', Email)
+        if (ValidateEmail(AdminEmail)) {
+            CreateAdminFormData.append('AdminEmail', AdminEmail);
         }
         else {
             errors.push("Please enter a valid email.");
         }
 
-        if (ValidatePassword(Password) === true) {
-            if (Password === ConfirmPassword) {
-                RegisterFormData.append('Password', Password);
+        if (validatePassword(AdminPassword) === true) {
+            if (AdminPassword === AdminConfirmPassword) {
+                CreateAdminFormData.append('Password', AdminPassword);
             }
             else {
                 errors.push("Ensure that the password and confirm password is the same");
             }
         }
         else {
-            errors.push(ValidatePassword(Password));
+            errors.push(validatePassword(AdminPassword));
         }
 
-        if (!isNaN(+ContactNumber)) {
-            if (ContactNumberLength === 8) {
-                RegisterFormData.append('ContactNumber', ContactNumber);
+        if (!isNaN(+AdminContactNumber)) {
+            if (AdminContactNumberLength === 8) {
+                CreateAdminFormData.append('ContactNumber', AdminContactNumber);
             }
             else {
                 errors.push("Please enter a valid phone number length");
@@ -121,71 +116,75 @@ function Register() {
         }
         else {
             setShowErrors({ showErrors: false });
-            const res = await fetch('/apis/user/create_user', {
+
+            const res = await fetch('/apis/superadmin/create_admin_account', {
                 method: "POST",
-                body: RegisterFormData
+                body: CreateAdminFormData
             });
 
             const data = await res.json();
 
-            if (res.status === 201) {
-                secureLocalStorage.setItem('Authentication', data.authentication);
-                secureLocalStorage.setItem('Email', data.Email);
-                secureLocalStorage.setItem('Role', data.Role);
+            const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
+            if (trimmedResponseMessage == "Successfully created user") {
+                alert(AdminUsername + " has been created")
                 navigate('/');
                 window.location.reload(false);
             }
-
             else {
-                const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
                 errors.push(trimmedResponseMessage);
                 setShowErrors({ showErrors: true });
                 setErrorMessages(errors);
             }
-
         }
+
     }
 
     return (
         <Container>
-            <div className="d-flex justify-content-center mb-2">
-                <h1>Register</h1>
+            {Authentication ?
+                <SessionTimeoutModal /> : null
+            }
+            <div className="d-flex align-items-center justify-content-center mt-4">
+                <Row>
+                    <h1>Create Admin</h1>
+                </Row>
             </div>
             <div className="d-flex justify-content-center">
-                <form onSubmit={postRegister}>
+                <form onSubmit={postCreateAdmin}>
                     <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formUsername">
+                        <Form.Group as={Row} className="mb-3" controlId="formAdminUsername">
                             <Form.Label column sm="1" xs lg="1">
                                 <span className="material-symbols-outlined">
                                     person
                                 </span>
                             </Form.Label>
                             <Col xs={10}>
-                                <Form.Control required type="text" placeholder="Username" value={Username} onChange={e => setUsername(e.target.value)} />
+                                <Form.Control required type="text" placeholder="Username" value={AdminUsername} onChange={e => setAdminUsername(e.target.value)} />
                             </Col>
                         </Form.Group>
                     </Row>
                     <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formEmail">
+                        <Form.Group as={Row} className="mb-3" controlId="formAdminEmail">
                             <Form.Label column sm="1" xs lg="1">
                                 <span className="material-symbols-outlined">
                                     mail
                                 </span>
                             </Form.Label>
                             <Col xs={10}>
-                                <Form.Control required type="email" placeholder="Email" value={Email} onChange={e => setEmail(e.target.value)} />
+                                <Form.Control required type="email" placeholder="Email" value={AdminEmail} onChange={e => setAdminEmail(e.target.value)} />
                             </Col>
                         </Form.Group>
                     </Row>
                     <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formPassword">
+                        <Form.Group as={Row} className="mb-3" controlId="formAdminPassword">
                             <Form.Label column sm="1" xs lg="1">
                                 <span className="material-symbols-outlined">
                                     lock
                                 </span>
                             </Form.Label>
                             <Col xs={10}>
-                                <Form.Control required type="password" placeholder="Password" value={Password} onChange={e => setPassword(e.target.value)} />
+                                <Form.Control required type="password" placeholder="Password" value={AdminPassword} onChange={e => setAdminPassword(e.target.value)} />
                             </Col>
                             <Col xs={10}>
                                 <Form.Text className="text-muted">
@@ -195,39 +194,32 @@ function Register() {
                         </Form.Group>
                     </Row>
                     <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formConfirmPassword">
+                        <Form.Group as={Row} className="mb-3" controlId="formAdminConfirmPassword">
                             <Form.Label column sm="1" xs lg="1">
                                 <span className="material-symbols-outlined">
                                     lock
                                 </span>
                             </Form.Label>
                             <Col xs={10}>
-                                <Form.Control required type="password" placeholder="Confirm Password" value={ConfirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+                                <Form.Control required type="password" placeholder="Confirm Password" value={AdminConfirmPassword} onChange={e => setAdminConfirmPassword(e.target.value)} />
                             </Col>
                         </Form.Group>
                     </Row>
                     <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formContactNumber">
+                        <Form.Group as={Row} className="mb-3" controlId="formAdminContactNumber">
                             <Form.Label column sm="1" xs lg="1">
                                 <span className="material-symbols-outlined">
                                     phone
                                 </span>
                             </Form.Label>
                             <Col xs={10}>
-                                <Form.Control required type="tel" placeholder="Contact Number" value={ContactNumber} onChange={e => setContactNumber(e.target.value)} />
+                                <Form.Control required type="tel" placeholder="Contact Number" value={AdminContactNumber} onChange={e => setAdminContactNumber(e.target.value)} />
                             </Col>
                         </Form.Group>
                     </Row>
-                    <div align={"center"} className="mb-3">
-                        <ReCAPTCHA
-                            sitekey="6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB"
-                            render="explicit"
-                            ref={captchaRef}
-                        />
-                    </div>
                     <div className="d-flex justify-content-center">
                         <Button variant="primary" type="submit">
-                            Register
+                            Create
                         </Button>
                     </div>
                     <div className="d-flex align-items-center justify-content-center mt-4">
@@ -239,8 +231,6 @@ function Register() {
                     </div>
                 </form>
             </div>
-        </Container >
+        </Container>
     );
 }
-
-export default Register;

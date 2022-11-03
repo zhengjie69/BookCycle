@@ -1,11 +1,26 @@
 import re
 
-def data_cleaning(userTextInput):
+def data_cleaning_without_space(userTextInput):
 
-    # matches and replaces anything that's not alphanumeric or underscore
-    cleanString = re.sub(r'[^\w]', ' ', userTextInput)
+    # matches and replaces anything that's not alphanumeric without a space
+    cleanString = re.sub(r'[^a-zA-Z0-9]+', '', userTextInput)
     return cleanString
 
+def data_cleaning_with_space(userTextInput):
+
+    # matches and replaces anything that's not alphanumeric with a space
+    cleanString = re.sub(r'[^a-zA-Z0-9]+', ' ', userTextInput)
+    return cleanString
+
+def isstring(userTextInput):
+    try:
+        str(userTextInput)
+        if userTextInput == "":
+            return False
+
+        return True
+    except ValueError:
+        return False
 
 def isemail(email):
 
@@ -22,7 +37,33 @@ def isemail(email):
         print("Invalid Email")
         return False
 
+def isvalidpassword(password):
 
+    # Make a regular expression
+    # for validating password
+    regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*?[#?!@$%^&*-])(?!.* ).{8,25}$"
+    
+    # pass the regular expression
+    # and the string into the fullmatch() method
+    if(re.fullmatch(regex, password)):
+        print("Valid Password")
+        return True
+    else:
+        print("Invalid Password")
+        return False
+
+def isvalidcontactnumber(contactNumber):
+
+    if isstring(contactNumber):
+        if isint(contactNumber):
+            if len(str(contactNumber)) == 8:
+
+                contactNumberStartingNumber = int(str(contactNumber)[0])
+                if contactNumberStartingNumber == 9 or contactNumberStartingNumber == 8 or contactNumberStartingNumber == 6:
+                    return True
+    
+    return False
+    
 def isfloat(num):
         try:
             float(num)

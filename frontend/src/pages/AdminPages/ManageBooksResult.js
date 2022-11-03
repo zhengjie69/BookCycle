@@ -1,31 +1,34 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Row } from 'react-bootstrap'
-import Button from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { LinkContainer } from 'react-router-bootstrap'
-import { useNavigate } from 'react-router-dom';
-import SessionTimeoutModal from '../../components/SessionTimeoutModal';
+import React, { useEffect, useState } from "react";
+import { Container, Card, Button, Row } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import SessionTimeoutModal from "../../components/SessionTimeoutModal";
 import secureLocalStorage from "react-secure-storage";
 
-function MyListings() {
+export default function ManageBooksResult() {
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [items, setItems] = useState([]);
-    const navigate = useNavigate();
-    const userEmail = secureLocalStorage.getItem('Email');
+    const [userBooks, setUserBooks] = useState([]);
+
+    const adminEmail = secureLocalStorage.getItem('Email');
     const Authentication = secureLocalStorage.getItem('Authentication');
     const Role = secureLocalStorage.getItem('Role');
 
+    const [Username, setUsername] = useState();
+
 
     useEffect(() => {
-        if (userEmail !== null && Authentication && Role === "User") {
-            fetch('/apis/book/get_all_user_books?Email=' + userEmail)
+        if (adminEmail !== null && Authentication && Role === "Admin") {
+
+            setUsername(location.state.Username);
+
+            fetch('/apis/book/get_all_user_books?Email=' + location.state.UserEmail)
                 .then(res => res.json())
                 .then(data => {
                     setIsLoaded(true);
-                    setItems(data);
+                    setUserBooks(data);
                 },
                     (error) => {
                         setIsLoaded(true);
@@ -44,18 +47,13 @@ function MyListings() {
                 <SessionTimeoutModal /> : null
             }
             <Container>
-                <div className="d-flex justify-content-center">
-                    <LinkContainer to="/MyListings/NewListings">
-                        <Button> Create New Listings</Button>
-                    </LinkContainer>
-                </div>
-                <div className='mb-4'>
-                    <h3><b>My Listings</b></h3>
+                <div className='d-flex justify-content-center mb-4'>
+                    <h1>{Username}'s Books</h1>
                 </div>
                 <div className="d-flex justify-content-center">
                     <Row>
-                        {Array.isArray(items) ?
-                            items.map(item => (
+                        {Array.isArray(userBooks) ?
+                            userBooks.map(item => (
                                 <div className="col-sm mb-2" key={item.BookID}>
                                     <Card style={{ width: '15rem', height: '28rem' }}>
                                         <Card.Img variant="top" src={item.Image} style={{ height: '15rem' }} />
@@ -67,19 +65,18 @@ function MyListings() {
                                             <Button onClick={() => {
                                                 navigate('/BookListingInformation', {
                                                     state: {
+                                                        Username: location.state.Username,
+                                                        UserEmail: location.state.UserEmail,
                                                         BookID: item.BookID,
                                                         Condition: item.BookCondition,
-                                                        ConditionID: item.BookConditionID,
                                                         Title: item.Title,
                                                         Price: item.Price,
                                                         Description: item.Description,
                                                         Image: item.Image,
                                                         Genre: item.Genre,
-                                                        GenreID: item.GenreID,
                                                         Location: item.Location,
-                                                        LocationID: item.LocationID,
                                                         BookStatus: item.BookStatus,
-                                                        Route: "MyListings"
+                                                        Route: "ManageBooksResult"
                                                     }
                                                 });
                                             }}>View More</Button>
@@ -93,6 +90,4 @@ function MyListings() {
             </Container>
         </div>
     )
-};
-
-export default MyListings;
+}

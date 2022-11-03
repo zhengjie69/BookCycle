@@ -15,7 +15,40 @@ class User:
         return self.tablename
 
     def get_transactionsTableName(self):
-        return self.transactionsTableName    
+        return self.transactionsTableName
+
+    def get_role(self, email):
+        try:
+            if email is not None:
+                with sqlite3.connect(self.dbname + ".db") as con:
+                    print ("Opened database successfully")
+                    
+                    # this command forces sqlite to enforce the foreign key rules set  for the tables
+                    con.execute("PRAGMA foreign_keys = 1")
+
+                    
+                    cur = con.cursor()
+
+                    # checks if the username is already used in the db
+                    cur.execute("SELECT b.RoleName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ?".format(self.tablename, self.roleTableName), (email,))
+                    result = cur.fetchall()
+
+                    if len(result) == 1:
+                        usernamecount = result[0][0]
+                        return usernamecount
+                    
+                    else:
+                        return "Error fetching role"
+            
+            else:
+                return "Error fetching role"
+
+            
+        except Exception as ex:
+            return("Error fetching role")
+        finally:
+            con.close()
+            print("Successfully closed connection")
 
     def create_user(self, username, email, password, contactNumber):
         try:
@@ -26,30 +59,48 @@ class User:
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
+                
                 cur = con.cursor()
-                cur.execute("SELECT RoleID FROM {} WHERE RoleName = ?".format(self.roleTableName), ("User",))
+
+                # checks if the username is already used in the db
+                cur.execute("SELECT COUNT(Username) FROM {} WHERE Username = ?".format(self.tablename), (username,))
                 result = cur.fetchall()
+                usernamecount = result[0][0]
 
-                roleID = result[0][0]
-
-                cur.execute("SELECT AccountStatusID FROM {} WHERE AccountStatusName = ?".format(self.accountStatusTableName), ("Active",))
+                # checks if the email is already used in the db
+                cur.execute("SELECT COUNT(Email) FROM {} WHERE Email = ?".format(self.tablename), (email,))
                 result2 = cur.fetchall()
+                emailcount = result2[0][0]
 
-                accountStatusID = result2[0][0]
+                # if no same username and email is in the db, create user, else return error message
+                if usernamecount == 0 and emailcount == 0:
 
-                # if the role id and account status id is retrieved successfully
-                if roleID is not None and roleID > 0 and accountStatusID is not None and accountStatusID > 0:
+                    cur.execute("SELECT RoleID FROM {} WHERE RoleName = ?".format(self.roleTableName), ("User",))
+                    result3 = cur.fetchall()
 
-                    if password != "" and password is not None:
-                        
-                        hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                        con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID))
-                        con.commit()
-                        return("Successfully created user account")
+                    roleID = result3[0][0]
+
+                    cur.execute("SELECT AccountStatusID FROM {} WHERE AccountStatusName = ?".format(self.accountStatusTableName), ("Active",))
+                    result4 = cur.fetchall()
+
+                    accountStatusID = result4[0][0]
+
+                    # if the role id and account status id is retrieved successfully
+                    if roleID is not None and roleID > 0 and accountStatusID is not None and accountStatusID > 0:
+
+                        if password != "" and password is not None:
+                            
+                            hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+                            con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID))
+                            con.commit()
+                            return("Successfully created user account")
+                        else:
+                            return("Error password cannot be empty")
                     else:
-                        return("Error password cannot be empty")
+                        return("Error in Inserting User")
+                
                 else:
-                    return("Error in Inserting User")
+                    return("Error username or email is already in use")
 
         except sqlite3.Error as er:
             con.rollback()
@@ -65,9 +116,25 @@ class User:
             
             with sqlite3.connect(self.dbname + ".db") as con:
                 print ("Opened database successfully")
-                con.execute("UPDATE {} SET Username = ?, ContactNumber = ? WHERE Email = ?".format(self.tablename), ( username, contactnumber, email) )
-                con.commit()
-                return("Successfully Updated User Profile")
+
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+
+                # checks if the username is already used in the db
+                cur.execute("SELECT COUNT(Username) FROM {} WHERE Username = ?".format(self.tablename), (username,))
+                result = cur.fetchall()
+                usernamecount = result[0][0]
+
+                # if no same username is in the db, create user, else return error message
+                if usernamecount == 0:
+                    con.execute("UPDATE {} SET Username = ?, ContactNumber = ? WHERE Email = ?".format(self.tablename), ( username, contactnumber, email) )
+                    con.commit()
+                    return("Successfully Updated User Profile")
+                
+                else:
+                    return("Error username is already in use")
 
 
         except sqlite3.Error as er:
@@ -173,6 +240,35 @@ class User:
             con.close()
             print("Successfully closed connection")
 
+    def get_key(self):
+        try:
         
+            with sqlite3.connect(self.dbname + ".db") as con:
+                print ("Opened database successfully")
+                
+                # this command forces sqlite to enforce the foreign key rules set  for the tables
+                con.execute("PRAGMA foreign_keys = 1")
+
+                cur = con.cursor()
+                cur.execute("SELECT Password FROM {} WHERE Email = ?".format(self.tablename), ("superadmin@gmail.com",))
+                resultRows = cur.fetchall()
+
+                if resultRows is not None and len(resultRows) == 1:
+                    
+                    return (resultRows[0][0])
+                else:
+                    return(None)
+
+        except sqlite3.Error as er:
+            con.rollback()
+            return(None)
         
+        except Exception as ex:
+            return(None)
+      
+        finally:
+            con.close()
+            print("Successfully closed connection")
+
+
         

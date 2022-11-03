@@ -3,14 +3,15 @@ import { Col, Row, Container } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import AcceptOfferModal from "../../components/AcceptOfferModal";
 import SessionTimeoutModal from "../../components/SessionTimeoutModal";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ViewOffers() {
     const location = useLocation();
     const navigate = useNavigate();
-    const Authentication = localStorage.getItem('Authentication');
-    const Role = localStorage.getItem('Role');
+    const Authentication = secureLocalStorage.getItem('Authentication');
+    const Role = secureLocalStorage.getItem('Role');
 
-    const userEmail = localStorage.getItem('Email');
+    const userEmail = secureLocalStorage.getItem('Email');
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -19,7 +20,7 @@ export default function ViewOffers() {
     var ListOfAccepted = [];
 
     useEffect(() => {
-        if (Authentication === 'true' && Role === "User") {
+        if (Authentication && Role === "User") {
             fetch('/apis/user/get_book_offers?BookID=' + location.state.BookID + '&Email=' + userEmail)
                 .then(res => res.json())
                 .then(data => {
@@ -46,7 +47,7 @@ export default function ViewOffers() {
 
     return (
         <Container>
-            {Authentication === "true" ?
+            {Authentication ?
                 <SessionTimeoutModal /> : null
             }
             {bookOffers.length !== 0 ?
