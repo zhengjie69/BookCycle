@@ -6,18 +6,44 @@ import Login from './Login'
 import { useNavigate } from 'react-router-dom'
 import secureLocalStorage from "react-secure-storage";
 
+
 const NavBarComp = () => {
     const navigate = useNavigate();
     const Authentication = secureLocalStorage.getItem('Authentication');
     const Role = secureLocalStorage.getItem('Role');
     const Email = secureLocalStorage.getItem('Email');
 
-    function LogOut() {
+    const LogoutData = new FormData();
+
+    const LogOut = async (e) => {
+
+        e.preventDefault();
+
         secureLocalStorage.removeItem('Authentication');
         secureLocalStorage.removeItem('Email');
         secureLocalStorage.removeItem('Role');
-        navigate('/')
-        window.location.reload(false);
+
+        LogoutData.append('Email', Email);
+
+        const res = await fetch('/apis/user/logout', {
+            method: "POST",
+            body: LogoutData
+        });
+
+        const data = await res.json();
+
+        const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
+        console.log(trimmedResponseMessage);
+
+        if (trimmedResponseMessage === "Successfully logged out") {
+            console.log("came in");
+            navigate('/');
+            // window.location.reload(false);
+        }
+        else {
+            alert("Failed to logout");
+        }
     }
 
     return (

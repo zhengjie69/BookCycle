@@ -119,9 +119,9 @@ export default function EditListings() {
         }
 
         //To print the details for form data
-        for (var pair of EditListingFormData.entries()) {
-            console.log(`${pair[0]}: ${pair[1]}`);
-        }
+        // for (var pair of EditListingFormData.entries()) {
+        //     console.log(`${pair[0]}: ${pair[1]}`);
+        // }
 
         const res = await fetch('/apis/book/update_book_details', {
             method: "POST",

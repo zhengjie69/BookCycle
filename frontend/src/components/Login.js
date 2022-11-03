@@ -27,10 +27,10 @@ const Login = () => {
 
         setErrorMessages([]);
 
-        e.preventDefault()
+        e.preventDefault();
 
-        LoginFormData.append('Email', Email)
-        LoginFormData.append('Password', Password)
+        LoginFormData.append('Email', Email);
+        LoginFormData.append('Password', Password);
 
         const res = await fetch('/apis/user/login', {
             method: "POST",
@@ -40,11 +40,19 @@ const Login = () => {
         const data = await res.json();
 
         if (res.status === 201) {
+            handleClose();
             secureLocalStorage.setItem("Authentication", data.authentication);
             secureLocalStorage.setItem("Email", data.Email);
             secureLocalStorage.setItem("Role", data.Role);
-            handleClose();
             navigate('/');
+            // navigate('/OTP', {
+            //     state: {
+            //         Authentication: data.Authentication,
+            //         Email: data.Email,
+            //         Role: data.Role,
+            //         Route: "Login"
+            //     }
+            // });
             window.location.reload(false);
         }
 
@@ -95,7 +103,7 @@ const Login = () => {
                             </Row>
                             <div className="d-flex justify-content-center">
                                 {showErrors ? errorMessages.map((item, index) => {
-                                    return <ul style={{color:"red"}} key={index}>{item}</ul>;
+                                    return <ul style={{ color: "red" }} key={index}>{item}</ul>;
                                 }) : null}
                             </div>
                             <div className="d-flex justify-content-center">
