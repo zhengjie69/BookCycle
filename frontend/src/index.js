@@ -36,7 +36,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const isAuthenticated = localStorage.getItem("Authentication");
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <Router>
       <NavBarComp />
       <Routes>
@@ -77,7 +77,7 @@ root.render(
 
       </Routes>
     </Router>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
 
 
