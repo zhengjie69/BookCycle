@@ -22,12 +22,15 @@ import MyOffers from './pages/UserPages/MyOffers'
 import TransactionDetails from './pages/UserPages/TransactionDetails'
 import ErrorPage from './pages/ErrorPage'
 import ManageUsers from './pages/AdminPages/ManageUsers'
+import UsersResult from './pages/AdminPages/UsersResult'
+import OTP from './pages/OTP'
 import ManageUsersResult from './pages/AdminPages/ManageUsersResult'
 import ManageBooks from './pages/AdminPages/ManageBooks'
 import ManageBooksResult from './pages/AdminPages/ManageBooksResult'
 import ManageAdmin from './pages/SuperAdminPages/ManageAdmin'
 import ManageAdminResult from './pages/SuperAdminPages/ManageAdminResult'
 import CreateAdmin from './pages/SuperAdminPages/CreateAdmin'
+
 //Homepage is App.js, Navbar is NavbarComp.js
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -50,6 +53,7 @@ root.render(
         <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
         <Route exact path='/ForgetResetPassword/:resetCode' element={<ResetPage />} />
         <Route exact path='/MyProfile' element={<MyProfile />} />
+        <Route exact path='/OTP' element={<OTP />} />
 
         {/* User Routes */}
         <Route exact path='/MyOffers' element={<MyOffers />} />
