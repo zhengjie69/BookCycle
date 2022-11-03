@@ -62,9 +62,9 @@ def create_app(test_config=None):
     app.config["SESSION_TYPE"] = "filesystem"
     app.permanent_session_lifetime = timedelta(minutes=30)
     Session(app)
-    #log = logging.getLogger('werkzeug')
-    #log.setLevel(logging.ERROR)
-    #logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
     jwt.init_app(app)
     mail.init_app(app)

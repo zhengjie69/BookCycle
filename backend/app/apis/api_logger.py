@@ -6,7 +6,7 @@ from os import stat, remove
 import os
 import pyAesCrypt
 import shutil
-
+import logging
 # function to log and return result
 # note that all result that is an error should be a string containing the word "Error" at the start
 # for ipAddress, if ngix is used for production, request.environ.get('HTTP_X_REAL_IP', request.remote_addr) should be used to get ip
@@ -20,25 +20,28 @@ def encrypt(key):
 
 
     bufferSize = 64 * 1024
-    
-    with open("recordc.log", "rb") as fIn:
+    with open("record.log", "rb") as fIn:
         with open("record.log.encrypted", "wb") as fOut:
-            pyAesCrypt.encryptStream(fIn, fOut, key, bufferSize)
-    
+            pyAesCrypt.encryptStream(fIn, fOut, str(key, 'utf-8'), bufferSize)
 
+    logging.shutdown()
+    remove('record.log')
 def decrypt(key):
     #pyAesCrypt.decryptFile("record.log.encrypted", "recordc.log", key)
 
     bufferSize = 64 * 1024
-    encFileSize = stat("record.log.encrypted").st_size
+    encFileSize = os.stat('record.log.encrypted').st_size
+
+
     with open("record.log.encrypted", "rb") as fIn:
         try:
-            with open("recordc.log", "wb") as fOut:
+            with open("record.log", "wb") as fOut:
                 # decrypt file stream
-                pyAesCrypt.decryptStream(fIn, fOut, key, bufferSize, encFileSize)
+                pyAesCrypt.decryptStream(fIn, fOut, str(key, 'utf-8'), bufferSize, encFileSize)
         except ValueError:
             # remove output file on error
-            remove("recordc.log")
+            remove("record.log")
+
 
 def return_result(ipAddress, actionDescription, functionCalled, result):
     
@@ -83,41 +86,32 @@ def return_result(ipAddress, actionDescription, functionCalled, result):
         # else:
         #     app.logger.error(loggerMessage)
         #     encrypt(userModel.get_key())
-
-        return(jsonify(result), 401)
-
-    else:
-
         loggerMessage = "{} ---- {} ---- {} ---- {}".format(ipAddress, actionDescription, functionCalled, result)
-        
+
         userModel = User()
 
         key = userModel.get_key()
+
         # # checks if the encrypted record exists before logging
         if os.path.exists('record.log.encrypted'):
             print("encrypt exist")
 
-            
-            
-            #if key is not None:
-            #    decrypt(key)
-            #    app.logger.error(loggerMessage)
-            #    encrypt(userModel.get_key())
+            # if key is not None:
+            decrypt(key)
+            app.logger.error(loggerMessage)
+            encrypt(key)
+
 
         else:
             print("encrypt does not exist")
-            #app.logger.error(loggerMessage)
+            app.logger.error(loggerMessage)
 
-            # f = open("record.log", "r")
-            # print(f.read())
-            # f.close()
-            
-            # Creates a new file
+            # # Creates a new file
             # with open('recordc.log', 'w') as fp:
             #     pass
             # shutil.copyfile('record.log','recordc.log')
 
-            # encrypt(key)
+            encrypt(key)
 
             # f = open("record.log.encrypted", "r")
             # encrypted = f.read()
@@ -128,5 +122,10 @@ def return_result(ipAddress, actionDescription, functionCalled, result):
             # f.close()
             # os.remove("record.log.encrypted")
             # os.remove("recordc.log")
+        return(jsonify(result), 401)
+
+    else:
+
+
 
         return(jsonify(result), 201) 
