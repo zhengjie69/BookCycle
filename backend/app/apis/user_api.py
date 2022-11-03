@@ -7,6 +7,7 @@ from ..models.data_cleaning import *
 from .api_logger import *
 import requests
 import json
+from flask import current_app
 
 
 userModel = User()
@@ -429,7 +430,7 @@ def verify_reset_password(token):
 def verify_captcha():
     if request.method == "POST":
         captchattoken = request.form.get("Token")               #retrieve token from ForgetPassword.js
-        secretkey = "6LdYjMwiAAAAAMhJ35HRw06NwAxQO9JZqPpMUqQ5"  #captcha secret key to validate
+        secretkey = current_app.config.get('RECAPTCHA_SECRET_KEY')  #captcha secret key to validate
         captchapayload = {'response': captchattoken, 'secret': secretkey}   # create the payload to sent request for captcha validation
 
         response = requests.post("https://www.google.com/recaptcha/api/siteverify",captchapayload)  #captcha validation

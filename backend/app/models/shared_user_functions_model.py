@@ -3,6 +3,7 @@ from flask import current_app, url_for
 import bcrypt
 import jwt
 import time
+from flask import current_app
 
 class Shared_User_Functions:
 
@@ -219,13 +220,13 @@ class Shared_User_Functions:
             con.close()
             print("Successfully closed connection")
 
-    def get_reset_token(self,email, expires=30):
+    def get_reset_token(self,email, expires=50):
         times = time.time()
-        return jwt.encode({'reset_password': email, 'exp': times + expires}, key=("TESTINGKEY"))
+        return jwt.encode({'reset_password': email, 'exp': times + expires}, key=current_app.config.get('FLASK_SECRET_KEY'))
 
     def verify_reset_token(self,token):
         try:
-            username = jwt.decode(token, key=("TESTINGKEY"),algorithms=['HS256']),['reset_password']
+            username = jwt.decode(token, current_app.config.get('FLASK_SECRET_KEY'),algorithms=['HS256']),['reset_password']
         except Exception as e:
             print(e)
             return "Invalid"
