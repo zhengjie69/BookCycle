@@ -91,7 +91,7 @@ class User:
                         if password != "" and password is not None:
                             
                             hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                            con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID))
+                            con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID, 0, 0))
                             con.commit()
                             return("Successfully created user account")
                         else:
