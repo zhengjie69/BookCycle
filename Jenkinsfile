@@ -9,7 +9,7 @@ pipeline {
         }
 	stage('OWASP DependencyCheck') {
 			      steps {
-				            dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: '3203DependencyCheckTest730'
+				            dependencyCheck additionalArguments: '--format HTML --format XML --enableExperimental', odcInstallation: '3203DependencyCheckTest730'
 			      }
 		}
 	}
