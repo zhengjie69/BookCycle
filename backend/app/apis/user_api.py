@@ -36,6 +36,7 @@ def create_User():
                     else:
 
                         role = sharedUserFunctionModel.get_role(email)
+                        session["email"] = email
                         return(jsonify(authentication=True, Email=email, Role=role), 201)
                 
                 else:
