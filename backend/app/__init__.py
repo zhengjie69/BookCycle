@@ -6,9 +6,8 @@ from .routes.book_routes import book
 from .routes.admin_routes import admin
 from .routes.super_admin_routes import superadmin
 from .models.user_model import *
-import sqlite3
+from .models.key_model import *
 import os, traceback
-import bcrypt
 from flask_recaptcha import ReCaptcha
 from datetime import timedelta
 import logging
@@ -21,32 +20,26 @@ mail = Mail()
 recaptcha = ReCaptcha()
 
 
-def mailSetup():
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
-    MAIL_USERNAME = "kopickosongml@gmail.com"
-    MAIL_PASSWORD = "hEXRsOjFENbBkrcQEZS!"
-    SECRET_KEY = 'secretkey'
-
-
 
 def create_app(test_config=None):
     # create and configure the app
+    keyModel = key()
     app = Flask(__name__, instance_relative_config=True)
-    flask_key = '95708a6bdb9148679e01d29975cef0c1'
-    app.config['RECAPTCHA_SITE_KEY'] = '6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB'
-    app.config['RECAPTCHA_SECRET_KEY'] = '6LdYjMwiAAAAAMhJ35HRw06NwAxQO9JZqPpMUqQ5'
-    app.config['FLASK_SECRET_KEY'] = flask_key
+    
+
     app.register_blueprint(user, url_prefix='/apis/user/')
     app.register_blueprint(book, url_prefix='/apis/book/')
     app.register_blueprint(admin, url_prefix='/apis/admin/')
     app.register_blueprint(superadmin, url_prefix='/apis/superadmin/')
 
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    app.config['MAIL_PORT'] = 465
-    app.config['MAIL_USERNAME'] = 'kopickosongml@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'vamjmxizezesorpg'
+    app.config['RECAPTCHA_SITE_KEY'] = keyModel.get_key("RECAPTCHA_SITE_KEY")
+    app.config['RECAPTCHA_SECRET_KEY'] = keyModel.get_key("RECAPTCHA_SECRET_KEY")
+    app.config['FLASK_SECRET_KEY'] = keyModel.get_key("FLASK_SECRET_KEY")
+
+    app.config['MAIL_SERVER'] = keyModel.get_key("MAIL_SERVER")
+    app.config['MAIL_PORT'] = int(keyModel.get_key("MAIL_PORT"))
+    app.config['MAIL_USERNAME'] = keyModel.get_key("MAIL_USERNAME")
+    app.config['MAIL_PASSWORD'] = keyModel.get_key("MAIL_PASSWORD")
     app.config['MAIL_USE_SSL'] = True
 
     userModel = User()
