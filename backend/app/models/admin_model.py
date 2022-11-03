@@ -11,40 +11,6 @@ class Admin:
         self.accountStatusTableName = "AccountStatus"
         self.bookTableName = "Book"
 
-
-    # fetches all users with the role "User"
-    # def get_all_users(self):
-    #     try:
-        
-    #         with sqlite3.connect(self.dbName + ".db") as con:
-    #             print ("Opened database successfully")
-
-    #             # this command forces sqlite to enforce the foreign key rules set  for the tables
-    #             con.execute("PRAGMA foreign_keys = 1")
-
-    #             cur = con.cursor()
-
-    #             # fetches all users role account from User table
-    #             cur.execute("SELECT a.Email FROM {} AS a INNER JOIN {} AS b ON a.AccountStatusID = b.AccountStatusID AND b.AccountStatusName = \"User\"".format(self.userTablename, self.accountStatusTableName))
-    #             rows = cur.fetchall()
-                   
-    #             # test print db records
-    #             if len(rows) > 0:
-    #                 print("rows of records:")
-    #                 for records in rows:
-    #                     print(records)
-    #                 return(rows)
-    #             else:
-    #                 return("No records in database") 
-
-    #     except:
-    #         con.rollback()
-    #         return("Error in fetching users")
-      
-    #     finally:
-    #         con.close()
-    #         print("Successfully closed connection")
-
     # checks if the account logged in is aa Admin
     def validate_admin(self, loginEmail):
        try:
@@ -149,7 +115,7 @@ class Admin:
                 if len(result) == 1:
                     accountStatusID = result[0][0]
 
-                    cur.execute("UPDATE {} SET AccountStatusID = ? WHERE Email = ? ".format(self.userTablename),(accountStatusID, userEmail))
+                    cur.execute("UPDATE {} SET AccountStatusID = ?, LoginAttemptCount = ? WHERE Email = ? ".format(self.userTablename),(accountStatusID, 0, userEmail))
                     con.commit()
                     return("successfully enabled account")
 

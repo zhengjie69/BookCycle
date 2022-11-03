@@ -10,7 +10,7 @@ import sqlite3
 import os, traceback
 import bcrypt
 from flask_recaptcha import ReCaptcha
-
+from datetime import timedelta
 import logging
 from flask.logging import default_handler
 
@@ -51,7 +51,7 @@ def sqlite_database_setup():
             # below tables are user related
             con.execute("CREATE TABLE IF NOT EXISTS AccountStatus(AccountStatusID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, AccountStatusName VARCHAR(255) NOT NULL)")
             con.execute("CREATE TABLE IF NOT EXISTS Role(RoleID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, RoleName VARCHAR(255) NOT NULL)")
-            con.execute("CREATE TABLE IF NOT EXISTS User(Username VARCHAR(255) NOT NULL, Email VARCHAR(255) NOT NULL PRIMARY KEY, Password VARCHAR(255) NOT NULL, ContactNumber INTEGER NOT NULL, RoleID INTEGER NOT NULL, AccountStatusID INTEGER NOT NULL, FOREIGN KEY(RoleID) REFERENCES Role(RoleID), FOREIGN KEY(AccountStatusID) REFERENCES AccountStatus(AccountStatusID))")
+            con.execute("CREATE TABLE IF NOT EXISTS User(Username VARCHAR(255) NOT NULL, Email VARCHAR(255) NOT NULL PRIMARY KEY, Password VARCHAR(255) NOT NULL, ContactNumber INTEGER NOT NULL, RoleID INTEGER NOT NULL, AccountStatusID INTEGER NOT NULL, LoginAttemptCount INTEGER NOT NULL, LastLoginAttemptTime INTEGER NOT NULL, FOREIGN KEY(RoleID) REFERENCES Role(RoleID), FOREIGN KEY(AccountStatusID) REFERENCES AccountStatus(AccountStatusID))")
             
             
             # below tables are book related
@@ -114,11 +114,11 @@ def sqlite_database_setup():
             
             if userRows[0][0] == 0:
                 # insert users
-                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("test1","test1@gmail.com", hash_Password("test1"), 98765407, 1, 1) )
-                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("test2","test2@gmail.com", hash_Password("test2"), 96543231, 1, 1) )
-                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("test3","test3@gmail.com", hash_Password("test3"), 12345678, 1, 1) )
-                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("admin","admin@gmail.com", hash_Password("admin"), 00000000, 2, 1) )
-                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID) VALUES (?,?,?,?,?,?)",("superadmin","superadmin@gmail.com", hash_Password("superadmin"), 00000000, 3, 1) )
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)",("test1","test1@gmail.com", hash_Password("Test123!"), 98765407, 1, 1, 0, 0) )
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)",("test2","test2@gmail.com", hash_Password("Test234!"), 96543231, 1, 1, 0, 0) )
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)",("test3","test3@gmail.com", hash_Password("Test345!"), 12345678, 1, 1, 0, 0) )
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)",("admin","admin@gmail.com", hash_Password("Admin123!"), 00000000, 2, 1, 0, 0) )
+                con.execute("INSERT INTO User (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)",("superadmin","superadmin@gmail.com", hash_Password("Superadmin123!"), 00000000, 3, 1, 0, 0) )
 
             # checks if the Genre table is empty, and if empty, insert Genre test data
             cur = cur.execute("SELECT COUNT(*) FROM Genre")
@@ -290,7 +290,7 @@ def create_app(test_config=None):
     #app.config['SECRET_KEY'] = 'secretkey'
     userModel = User()
     app.config['SECRET_KEY'] = userModel.get_key()
-    
+
 
     UPLOAD_FOLDER = os.path.join('static', 'BookImages')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -299,7 +299,7 @@ def create_app(test_config=None):
 
     app.config["SESSION_PERMANENT"] = False
     app.config["SESSION_TYPE"] = "filesystem"
-
+    app.permanent_session_lifetime = timedelta(minutes=30)
     Session(app)
     #log = logging.getLogger('werkzeug')
     #log.setLevel(logging.ERROR)

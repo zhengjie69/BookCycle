@@ -1,6 +1,6 @@
 from ..models.data_cleaning import *
 from ..models.admin_model import Admin
-from flask import request
+from flask import request, session
 from .api_logger import *
 
 adminModel = Admin()
@@ -9,7 +9,8 @@ def search_user():
     if request.method == "POST":
 
         try:
-            adminEmail = request.form.get("AdminEmail")
+            #adminEmail = request.form.get("AdminEmail")
+            adminEmail = session.get("email")
             userEmail = request.form.get("UserEmail")
 
             # checks if the values are valid and not none, if valid and not none check if the user has right role
@@ -34,7 +35,8 @@ def delete_user_book():
 
         try:
             ownerEmail = request.form.get("OwnerEmail")
-            email = request.form.get("Email")
+            #email = request.form.get("Email")
+            email = session.get("email")
             bookID = request.form.get("BookID")
 
             # checks if the values are valid and not none, if valid and not none check if the user has right role
@@ -60,7 +62,8 @@ def enable_user_account():
 
         try:
             userEmail = request.form.get("UserEmail")
-            email = request.form.get("Email")
+            #email = request.form.get("Email")
+            email = session.get("email")
             
             # checks if the values are valid and not none, if valid and not none check if the user has right role
             if userEmail is not None and email is not None and isemail(userEmail) and isemail(email):
@@ -85,7 +88,8 @@ def disable_user_account():
 
         try:
             userEmail = request.form.get("UserEmail")
-            email = request.form.get("Email")
+            #email = request.form.get("Email")
+            email = session.get("email")
 
             # checks if the values are valid and not none, if valid and not none check if the user has right role
             if userEmail is not None and email is not None and isemail(userEmail) and isemail(email):

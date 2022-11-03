@@ -347,7 +347,7 @@ def delete_book():
 
                         # gets the image name before deletion
                         imagename = bookmodel.get_book_image_name(bookID)
-
+                
                         result = bookmodel.delete_book(bookID, ownerEmail)
 
                         # prepares to delete the image from storage if record is successfully deleted
@@ -356,9 +356,11 @@ def delete_book():
                             print("image name is")
                             print(imagename)
                             current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
+                            print(current_dir)
                             # searches for the image in the file system
                             # if found, delete the image
                             if find_image(imagename, current_dir):
+                                print(current_dir)
                                 os.remove(os.path.join(current_dir, imagename))
 
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", result)

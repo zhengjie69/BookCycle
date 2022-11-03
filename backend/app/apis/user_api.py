@@ -60,7 +60,8 @@ def login():
             # checks if the input is null or empty and is valid
             if email is not None and password is not None and isemail(email):
 
-                if(sharedUserFunctionModel.login(email, password) == True): 
+                result = sharedUserFunctionModel.login(email, password)
+                if "Success" in result: 
 
                     role = sharedUserFunctionModel.get_role(email)
                     if role is not None: 
@@ -70,7 +71,7 @@ def login():
                     else:
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Error login failed")
                 else:
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user", "login", "Error email or password is wrong")
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user", "login", result)
             else:
                 return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user", "login", "Error fields cannot be left blank and must be valid inputs")
         

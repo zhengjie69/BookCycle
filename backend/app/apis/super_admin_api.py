@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, session
 from ..models.data_cleaning import *
 from ..models.super_admin_model import SuperAdmin
 from .api_logger import *
@@ -9,7 +9,8 @@ def create_admin_account():
     if request.method == "POST":
 
         try:
-            superAdminEmail = request.form.get("superAdminEmail")
+            #superAdminEmail = request.form.get("superAdminEmail")
+            superAdminEmail = session.get("email")
             username = request.form.get("Username")
             adminEmail = request.form.get("AdminEmail")
             password = request.form.get("Password")
@@ -45,7 +46,8 @@ def search_admin():
 
         try:
             adminEmail = request.form.get("AdminEmail")
-            superAdminEmail = request.form.get("SuperAdminEmail")
+            #superAdminEmail = request.form.get("SuperAdminEmail")
+            superAdminEmail = session.get("email")
 
             # checks if the values are valid and not none, if valid and not none check if the user has right role
             if adminEmail is not None and isemail(adminEmail) and superAdminEmail is not None and isemail(superAdminEmail):
@@ -69,7 +71,8 @@ def delete_admin_account():
 
             try:
         
-                superAdminEmail = request.form.get("superAdminEmail")
+                #superAdminEmail = request.form.get("superAdminEmail")
+                superAdminEmail = session.get("email")
                 adminEmail = request.form.get("AdminEmail")
 
                 # checks if the values are valid and not none, if valid and not none check if the user has right role
@@ -94,7 +97,8 @@ def disable_admin_account():
     if request.method == "POST":
 
         try:
-            superAdminEmail = request.form.get("superAdminEmail")
+            #superAdminEmail = request.form.get("superAdminEmail")
+            superAdminEmail = session.get("email")
             adminEmail = request.form.get("AdminEmail")
 
 

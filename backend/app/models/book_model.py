@@ -111,7 +111,7 @@ class Book:
                 con.execute("PRAGMA foreign_keys = 1")
 
                 cur = con.cursor()
-                cur.execute("SELECT image FROM {}".format(self.tablename))
+                cur.execute("SELECT image FROM {} WHERE BookID = ?".format(self.tablename), (bookID))
                 rows = cur.fetchall()
                    
                 # 

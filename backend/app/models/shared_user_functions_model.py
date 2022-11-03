@@ -3,6 +3,8 @@ from flask import current_app, url_for
 import bcrypt
 import jwt
 import time
+from datetime import datetime
+
 from flask import current_app
 
 class Shared_User_Functions:
@@ -13,6 +15,7 @@ class Shared_User_Functions:
             self.roleTableName = "Role"
             self.accountStatusTableName = "AccountStatus"
 
+
     def login(self, email, password):
         try:
         
@@ -21,27 +24,79 @@ class Shared_User_Functions:
                 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
-
+                
                 cur = con.cursor()
-                cur.execute("SELECT * FROM {} WHERE Email = \"{}\"".format(self.tablename, email))
+                
+                cur.execute("SELECT * FROM {} WHERE Email = ? ".format(self.tablename), (email,))
                 rows = cur.fetchall()
-                print(rows)
-                # if only 1 record is found (as each email should only have 1 account) 
+                # if only 1 record is found (as each email should only have 1 account) and account did not hit attempt limit
                 if len(rows) == 1:
-                    hashedPassword = rows[0][2]
-                    if bcrypt.checkpw(password.encode(), hashedPassword):
-                        print("Password matched")
-                        return True
+
+                    # fetches the id for "Disabled" status
+                    cur.execute("SELECT AccountStatusID FROM {} WHERE AccountStatusName = ?".format(self.accountStatusTableName), ("Disabled",))
+                    statusRow = cur.fetchall()
+                    print(len(statusRow))
+                    if len(statusRow) == 1:
+
+                        disabledAccountStatusID = statusRow[0][0]
+                        hashedPassword = rows[0][2]
+                        timestamp = int(time.time())
+                        # if account is not disabled:
+                        if int(rows[0][5]) != disabledAccountStatusID:
+
+                            loginAttemptCount = int(rows[0][6])
+
+                            # if < 5 attempts are made, normal login
+                            if loginAttemptCount <= 5:
+                                
+                                if bcrypt.checkpw(password.encode(), hashedPassword):
+                                    print("Password matched")
+                                    con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(0, timestamp, email))
+                                    return ("Login Success")
+                                else:
+                                    print("Password wrong")
+                                    
+                                    con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(loginAttemptCount + 1, timestamp, email))
+                                    con.commit()
+                                    return ("Error incorrect email or password")
+                            
+                            # if more the 5 but less then 10 tries, place users on timeout for 10 minutes for next try:
+                            elif loginAttemptCount > 5 and loginAttemptCount <=10:
+
+                                # as in unix time, 10 minutes = 60 * 10 = 600, deduct now timing with stored timing to determine if 10 minutes has passed.
+                                timePassed = int(time.time()) - int(rows[0][7])
+                                print(timePassed)
+                                if timePassed < 600:
+                                    return ("Error please try again in 10 minutes")
+
+                                else:
+                                    if bcrypt.checkpw(password.encode(), hashedPassword):
+                                        print("Password matched")
+                                        con.execute("UPDATE {} SET LoginAttemptCount = ? WHERE Email = ?".format(self.tablename),(0, email))
+                                        con.commit()
+                                        return ("Login Success")
+                                    else:
+                                        print("Password wrong")
+                                        con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(loginAttemptCount + 1, int(time.time()), email))
+                                        con.commit()
+                                        return ("Error incorrect email or password")
+                            
+                            elif loginAttemptCount > 10:
+
+                                con.execute("UPDATE {} SET LastLoginAttemptTime = ?, AccountStatusID = ?  WHERE Email = ?".format(self.tablename),(int(time.time()), disabledAccountStatusID, email))
+                                con.commit()
+                                return("Error account disabled, please contact an admin for assistance")
+                        else:
+                            return("Error account disabled, please contact an admin for assistance")
                     else:
-                        print("Password wrong")
-                        return False
+                        return("Error logging in, please try again")
                 else:
                     print("Password wrong")
-                    return False
+                    return ("Error incorrect email or password")
 
         except:
             con.rollback()
-            return("Error in Logging in, Please try again")
+            #return("Error in Logging in, Please try again")
       
         finally:
             con.close()

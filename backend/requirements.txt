@@ -4,3 +4,5 @@ Flask-Mail
 Flask-JWT-Extended
 pyjwt
 flask_recaptcha
+pyAesCrypt
+flask_session
