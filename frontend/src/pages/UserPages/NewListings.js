@@ -109,7 +109,7 @@ export default function NewListings() {
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        if (res.status === 201) {
+        if (trimmedResponseMessage === "Successfully logged out") {
             navigate('/MyListings');
             window.location.reload(false);
         }

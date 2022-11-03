@@ -56,7 +56,7 @@ function SessionTimeoutModal() {
         secureLocalStorage.removeItem('Authentication');
         secureLocalStorage.removeItem('Email');
         secureLocalStorage.removeItem('Role');
-        navigate('/')
+        navigate('/');
         window.location.reload(false);
     }
 

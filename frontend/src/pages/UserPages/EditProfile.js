@@ -89,9 +89,17 @@ const EditProfile = () => {
 
             const data = await res.json();
 
+            const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
             if (res.status === 201) {
                 navigate('/MyProfile');
                 window.location.reload(false);
+            }
+
+            else {
+                errors.push(trimmedResponseMessage);
+                setShowErrors({ showErrors: true });
+                setErrorMessages(errors);
             }
         }
 
@@ -156,6 +164,7 @@ const EditProfile = () => {
                                 return <ul key={index}>{item}</ul>;
                             }) : null}
                         </Row>
+
                     </Form>
                 </div>
             </Container>

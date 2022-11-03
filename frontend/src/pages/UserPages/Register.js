@@ -54,8 +54,6 @@ function Register() {
 
         e.preventDefault();
 
-        sessionStorage.removeItem("reload");
-
         const captchares = await captchaRef.current.getValue();
         captchaRef.current.reset();
         captchaTokenForm.append('Token', captchares)
@@ -63,7 +61,7 @@ function Register() {
             method: "POST",
             body: captchaTokenForm
         });
-        if (capres.ok == false) {
+        if (capres.ok === false) {
             console.log(capres.ok)
             errors.push("Please complete captcha validation")
         }

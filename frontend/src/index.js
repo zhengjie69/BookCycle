@@ -30,53 +30,56 @@ import ManageAdmin from './pages/SuperAdminPages/ManageAdmin'
 import ManageAdminResult from './pages/SuperAdminPages/ManageAdminResult'
 import CreateAdmin from './pages/SuperAdminPages/CreateAdmin'
 
+// require('dotenv').config()
+
 //Homepage is App.js, Navbar is NavbarComp.js
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-const isAuthenticated = localStorage.getItem("Authentication");
+// console.log(process.env.REACT_APP_OTP_SECRET_KEY);
+
 root.render(
   //<React.StrictMode>
-    <Router>
-      <NavBarComp />
-      <Routes>
-        <Route index element={<App />} />
-        <Route exact path='/' element={<App />} />
-        <Route exact path='/Register' element={<Register />} />
-        <Route exact path='/BookListingInformation' element={<BookListingInformation />} />
-        <Route exact path='/SearchResult' element={<SearchResult />} />
-        <Route path='*' element={<ErrorPage />} />
+  <Router>
+    <NavBarComp />
+    <Routes>
+      <Route index element={<App />} />
+      <Route exact path='/' element={<App />} />
+      <Route exact path='/Register' element={<Register />} />
+      <Route exact path='/BookListingInformation' element={<BookListingInformation />} />
+      <Route exact path='/SearchResult' element={<SearchResult />} />
+      <Route path='*' element={<ErrorPage />} />
 
-        {/* Common Routes */}
-        <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
-        <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
-        <Route exact path='/ForgetResetPassword/:resetCode' element={<ResetPage />} />
-        <Route exact path='/MyProfile' element={<MyProfile />} />
-        <Route exact path='/OTP' element={<OTP />} />
+      {/* Common Routes */}
+      <Route exact path='/MyProfile/ChangePassword' element={<ChangePassword />} />
+      <Route exact path='/ForgetPassword' element={<ForgetPassword />} />
+      <Route exact path='/ForgetResetPassword/:resetCode' element={<ResetPage />} />
+      <Route exact path='/MyProfile' element={<MyProfile />} />
+      <Route exact path='/OTP' element={<OTP />} />
 
-        {/* User Routes */}
-        <Route exact path='/MyOffers' element={<MyOffers />} />
-        <Route exact path='/MyOffers/TransactionDetails' element={<TransactionDetails />} />
-        <Route exact path='/MyListings' element={<MyListings />} />
-        <Route exact path='/MyListings/NewListings' element={<NewListings />} />
-        <Route exact path='/MyListings/EditListings' element={<EditListings />} />
-        <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} />
-        <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} />
+      {/* User Routes */}
+      <Route exact path='/MyOffers' element={<MyOffers />} />
+      <Route exact path='/MyOffers/TransactionDetails' element={<TransactionDetails />} />
+      <Route exact path='/MyListings' element={<MyListings />} />
+      <Route exact path='/MyListings/NewListings' element={<NewListings />} />
+      <Route exact path='/MyListings/EditListings' element={<EditListings />} />
+      <Route exact path='/MyListings/ViewOffers' element={<ViewOffers />} />
+      <Route exact path='/MyProfile/EditProfile' element={<EditProfile />} />
 
 
-        {/* Admin Routes */}
-        <Route exact path='/ManageUsers' element={<ManageUsers />} />
-        <Route exact path='/ManageUsers/ManageUsersResult' element={<ManageUsersResult />} />
-        <Route exact path='/ManageBooks' element={<ManageBooks />} />
-        <Route exact path='/ManageBooks/ManageBooksResult' element={<ManageBooksResult />} />
+      {/* Admin Routes */}
+      <Route exact path='/ManageUsers' element={<ManageUsers />} />
+      <Route exact path='/ManageUsers/ManageUsersResult' element={<ManageUsersResult />} />
+      <Route exact path='/ManageBooks' element={<ManageBooks />} />
+      <Route exact path='/ManageBooks/ManageBooksResult' element={<ManageBooksResult />} />
 
-        {/* Super Admin Routes */}
-        <Route exact path='/ManageAdmin' element={<ManageAdmin />} />
-        <Route exact path='/ManageAdmin/ManageAdminResult' element={<ManageAdminResult />} />
-        <Route exact path='/CreateAdmin' element={<CreateAdmin />} />
+      {/* Super Admin Routes */}
+      <Route exact path='/ManageAdmin' element={<ManageAdmin />} />
+      <Route exact path='/ManageAdmin/ManageAdminResult' element={<ManageAdminResult />} />
+      <Route exact path='/CreateAdmin' element={<CreateAdmin />} />
 
-      </Routes>
-    </Router>
+    </Routes>
+  </Router>
   //</React.StrictMode>
 );
 
