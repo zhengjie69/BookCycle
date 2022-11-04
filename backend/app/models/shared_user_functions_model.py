@@ -97,9 +97,10 @@ class Shared_User_Functions:
                     print("Password wrong")
                     return ("Error incorrect email or password")
 
-        except:
+        except Exception as ex:
             con.rollback()
-            #return("Error in Logging in, Please try again")
+            # fowards the exception caused to api level
+            raise ex
       
         finally:
             con.close()
@@ -141,10 +142,9 @@ class Shared_User_Functions:
 
                 
                 return returnMessage
-        except sqlite3.Error as er:
-            print(er)
+        except Exception as ex:
             con.rollback()
-            return("Error in Updating Password")
+            raise ex
       
         finally:
             con.close()
@@ -165,8 +165,7 @@ class Shared_User_Functions:
                 cur = con.cursor()
 
                 newHashPassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                con.execute("UPDATE {} SET Password = ? WHERE Email = ?".format(self.tablename),
-                                    (newHashPassword, email))
+                con.execute("UPDATE {} SET Password = ?, LoginAttemptCount = ? WHERE Email = ?".format(self.tablename),(newHashPassword, 0, email))
                 con.commit()
                 returnMessage = "Password Successfully Changed"
 
@@ -174,10 +173,9 @@ class Shared_User_Functions:
 
 
                 return returnMessage
-        except sqlite3.Error as er:
-            print(er)
+        except Exception as ex:
             con.rollback()
-            return ("Error in Updating Password")
+            raise ex
 
         finally:
             con.close()
@@ -204,13 +202,13 @@ class Shared_User_Functions:
                 else:
                     return(None) 
 
-        except:
+        except Exception as ex:
             con.rollback()
-            return(None)
+            raise ex
       
         finally:
             con.close()
-            print(None)
+            print("Successfully closed connection")
 
     def get_user_profile(self, email):
         try:
@@ -240,9 +238,9 @@ class Shared_User_Functions:
                 else:
                     return("No matching user in database") 
 
-        except:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching selected user")
+            raise ex
       
         finally:
             con.close()
@@ -270,9 +268,9 @@ class Shared_User_Functions:
                 else:
                     return ("No matching email in database")
 
-        except:
+        except Exception as ex:
             con.rollback()
-            return ("Error in fetching selected email")
+            raise ex
 
         finally:
             con.close()

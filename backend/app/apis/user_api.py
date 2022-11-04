@@ -36,8 +36,14 @@ def create_User():
                     else:
 
                         role = sharedUserFunctionModel.get_role(email)
-                        session["email"] = email
-                        return(jsonify(authentication=True, Email=email, Role=role), 201)
+                        if role is not None:
+                            
+
+                            session["email"] = email
+                            return(jsonify(authentication=True, Email=email, Role=role), 201)
+                        
+                        else:
+                            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get row aftercreate user account", "create_user", "Error invalid role found")
                 
                 else:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create user account", "create_user", "Error invalid input found")
@@ -182,7 +188,7 @@ def send_book_offer():
             if bookID is not None and isint(bookID) and offererEmail is not None and isemail(offererEmail) and offer is not None and isfloat(offer):
                 
                 # verifies if the role is User, as only users can send_book_offer
-                if userModel.get_role(offererEmail) == "User":
+                if sharedUserFunctionModel.get_role(offererEmail) == "User":
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.send_book_offer(bookID, offer, offererEmail))
 
                 else:
@@ -260,7 +266,7 @@ def accept_book_offer():
             if bookOfferID is not None and isint(bookOfferID) and ownerEmail is not None and isemail(ownerEmail):
 
                 # verifies if the role is User, as only users can accept_book_offer
-                if userModel.get_role(ownerEmail) == "User":
+                if sharedUserFunctionModel.get_role(ownerEmail) == "User":
                     result = bookModel.accept_book_offer(bookOfferID, ownerEmail)
                 
                 else:
@@ -318,7 +324,7 @@ def delete_book_offer():
             # checks if the input is null or empty and is valid
             if bookOfferID is not None and isint(bookOfferID) and offererEmail is not None and isemail(offererEmail):
 
-                if userModel.get_role(offererEmail) == "User":
+                if sharedUserFunctionModel.get_role(offererEmail) == "User":
                 
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
                 
@@ -345,7 +351,7 @@ def get_transaction_details():
                 # checks if the input is null or empty and is valid and a session is active
                 if transactionID is not None and isint(transactionID) and email is not None and isemail(email):
                     
-                    if userModel.get_role(email) == "User":
+                    if sharedUserFunctionModel.get_role(email) == "User":
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation details of a specific transcation", "get_transaction_details", userModel.get_transaction_details(transactionID))
 
                     else:
@@ -389,14 +395,22 @@ def get_all_user_transactions():
 
 def forget_password_reset():
     if request.method == "POST":
-        email = request.form.get("Email")
-        if (sharedUserFunctionModel.verifyEmailExists(email) == True):
-            token = sharedUserFunctionModel.get_reset_token(email)
-            send_email(email,token)
-            return (jsonify(message='OKK'), 201)
-        else:
-            print("NOTOK")
-            return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
+
+        try:
+            email = request.form.get("Email")
+            if (sharedUserFunctionModel.verifyEmailExists(email) == True):
+                token = sharedUserFunctionModel.get_reset_token(email)
+                send_email(email,token)
+                return (jsonify(message='OKK'), 201)
+            else:
+                print("NOTOK")
+                return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
+        
+        except Exception as ex:
+            # logs the error log and returns a error message
+            logMessage = "Exception Error " + str(ex)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when sending email for password reset", "forget_password_reset", logMessage)
+            return jsonify("Something went wrong, please try again later"), 401
 
 
 def send_email(email,generatedtoken):
@@ -413,35 +427,52 @@ def send_email(email,generatedtoken):
     mail.send(msg)
 
 def verify_reset_password(token):
-    args = request.view_args['token']
-    username = sharedUserFunctionModel.verify_reset_token(args)
-    if request.method == "GET":
-        if username == "Invalid":
-            return (jsonify(message='Token Expired'), 404)
 
-        return (jsonify(message='OKK'), 201)
+    try:
+        args = request.view_args['token']
+        username = sharedUserFunctionModel.verify_reset_token(args)
+        if request.method == "GET":
+            if username == "Invalid":
+                return (jsonify(message='Token Expired'), 404)
 
-    if request.method == "POST":
+            return (jsonify(message='OKK'), 201)
 
-        newpassword = request.form.get("Password")
-        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating user password",
-                             "update_password",
-                             sharedUserFunctionModel.reset_password(username,newpassword))
+        if request.method == "POST":
+
+            newpassword = request.form.get("Password")
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating user password",
+                                "update_password",
+                                sharedUserFunctionModel.reset_password(username,newpassword))
+
+    except Exception as ex:
+        # logs the error log and returns a error message
+        logMessage = "Exception Error " + str(ex)
+        return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when validating email for password reset", "verify_reset_password", logMessage)
+        return jsonify("Something went wrong, please try again later"), 401
 
 
 def verify_captcha():
     if request.method == "POST":
-        captchattoken = request.form.get("Token")               #retrieve token from ForgetPassword.js
-        secretkey = current_app.config.get('RECAPTCHA_SECRET_KEY')  #captcha secret key to validate
-        captchapayload = {'response': captchattoken, 'secret': secretkey}   # create the payload to sent request for captcha validation
 
-        response = requests.post("https://www.google.com/recaptcha/api/siteverify",captchapayload)  #captcha validation
-        captcharesponse_text = json.loads(response.text)
+        try:
+            captchattoken = request.form.get("Token")               #retrieve token from ForgetPassword.js
+            secretkey = current_app.config.get('RECAPTCHA_SECRET_KEY')  #captcha secret key to validate
+            captchapayload = {'response': captchattoken, 'secret': secretkey}   # create the payload to sent request for captcha validation
+
+            response = requests.post("https://www.google.com/recaptcha/api/siteverify",captchapayload)  #captcha validation
+            captcharesponse_text = json.loads(response.text)
 
 
-        if (captcharesponse_text['success'] == True):
-            return {'message':['true']}
+            if (captcharesponse_text['success'] == True):
+                return {'message':['true']}
 
-        else:
-            print("CAPTCHA NOT OK")
-            return {jsonify({'message':['false']})}
+            else:
+                print("CAPTCHA NOT OK")
+                return {jsonify({'message':['false']})}
+        
+        except Exception as ex:
+            # logs the error log and returns a error message
+            logMessage = "Exception Error " + str(ex)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when validating capcha", "verify_captcha", logMessage)
+            return jsonify("Something went wrong, please try again later"), 401
+

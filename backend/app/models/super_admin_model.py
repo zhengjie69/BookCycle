@@ -26,10 +26,9 @@ class SuperAdmin:
                else:
                    return(False) 
 
-       except:
+       except Exception as ex:
            con.rollback()
-           print("Error unable to validate user")
-           return(False) 
+           raise ex
       
        finally:
            con.close()
@@ -67,10 +66,9 @@ class SuperAdmin:
                 con.commit()
                 return("Successfully created user")
 
-        except sqlite3.Error as er:
-            print(er)
+        except Exception as ex:
             con.rollback()
-            return("Error in Creating Admin")
+            raise ex
       
         finally:
             con.close()
@@ -101,9 +99,9 @@ class SuperAdmin:
                 else:
                     return("Error no matching account found") 
 
-        except:
+        except Exception as ex:
             con.rollback()
-            return("Error in searching account")
+            raise ex
       
         finally:
             con.close()
@@ -130,10 +128,9 @@ class SuperAdmin:
                 
                 return("Successfully deleted")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            print(er)
-            return("Error in deleting book")
+            raise ex
 
         finally:
             con.close()
@@ -166,9 +163,9 @@ class SuperAdmin:
                 else:
                     return("Error in getting Account")
                 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in disabling account")
+            raise ex
 
         finally:
             con.close()

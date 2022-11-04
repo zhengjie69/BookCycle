@@ -27,10 +27,9 @@ class Admin:
                else:
                    return(False) 
 
-       except:
+       except Exception as ex:
            con.rollback()
-           print("Error unable to validate user")
-           return(False) 
+           raise ex
       
        finally:
            con.close()
@@ -61,9 +60,9 @@ class Admin:
                 else:
                     return("Error no matching user found") 
 
-        except:
+        except Exception as ex:
             con.rollback()
-            return("Error in searching user")
+            raise ex
       
         finally:
             con.close()
@@ -84,10 +83,9 @@ class Admin:
                 con.commit()
                 return("successfully deleted")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            print(er)
-            return("Error in deleting book")
+            raise ex
 
         finally:
             con.close()
@@ -122,10 +120,9 @@ class Admin:
                 else:
                     return("Error in getting Account Status ID")
                 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            print(er)
-            return("Error in enabling account")
+            raise ex
 
         finally:
             con.close()
@@ -159,10 +156,9 @@ class Admin:
                 else:
                     return("Error in getting Account Status ID")
                 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            print(er)
-            return("Error in disabling account")
+            raise ex
 
         finally:
             con.close()

@@ -249,13 +249,16 @@ class Book:
 
                 # checks if location is None, if not none build the command for location filter
                 if locationFilter is not None:
-                    tempData2 = "("
-                    for idx, location in enumerate(locationFilter):
-                        tempData2 += str(location)
-                        if idx < len(locationFilter) - 1:
-                            tempData2 += ","
-                        else:
-                            tempData2 += ")"
+
+                    tempData2 = "({})".format(locationFilter)
+
+                    # tempData2 = "("
+                    # for idx, location in enumerate(locationFilter):
+                    #     tempData2 += str(location)
+                    #     if idx < len(locationFilter) - 1:
+                    #         tempData2 += ","
+                    #     else:
+                    #         tempData2 += ")"
 
                         
                     queryStorage.append("c.LocationID in {}".format(tempData2))
@@ -312,12 +315,9 @@ class Book:
                 else:
                     return("No results found") 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching books")
-
-        except Exception as e:
-            return("Error in fetching books")
+            raise ex
         finally:
             con.close()
             print("Successfully closed connection")

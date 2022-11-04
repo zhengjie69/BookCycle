@@ -17,38 +17,33 @@ class User:
     def get_transactionsTableName(self):
         return self.transactionsTableName
 
-    def get_role(self, email):
-        try:
-            if email is not None:
-                with sqlite3.connect(self.dbname + ".db") as con:
-                    print ("Opened database successfully")
-                    
-                    # this command forces sqlite to enforce the foreign key rules set  for the tables
-                    con.execute("PRAGMA foreign_keys = 1")
+    # def get_role(self, email):
+    #     try:
+    #         with sqlite3.connect(self.dbname + ".db") as con:
+    #             print ("Opened database successfully")
 
-                    
-                    cur = con.cursor()
+    #             # this command forces sqlite to enforce the foreign key rules set  for the tables
+    #             con.execute("PRAGMA foreign_keys = 1")
 
-                    # checks if the username is already used in the db
-                    cur.execute("SELECT b.RoleName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ?".format(self.tablename, self.roleTableName), (email,))
-                    result = cur.fetchall()
+    #             cur = con.cursor()
 
-                    if len(result) == 1:
-                        usernamecount = result[0][0]
-                        return usernamecount
-                    
-                    else:
-                        return "Error fetching role"
-            
-            else:
-                return "Error fetching role"
+    #             # fetches all users from User table
+    #             cur.execute("SELECT b.RoleName FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ?".format(self.tablename, self.roleTableName), (email,))
+    #             rows = cur.fetchall()
+                   
+    #             # gets the role if a role is found
+    #             if len(rows) == 1:
+    #                 return(rows[0][0])
+    #             else:
+    #                 return(None)
 
             
-        except Exception as ex:
-            return("Error fetching role")
-        finally:
-            con.close()
-            print("Successfully closed connection")
+    #     except Exception as ex:
+    #         raise ex
+
+    #     finally:
+    #         con.close()
+    #         print("Successfully closed connection")
 
     def create_user(self, username, email, password, contactNumber):
         try:
@@ -102,9 +97,9 @@ class User:
                 else:
                     return("Error username or email is already in use")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in Inserting User")
+            raise ex
       
         finally:
             con.close()
@@ -137,10 +132,9 @@ class User:
                     return("Error username is already in use")
 
 
-        except sqlite3.Error as er:
-            print(er)
+        except Exception as ex:
             con.rollback()
-            return("Error in Updating User Profile")
+            raise ex
       
         finally:
             con.close()
@@ -168,12 +162,9 @@ class User:
                 con.commit()
                 return("Successfully Created Transaction")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error failed to create transaction")
-
-        except Exception as e:
-            return("Error in fetching books")
+            raise ex
             
         finally:
             con.close()
@@ -196,9 +187,9 @@ class User:
                 contactNumber = cur.fetchall()[0][0]
                 return({'TransactionID': transactionInfo[0], 'BookTitle': transactionInfo[1], 'Price': transactionInfo[2], 'Owner': transactionInfo[3], 'OwnerPhoneNumber': contactNumber, 'PurchaserEmail': transactionInfo[4]})
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error failed to get transaction")
+            raise ex
       
         finally:
             con.close()
@@ -228,13 +219,9 @@ class User:
                     return (returnList)
                 else:
                     return("No transactions found")
-
-        except sqlite3.Error as er:
-            con.rollback()
-            return("Error failed to get transaction")
         
-        except Exception as e:
-            return("Error in fetching books")
+        except Exception as ex:
+            raise ex
       
         finally:
             con.close()
@@ -259,12 +246,9 @@ class User:
                 else:
                     return(None)
 
-        except sqlite3.Error as er:
-            con.rollback()
-            return(None)
         
         except Exception as ex:
-            return(None)
+            raise ex
       
         finally:
             con.close()

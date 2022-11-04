@@ -6,10 +6,12 @@ import string
 from app.models.data_cleaning import *
 from ..models.book_model import Book
 from ..models.user_model import User
+from ..models.shared_user_functions_model import Shared_User_Functions
 from .api_logger import *
 
 bookmodel = Book()
 usermodel = User()
+sharedUserFunctionModel = Shared_User_Functions()
 
 # helper function to check for allowed files for upload
 def allowed_file(filename):
@@ -103,7 +105,7 @@ def create_book():
                 if isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isemail(email) and isint(locationID) and isint(bookConditionID):
                     
                     # verifies if the role is User, as only users can create book
-                    if usermodel.get_role(email) == "User":
+                    if sharedUserFunctionModel.get_role(email) == "User":
                         # If the user does not select a file, the browser submits an
                         # empty file without a filename.
                         if image.filename == '':
@@ -212,12 +214,12 @@ def search_book():
             print("session email is")
             print(session.get("email"))
             # checks if the result is an error result
-            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_books", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
+            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_book", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
         
         except Exception as ex:
             # logs the error log and returns a error message
             logMessage = "Exception Error " + str(ex)
-            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when fetching books with or without a filter", "search_books", logMessage)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when fetching books with or without a filter", "search_book", logMessage)
             return jsonify("Something went wrong, please try again later"), 401    
 
 
@@ -230,11 +232,7 @@ def get_all_user_books():
             if email is not None and isemail(email) and session.get("email") is not None:
 
                 # verifies if the role is User or admin, as only users and admins can get all user books and only User books can be fetched
-                
-                print("rows")
-                print(usermodel.get_role(session.get("email")))
-                print(usermodel.get_role(email))
-                if usermodel.get_role(session.get("email")) == "User" or usermodel.get_role(session.get("email")) == "Admin" and usermodel.get_role(email) == "User":
+                if sharedUserFunctionModel.get_role(session.get("email")) == "User" or sharedUserFunctionModel.get_role(session.get("email")) == "Admin" and sharedUserFunctionModel.get_role(email) == "User":
 
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching all user books", "get_all_user_books", bookmodel.get_all_user_books(email))
 
@@ -278,7 +276,7 @@ def update_book_details():
             if bookID is not None and title is not None and price is not None and description is not None and genreID is not None and locationID is not None and bookConditionID is not None and email is not None:
                 
                 # 
-                if usermodel.get_role(email) == "User":
+                if sharedUserFunctionModel.get_role(email) == "User":
                     if isint(bookID) and isstring(title) and isfloat(price) and isstring(description) and isint(genreID) and isint(locationID) and isint(bookConditionID) and isemail(email):
                         
                         # generates the new image name and gets the old image name for deletion below
@@ -343,7 +341,7 @@ def delete_book():
                 if isint(bookID) and isemail(ownerEmail):
                     
                     # if the logged in email is a User or Admin and the owneremail has a User role
-                    if usermodel.get_role(email) == "User" or usermodel.get_role(email) == "Admin" and usermodel.get_role(ownerEmail) == "User":
+                    if sharedUserFunctionModel.get_role(email) == "User" or sharedUserFunctionModel.get_role(email) == "Admin" and sharedUserFunctionModel.get_role(ownerEmail) == "User":
 
                         # gets the image name before deletion
                         imagename = bookmodel.get_book_image_name(bookID)

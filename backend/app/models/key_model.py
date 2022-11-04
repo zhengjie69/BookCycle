@@ -24,9 +24,9 @@ class key:
                     return keyRow[0][0]
                 else:
                     return None
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return ("Error in getting key")
+            raise ex
 
         finally:
             con.close()
