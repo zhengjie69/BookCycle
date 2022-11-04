@@ -229,7 +229,7 @@ export default function EditListings() {
                     <div className="d-flex justify-content-center mb-3">
                         <Row>
                             {showErrors ? errorMessages.map((item, index) => {
-                                return <ul key={index}>{item}</ul>;
+                                return <ul style={{ color: "red" }} key={index}>{item}</ul>;
                             }) : null}
                         </Row>
                     </div>

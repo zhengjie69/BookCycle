@@ -161,7 +161,7 @@ const EditProfile = () => {
                         </Row>
                         <Row>
                             {showErrors ? errorMessages.map((item, index) => {
-                                return <ul key={index}>{item}</ul>;
+                                return <ul style={{ color: "red" }} key={index}>{item}</ul>;
                             }) : null}
                         </Row>
 
