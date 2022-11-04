@@ -53,9 +53,9 @@ const ChangePassword = () => {
 
         const NewPasswordLength = NewPassword ? NewPassword.length : 0;
 
-        console.log(CurrentPassword);
-        console.log(NewPassword);
-        console.log(ConfirmNewPassword);
+        // console.log(CurrentPassword);
+        // console.log(NewPassword);
+        // console.log(ConfirmNewPassword);
 
         ChangePasswordData.append('Email', userEmail);
         ChangePasswordData.append('OldPassword', CurrentPassword);

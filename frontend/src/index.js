@@ -36,8 +36,6 @@ import CreateAdmin from './pages/SuperAdminPages/CreateAdmin'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-// console.log(process.env.REACT_APP_OTP_SECRET_KEY);
-
 root.render(
   //<React.StrictMode>
   <Router>

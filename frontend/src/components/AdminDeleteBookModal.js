@@ -29,9 +29,9 @@ export default function AdminDeleteBookModal() {
         const book_id = location.state.BookID;
         const username = location.state.Username;
 
-        console.log(book_id);
-        console.log(userEmail);
-        console.log(adminEmail);
+        // console.log(book_id);
+        // console.log(userEmail);
+        // console.log(adminEmail);
 
         AdminDeleteBookData.append('BookID', book_id);
         AdminDeleteBookData.append('OwnerEmail', userEmail);

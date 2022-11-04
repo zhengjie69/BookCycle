@@ -62,7 +62,7 @@ function Register() {
             body: captchaTokenForm
         });
         if (capres.ok === false) {
-            console.log(capres.ok)
+            //console.log(capres.ok)
             errors.push("Please complete captcha validation")
         }
 

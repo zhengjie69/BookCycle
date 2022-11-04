@@ -101,9 +101,9 @@ export default function NewListings() {
             body: NewListingsFormData
         });
 
-        for (var pair of NewListingsFormData.entries()) {
-            console.log(`${pair[0]}: ${pair[1]}`);
-        }
+        // for (var pair of NewListingsFormData.entries()) {
+        //     console.log(`${pair[0]}: ${pair[1]}`);
+        // }
 
         const data = await res.json();
 

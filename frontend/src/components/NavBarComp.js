@@ -34,7 +34,7 @@ const NavBarComp = () => {
 
         const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
 
-        console.log(trimmedResponseMessage);
+        //console.log(trimmedResponseMessage);
 
         if (trimmedResponseMessage === "Successfully logged out") {
             navigate('/');

@@ -27,7 +27,7 @@ export function SearchResult() {
     const Authentication = secureLocalStorage.getItem('Authentication');
 
     useEffect(() => {
-        console.log(location.state.SearchKey)
+        //console.log(location.state.SearchKey)
         if (location.state.SearchKey !== null && userEmail !== null) {
             fetch('/apis/book/search_book?BookTitle=' + location.state.SearchKey + '&Email=' + userEmail)
                 .then(res => res.json())
@@ -91,10 +91,10 @@ export function SearchResult() {
     const getFilterResult = async (e) => {
 
         e.preventDefault();
-        console.log(GenreID);
-        console.log(LocationID);
-        console.log(MinPrice);
-        console.log(MaxPrice);
+        // console.log(GenreID);
+        // console.log(LocationID);
+        // console.log(MinPrice);
+        // console.log(MaxPrice);
 
         fetch('/apis/book/search_book?BookTitle=' + location.state.SearchKey +
             '&GenreFilter=' + GenreID + '&LocationFilter=' + LocationID + '&Email=' + userEmail

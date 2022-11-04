@@ -50,7 +50,7 @@ export default function ManageUsers() {
 
             const data = await res.json();
 
-            console.log(data[0].ContactNumber);
+            //console.log(data[0].ContactNumber);
 
             if (data[0].ContactNumber !== undefined && data[0].AccountStatus !== undefined && data[0].Username !== undefined) {
                 navigate('/ManageUsers/ManageUsersResult', {
