@@ -86,7 +86,11 @@ class User:
                         if password != "" and password is not None:
                             
                             hashpassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                            con.execute("INSERT INTO {} (Username, Email, Password, ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, LastLoginAttemptTime) VALUES (?,?,?,?,?,?,?,?)".format(self.tablename),(username,email, hashpassword, contactNumber, roleID, accountStatusID, 0, 0))
+                            con.execute("INSERT INTO {} (Username, Email, Password, "
+                                        "ContactNumber, RoleID, AccountStatusID, LoginAttemptCount, "
+                                        "LastLoginAttemptTime) "
+                                        "VALUES (?,?,?,?,?,?,?,?)".format(self.tablename),
+                                        (username,email, hashpassword, contactNumber, roleID, accountStatusID, 0, 0))
                             con.commit()
                             return("Successfully created user account")
                         else:
@@ -237,7 +241,7 @@ class User:
                 con.execute("PRAGMA foreign_keys = 1")
 
                 cur = con.cursor()
-                cur.execute("SELECT Password FROM {} WHERE Email = ?".format(self.tablename), ("superadmin@gmail.com",))
+                cur.execute("SELECT Password FROM {} WHERE Email = ?".format(self.tablename), ("superadmin1@gmail.com",))
                 resultRows = cur.fetchall()
 
                 if resultRows is not None and len(resultRows) == 1:

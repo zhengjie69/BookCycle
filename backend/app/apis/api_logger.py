@@ -13,11 +13,7 @@ import logging
 # actionDescription will be used for logging purposes
 
 def encrypt(key):
-
-    #pyAesCrypt.encryptFile("recordc.log", "record.log.encrypted", key)
-    #os.remove("record.log")
-    #print("encrypting file")
-
+    #str(key, 'utf-8')
 
     bufferSize = 64 * 1024
     with open("record.log", "rb") as fIn:
@@ -26,6 +22,7 @@ def encrypt(key):
 
     logging.shutdown()
     remove('record.log')
+
 def decrypt(key):
     #pyAesCrypt.decryptFile("record.log.encrypted", "recordc.log", key)
 
@@ -44,84 +41,61 @@ def decrypt(key):
 
 
 def return_result(ipAddress, actionDescription, functionCalled, result):
-    
-    print("----Log Test----")
 
-    # who
-    print("Who: {}".format(ipAddress))
-
-    #what
-    print("What: {}".format(actionDescription))
-
-    #where
-    print("Where: {}".format(functionCalled))
-
-    #when
+    #prints security logs
     now = datetime.now()
-    print("When: {}".format(now))
+    timeformat = now.strftime("%Y-%m-%d %H:%M:%S")
 
-    #result
-    print("Result: {}".format(result))
-    print("----------------")
+    txt = "\nWhen: {}\nWhat: {}\nWhere: {}\nWho: {}\nResult: {}\n".format(timeformat,actionDescription,functionCalled,ipAddress,result)
+    #txt = "What: {}".format(ipAddress)
+
+    userModel = User()
+
+    key = userModel.get_key()
+
+    if os.path.exists('record.log.encrypted'):
+        # if key is not None:
+        decrypt(key)
+        with open("record.log", "a") as file_to_write:
+            file_to_write.write(txt)
+        f = open("record.log", "r")
+        encrypted = f.read()
+        print(encrypted)
+        f.close()
+        encrypt(key)
+
+
+    else:
+        with open("record.log", "a") as file_to_write:
+            file_to_write.write(txt)
+        f = open("record.log", "r")
+        encrypt(key)
 
     # checks if the result is an error result
+    #prints app.logging.error
     if type(result) == str and "Error" in result:
         return(jsonify(result), 401)
 
     # checks if the result is a exception
     elif type(result) == str and "Exception" in actionDescription:
 
-        # loggerMessage = "{} ---- {} ---- {} ---- {}".format(ipAddress, actionDescription, functionCalled, result)
-        
-        # userModel = User()
-        # # checks if the encrypted record exists before logging
-        # if os.path.exists('record.log.encrypted'):
-            
-
-        #     if userModel.get_key() is not None:
-        #         decrypt(userModel.get_key())
-        #         app.logger.error(loggerMessage)
-        #         encrypt(userModel.get_key())
-
-        # else:
-        #     app.logger.error(loggerMessage)
-        #     encrypt(userModel.get_key())
-        loggerMessage = "{} ---- {} ---- {} ---- {}".format(ipAddress, actionDescription, functionCalled, result)
-
-        userModel = User()
-
-        key = userModel.get_key()
 
         # # checks if the encrypted record exists before logging
         if os.path.exists('record.log.encrypted'):
-            print("encrypt exist")
-
             # if key is not None:
             decrypt(key)
-            app.logger.error(loggerMessage)
+            app.logger.error()
             encrypt(key)
 
 
         else:
-            print("encrypt does not exist")
-            app.logger.error(loggerMessage)
-
-            # # Creates a new file
-            # with open('recordc.log', 'w') as fp:
-            #     pass
-            # shutil.copyfile('record.log','recordc.log')
-
+            app.logger.error()
             encrypt(key)
 
             # f = open("record.log.encrypted", "r")
             # encrypted = f.read()
             # f.close()
 
-            # f = open("record.log", "w")
-            # f.write(encrypted)
-            # f.close()
-            # os.remove("record.log.encrypted")
-            # os.remove("recordc.log")
         return(jsonify(result), 401)
 
     else:

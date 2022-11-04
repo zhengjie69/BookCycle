@@ -32,7 +32,6 @@ def create_app(test_config=None):
     app.register_blueprint(admin, url_prefix='/apis/admin/')
     app.register_blueprint(superadmin, url_prefix='/apis/superadmin/')
 
-    app.config['RECAPTCHA_SITE_KEY'] = keyModel.get_key("RECAPTCHA_SITE_KEY")
     app.config['RECAPTCHA_SECRET_KEY'] = keyModel.get_key("RECAPTCHA_SECRET_KEY")
     app.config['FLASK_SECRET_KEY'] = keyModel.get_key("FLASK_SECRET_KEY")
 
@@ -50,14 +49,13 @@ def create_app(test_config=None):
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     recaptcha.init_app(app)
-
     app.config["SESSION_PERMANENT"] = False
     app.config["SESSION_TYPE"] = "filesystem"
     app.permanent_session_lifetime = timedelta(minutes=30)
     Session(app)
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
-    logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+    logging.basicConfig(filename='record.log', level=logging.ERROR, format=f'%(asctime)s - %(levelname)s - %(name)s - %(threadName)s : %(message)s')
 
     jwt.init_app(app)
     mail.init_app(app)

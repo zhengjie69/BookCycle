@@ -21,8 +21,6 @@ user.route('/get_user_profile', methods=['GET'])(get_user_profile)
 # 'http://localhost:5000/apis/user/update_password'
 user.route('/update_password', methods=['POST'])(update_password)
 
-# 'http://localhost:5000/apis/user/reset_password'
-user.route('/reset_password', methods=['POST'])(reset_password)
 
 # 'http://localhost:5000/apis/user/update_profile'
 user.route('/update_profile', methods=['POST'])(update_profile)

@@ -27,7 +27,9 @@ def create_User():
             if username is not None and email is not None and password is not None and contactNumber is not None and isstring(username) and isstring(email) and isstring(password) and isstring(contactNumber):
 
                 # checks if the email is valid and contact Number is all numbers and length of contact number is 8 and if the email length exceeds SMTP limit (RFC 2821)
-                if len(str(username)) <= 12 and isemail(email) and len(email) < 254 and len(str(password)) >= 8 and len(str(password)) <= 25 and isvalidpassword(password) and isint(contactNumber) and len(str(contactNumber)) == 8:
+                if len(str(username)) <= 12 and isemail(email) and len(email) < 254 and \
+                        len(str(password)) >= 8 and len(str(password)) <= 25 and \
+                        isvalidpassword(password) and isint(contactNumber) and len(str(contactNumber)) == 8:
 
 
                     result = userModel.create_user(data_cleaning_without_space(username), email, password, contactNumber)
@@ -40,15 +42,18 @@ def create_User():
                             
 
                             session["email"] = email
+                            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                         "User account successfully created with the username "+email, "create_user",
+                                         "Successful User Creation")
                             return(jsonify(authentication=True, Email=email, Role=role), 201)
                         
                         else:
-                            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get row aftercreate user account", "create_user", "Error invalid role found")
+                            return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get row after create user account", "create_user", "Error invalid role found")
                 
                 else:
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create user account", "create_user", "Error invalid input found")
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create user account with the username"+email, "create_user", "Error invalid input found")
             else:
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create user account", "create_user", "Error fields cannot be left blank")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to create user account with the username"+email, "create_user", "Error fields cannot be left blank")
         
         except Exception as ex:
             
@@ -72,15 +77,15 @@ def login():
 
                     role = sharedUserFunctionModel.get_role(email)
                     if role is not None: 
-                        return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Successfully logged in")
+                        return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sucessful Login by "+email, "get_role", "Successfully logged in")
                         session["email"] = email
                         return(jsonify(authentication=True, Email=email, Role= role), 201)
                     else:
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting role for user during login", "get_role", "Error login failed")
                 else:
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user", "login", result)
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user. Username used by login is"+email, "login", result)
             else:
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user", "login", "Error fields cannot be left blank and must be valid inputs")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to login user. Username used by login is"+email, "login", "Error fields cannot be left blank and must be valid inputs")
         
         except Exception as ex:
             # logs the error log and returns a error message
@@ -95,7 +100,7 @@ def logout():
             email = request.form.get("Email")
             if session.get("email") is not None:
                 session.clear()
-                return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Logging out", "logout", "Successfully logged out"))
+                return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful Logging out by"+email, "logout", "Successfully logged out"))
             
             else:
                 return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to log out", "logout", "Error Not logged in"))
@@ -136,11 +141,11 @@ def update_password():
 
             # checks if the input is null or empty and is valid
             if userEmail is not None and isemail(userEmail) and oldPassword is not None and newPassword is not None:
-
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating user password", "update_password", sharedUserFunctionModel.update_password(userEmail, oldPassword, newPassword))
+                sharedUserFunctionModel.update_password(userEmail, oldPassword, newPassword)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful updating user password by"+userEmail, "update_password", "Successful password update")
             
             else:
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update user password", "update_password", "Error fields cannot be left blank and must be valid inputs")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update user password by"+userEmail, "update_password", "Error fields cannot be left blank and must be valid inputs")
         
         except Exception as ex:
             # logs the error log and returns a error message
@@ -163,7 +168,8 @@ def update_profile():
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email) and username is not None and contactNumber is not None:
                 #return(jsonify(userModel.update_profile(email, username, contactNumber)), 200)
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating profile", "update_profile", userModel.update_profile(email, username, contactNumber))
+                userModel.update_profile(email, username, contactNumber)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful Update profile", "update_profile", "Success")
             
             else:
 
@@ -189,7 +195,8 @@ def send_book_offer():
                 
                 # verifies if the role is User, as only users can send_book_offer
                 if sharedUserFunctionModel.get_role(offererEmail) == "User":
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", bookModel.send_book_offer(bookID, offer, offererEmail))
+                    bookModel.send_book_offer(bookID, offer, offererEmail)
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Sending book offer", "send_book_offer", "Success Book Offer")
 
                 else:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to send book offer", "send_book_offer", "Error user not authroized")
@@ -214,8 +221,8 @@ def get_book_offers():
             # checks if the input is null or empty and is valid
             if bookID is not None and isint(bookID) and ownerEmail is not None and isemail(ownerEmail) and userTableName is not None:
 
-                
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting book offers", "get_book_offers", bookModel.get_book_offers(bookID, ownerEmail, userTableName))
+                bookModel.get_book_offers(bookID, ownerEmail, userTableName)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting book offers", "get_book_offers", "Success")
 
 
 
@@ -241,8 +248,8 @@ def get_all_user_book_offers():
 
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email) and userTableName is not None and transactionsTableName is not None:
-                
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all book offers made by selected user email", "get_all_user_book_offers", bookModel.get_all_user_book_offers(email, userTableName, transactionsTableName))
+                bookModel.get_all_user_book_offers(email, userTableName, transactionsTableName)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all book offers made by selected user email", "get_all_user_book_offers", "Success")
             
             else:
            
@@ -299,9 +306,9 @@ def edit_book_offer():
 
             # checks if the input is null or empty and is valid
             if bookOfferID is not None and isint(bookOfferID) and offererEmail is not None and isemail(offererEmail) and newOffer is not None and isfloat(newOffer):
-                
-                
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Editing book offer", "edit_book_offer", bookModel.edit_book_offer(bookOfferID, offererEmail, newOffer))
+
+                bookModel.edit_book_offer(bookOfferID, offererEmail, newOffer)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Editing book offer", "edit_book_offer", "Success")
             
             else:
 
@@ -325,8 +332,8 @@ def delete_book_offer():
             if bookOfferID is not None and isint(bookOfferID) and offererEmail is not None and isemail(offererEmail):
 
                 if sharedUserFunctionModel.get_role(offererEmail) == "User":
-                
-                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", bookModel.delete_book_offer(bookOfferID, offererEmail))
+                    bookModel.delete_book_offer(bookOfferID, offererEmail)
+                    return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book offer", "delete_book_offer", "Success")
                 
                 else:
                     return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to delete book offer", "delete_book_offer", "Error user not authroized")
@@ -352,7 +359,8 @@ def get_transaction_details():
                 if transactionID is not None and isint(transactionID) and email is not None and isemail(email):
                     
                     if sharedUserFunctionModel.get_role(email) == "User":
-                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation details of a specific transcation", "get_transaction_details", userModel.get_transaction_details(transactionID))
+                        userModel.get_transaction_details(transactionID)
+                        return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting transcation details of a specific transcation", "get_transaction_details", "Success")
 
                     else:
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to get transcation details of a specific transcation", "get_transaction_details", "Error user not authroized")
@@ -376,8 +384,8 @@ def get_all_user_transactions():
 
             # checks if the input is null or empty and is valid
             if email is not None and isemail(email):
-                
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", userModel.get_all_user_transactions(email))
+                userModel.get_all_user_transactions(email)
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Getting all user transcations made by selected user email", "get_all_user_transcations", "Success")
             
             else:
 
@@ -395,15 +403,16 @@ def get_all_user_transactions():
 
 def forget_password_reset():
     if request.method == "POST":
-
         try:
             email = request.form.get("Email")
             if (sharedUserFunctionModel.verifyEmailExists(email) == True):
                 token = sharedUserFunctionModel.get_reset_token(email)
+
                 send_email(email,token)
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by"+email, "forget_password_reset", "Success")
                 return (jsonify(message='OKK'), 201)
             else:
-                print("NOTOK")
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by"+email, "forget_password_reset", "Fail. Invalid Email")
                 return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
         
         except Exception as ex:
@@ -413,10 +422,12 @@ def forget_password_reset():
             return jsonify("Something went wrong, please try again later"), 401
 
 
+
 def send_email(email,generatedtoken):
 
     from app import mail
-    sender = 'kopickosongml@gmail.com'
+
+    sender = current_app.config.get('MAIL_USERNAME')
     recipients = [email]
     msg = Message()
     msg.subject = "Password Recovery"
@@ -433,6 +444,10 @@ def verify_reset_password(token):
         username = sharedUserFunctionModel.verify_reset_token(args)
         if request.method == "GET":
             if username == "Invalid":
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                                     "Accesssing URL of password reset",
+                                     "verify_reset_password",
+                                     "Error! Invalid or expired token")
                 return (jsonify(message='Token Expired'), 404)
 
             return (jsonify(message='OKK'), 201)
@@ -440,9 +455,10 @@ def verify_reset_password(token):
         if request.method == "POST":
 
             newpassword = request.form.get("Password")
+            sharedUserFunctionModel.reset_password(username, newpassword)
             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Updating user password",
-                                "update_password",
-                                sharedUserFunctionModel.reset_password(username,newpassword))
+                                "verify_reset_password",
+                                "Success")
 
     except Exception as ex:
         # logs the error log and returns a error message
@@ -455,24 +471,29 @@ def verify_captcha():
     if request.method == "POST":
 
         try:
-            captchattoken = request.form.get("Token")               #retrieve token from ForgetPassword.js
-            secretkey = current_app.config.get('RECAPTCHA_SECRET_KEY')  #captcha secret key to validate
-            captchapayload = {'response': captchattoken, 'secret': secretkey}   # create the payload to sent request for captcha validation
+            captchattoken = request.form.get("Token")  # retrieve token from ForgetPassword.js
+            secretkey = current_app.config.get('RECAPTCHA_SECRET_KEY')  # captcha secret key to validate
+            captchapayload = {'response': captchattoken,
+                              'secret': secretkey}  # create the payload to sent request for captcha validation
 
-            response = requests.post("https://www.google.com/recaptcha/api/siteverify",captchapayload)  #captcha validation
+            response = requests.post("https://www.google.com/recaptcha/api/siteverify",
+                                     captchapayload)  # captcha validation
             captcharesponse_text = json.loads(response.text)
 
-
             if (captcharesponse_text['success'] == True):
-                return {'message':['true']}
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                              "Verifying Captcha", "verify_reset_password", "Success")
+
+                return {'message': ['true']}
 
             else:
-                print("CAPTCHA NOT OK")
-                return {jsonify({'message':['false']})}
-        
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                              "Verifying Captcha", "verify_reset_password", "Fail! Invalid key")
+                return {jsonify({'message': ['false']})}
+
         except Exception as ex:
             # logs the error log and returns a error message
             logMessage = "Exception Error " + str(ex)
-            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when validating capcha", "verify_captcha", logMessage)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
+                          "Exception when validating capcha", "verify_captcha", logMessage)
             return jsonify("Something went wrong, please try again later"), 401
-

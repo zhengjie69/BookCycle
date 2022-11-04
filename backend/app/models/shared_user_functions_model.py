@@ -29,7 +29,7 @@ class Shared_User_Functions:
                 
                 cur.execute("SELECT * FROM {} WHERE Email = ? ".format(self.tablename), (email,))
                 rows = cur.fetchall()
-                print("1")
+
                 # if only 1 record is found (as each email should only have 1 account) and account did not hit attempt limit
                 if len(rows) == 1:
 
@@ -37,9 +37,9 @@ class Shared_User_Functions:
                     cur.execute("SELECT AccountStatusID FROM {} WHERE AccountStatusName = ?".format(self.accountStatusTableName), ("Disabled",))
                     statusRow = cur.fetchall()
                     print(len(statusRow))
-                    print("2")
+
                     if len(statusRow) == 1:
-                        print("3")
+
                         disabledAccountStatusID = statusRow[0][0]
                         hashedPassword = rows[0][2]
                         timestamp = int(time.time())
@@ -50,11 +50,11 @@ class Shared_User_Functions:
 
                             # if < 5 attempts are made, normal login
                             if loginAttemptCount <= 5:
-                                print("4")
+
                                 if bcrypt.checkpw(password.encode(), hashedPassword):
                                     print("Password matched")
                                     con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(0, timestamp, email))
-                                    print("5")
+
                                     return ("Login Success")
                                 else:
                                     print("Password wrong")
