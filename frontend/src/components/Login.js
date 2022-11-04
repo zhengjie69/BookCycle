@@ -44,15 +44,14 @@ const Login = () => {
             secureLocalStorage.setItem("Authentication", data.authentication);
             secureLocalStorage.setItem("Email", data.Email);
             secureLocalStorage.setItem("Role", data.Role);
-            navigate('/');
-            // navigate('/OTP', {
-            //     state: {
-            //         Authentication: data.Authentication,
-            //         Email: data.Email,
-            //         Role: data.Role,
-            //         Route: "Login"
-            //     }
-            // });
+            navigate('/OTP', {
+                state: {
+                    Authentication: data.Authentication,
+                    Email: data.Email,
+                    Role: data.Role,
+                    Route: "Login"
+                }
+            });
             window.location.reload(false);
         }
 
