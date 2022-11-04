@@ -1,6 +1,6 @@
 import React from 'react'
 import Container from 'react-bootstrap/Container'
-import { Nav, Navbar, Button } from 'react-bootstrap'
+import { Nav, Navbar, Button, Form } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import Login from './Login'
 import { useNavigate } from 'react-router-dom'
@@ -19,16 +19,16 @@ const NavBarComp = () => {
 
         e.preventDefault();
 
-        secureLocalStorage.removeItem('Authentication');
-        secureLocalStorage.removeItem('Email');
-        secureLocalStorage.removeItem('Role');
-
         LogoutData.append('Email', Email);
 
         const res = await fetch('/apis/user/logout', {
             method: "POST",
             body: LogoutData
         });
+
+        secureLocalStorage.removeItem('Authentication');
+        secureLocalStorage.removeItem('Email');
+        secureLocalStorage.removeItem('Role');
 
         const data = await res.json();
 
@@ -37,13 +37,15 @@ const NavBarComp = () => {
         console.log(trimmedResponseMessage);
 
         if (trimmedResponseMessage === "Successfully logged out") {
-            console.log("came in");
             navigate('/');
-            // window.location.reload(false);
+            window.location.reload(false);
         }
         else {
             alert("Failed to logout");
         }
+
+        navigate('/');
+        window.location.reload(false);
     }
 
     return (
@@ -87,19 +89,8 @@ const NavBarComp = () => {
                         }
                         {!Authentication ? <Login /> : null}
                         {Authentication ?
-                            <Button variant='primary' to='/' onClick={LogOut}> Logout</Button> : null
+                            <Button variant='primary' onClick={(e) => LogOut(e)}>Logout</Button> : null
                         }
-                        {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                                    <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                                    <NavDropdown.Item href="#action/3.2">
-                                        Another action
-                                    </NavDropdown.Item>
-                                    <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                                    <NavDropdown.Divider />
-                                    <NavDropdown.Item href="#action/3.4">
-                                        Separated link
-                                    </NavDropdown.Item>
-                                </NavDropdown> */}
                     </Nav>
                 </Navbar.Collapse>
             </Container>

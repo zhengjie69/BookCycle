@@ -9,10 +9,13 @@ function SessionTimeoutModal() {
     const [idleModal, setIdleModal] = useState(false);
     const navigate = useNavigate();
 
-    let idleTimeout = 1000 * 60 * 15;  //15 minute
-    let idleLogout = 1000 * 60 * 30; //30 Minutes
+    let idleTimeout = 1000 * 60 * 1;  //15 minute
+    let idleLogout = 1000 * 60 * 2; //30 Minutes
     let idleEvent;
     let idleLogoutEvent;
+
+    const Email = secureLocalStorage.getItem('Email');
+    const LogoutData = new FormData();
 
     /**
      * Add any other events listeners here
@@ -51,11 +54,34 @@ function SessionTimeoutModal() {
      * @method logOut
      * This function will destroy current user session.
      */
-    const logOut = () => {
-        setIdleModal(false);
+    const logOut = async (e) => {
+        e.preventDefault();
+
+        LogoutData.append('Email', Email);
+
+        const res = await fetch('/apis/user/logout', {
+            method: "POST",
+            body: LogoutData
+        });
+
         secureLocalStorage.removeItem('Authentication');
         secureLocalStorage.removeItem('Email');
         secureLocalStorage.removeItem('Role');
+
+        const data = await res.json();
+
+        const trimmedResponseMessage = JSON.stringify(data).replace(/[^a-zA-Z ]/g, "");
+
+        console.log(trimmedResponseMessage);
+
+        if (trimmedResponseMessage === "Successfully logged out") {
+            navigate('/');
+            window.location.reload(false);
+        }
+        else {
+            alert("Failed to logout");
+        }
+
         navigate('/');
         window.location.reload(false);
     }
@@ -84,7 +110,7 @@ function SessionTimeoutModal() {
             </ModalBody>
             <ModalFooter>
                 <button className="btn btn-primary" onClick={() => extendSession()}>Extend session</button>
-                <button className="btn btn-danger" onClick={() => logOut()}>Logout</button>
+                <button className="btn btn-danger" onClick={(e) => logOut(e)}>Logout</button>
             </ModalFooter>
         </Modal>
     )
