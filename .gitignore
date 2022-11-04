@@ -19,6 +19,7 @@ pyvenv.cfg
 /frontend/api
 /frontend/package-lock.json
 /frontend/node_modules
+/frontend/.env
 /.vscode
 
 # **/bin/*

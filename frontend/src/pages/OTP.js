@@ -46,11 +46,9 @@ function OTP() {
         }
     }, [])
 
-    console.log(contactNum);
-
     // Initialise the Supabase client
-    const supabaseUrl = "https://ttkymcvevwxzywpnxqge.supabase.co"
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a3ltY3Zldnd4enl3cG54cWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjczMzg2OTIsImV4cCI6MTk4MjkxNDY5Mn0.cjOQ2Li81-N8vP_wRdQHndRxL1jIr1dR-DqYRDP_-xA"
+    const supabaseUrl = process.env.REACT_APP_OTP_URL
+    const supabaseAnonKey = process.env.REACT_APP_OTP_SECRET_KEY
     const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
     // Send OTP to the User Contact Number

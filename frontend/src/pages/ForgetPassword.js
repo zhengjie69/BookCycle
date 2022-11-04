@@ -23,11 +23,7 @@ function ForgetPassword() {
     const captchaTokenForm = new FormData();
     const captchaRef = useRef(null);
 
-
-
     let errors = [];
-
-
 
     const postForgetPassword = async (e) => {
 
@@ -97,16 +93,12 @@ function ForgetPassword() {
                 </div>
 
                 <div align={"center"}>
-
-
                     <ReCAPTCHA
-                        sitekey="6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB"
+                        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                         render="explicit"
                         ref={captchaRef}
 
                     />
-
-
                 </div>
                 <div className="d-flex justify-content-center mt-2 mb-4">
                     <Row>

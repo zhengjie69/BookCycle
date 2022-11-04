@@ -184,11 +184,11 @@ function Register() {
                             </Form.Label>
                             <Col xs={10}>
                                 <Form.Control required type="password" placeholder="Password" value={Password} onChange={e => setPassword(e.target.value)} />
-                            <Row xs={10}>
-                                <Form.Text className="text-muted">
-                                    Password length to be more than 8 containing 1 uppcase, 1 lowercase and 1 special character
-                                </Form.Text>
-                            </Row>
+                                <Row xs={10}>
+                                    <Form.Text className="text-muted">
+                                        Password length to be more than 8 containing 1 uppcase, 1 lowercase and 1 special character
+                                    </Form.Text>
+                                </Row>
                             </Col>
                         </Form.Group>
                     </Row>
@@ -218,7 +218,7 @@ function Register() {
                     </Row>
                     <div align={"center"} className="mb-3">
                         <ReCAPTCHA
-                            sitekey="6LdYjMwiAAAAABNShyJ2aGa6nFzWi5egcvGIbUUB"
+                            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                             render="explicit"
                             ref={captchaRef}
                         />
@@ -231,7 +231,7 @@ function Register() {
                     <div className="d-flex align-items-center justify-content-center mt-4">
                         <Row>
                             {showErrors ? errorMessages.map((item, index) => {
-                                return <ul style={{color:"red"}} key={index}>{item}</ul>;
+                                return <ul style={{ color: "red" }} key={index}>{item}</ul>;
                             }) : null}
                         </Row>
                     </div>
