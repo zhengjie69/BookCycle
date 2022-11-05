@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Button } from 'react-bootstrap'
 import OTPInput, { ResendOTP } from "otp-input-react";
-import { LinkContainer } from 'react-router-bootstrap'
 import { useNavigate, useLocation } from 'react-router-dom';
 import secureLocalStorage from "react-secure-storage";
 import { createClient } from '@supabase/supabase-js';
@@ -91,7 +90,7 @@ function OTP() {
         let resendBtn = document.getElementById("reSendID");
         let verifyBtn = document.getElementById("verifyCodeID");
         let space = document.getElementById("space");
-        // SendOTP();
+        SendOTP();
         resendBtn.removeAttribute("hidden");
         verifyBtn.removeAttribute("hidden");
         space.removeAttribute("hidden");
