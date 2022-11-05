@@ -20,8 +20,7 @@ class Shared_User_Functions:
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
                 
@@ -36,7 +35,6 @@ class Shared_User_Functions:
                     # fetches the id for "Disabled" status
                     cur.execute("SELECT AccountStatusID FROM {} WHERE AccountStatusName = ?".format(self.accountStatusTableName), ("Disabled",))
                     statusRow = cur.fetchall()
-                    print(len(statusRow))
 
                     if len(statusRow) == 1:
 
@@ -52,13 +50,11 @@ class Shared_User_Functions:
                             if loginAttemptCount <= 5:
 
                                 if bcrypt.checkpw(password.encode(), hashedPassword):
-                                    print("Password matched")
                                     con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(0, timestamp, email))
 
                                     return ("Login Success")
                                 else:
-                                    print("Password wrong")
-                                    
+
                                     con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(loginAttemptCount + 1, timestamp, email))
                                     con.commit()
                                     return ("Error incorrect email or password")
@@ -68,18 +64,15 @@ class Shared_User_Functions:
 
                                 # as in unix time, 10 minutes = 60 * 10 = 600, deduct now timing with stored timing to determine if 10 minutes has passed.
                                 timePassed = int(time.time()) - int(rows[0][7])
-                                print(timePassed)
                                 if timePassed < 600:
                                     return ("Error please try again in 10 minutes")
 
                                 else:
                                     if bcrypt.checkpw(password.encode(), hashedPassword):
-                                        print("Password matched")
                                         con.execute("UPDATE {} SET LoginAttemptCount = ? WHERE Email = ?".format(self.tablename),(0, email))
                                         con.commit()
                                         return ("Login Success")
                                     else:
-                                        print("Password wrong")
                                         con.execute("UPDATE {} SET LoginAttemptCount = ?, LastLoginAttemptTime = ?  WHERE Email = ?".format(self.tablename),(loginAttemptCount + 1, int(time.time()), email))
                                         con.commit()
                                         return ("Error incorrect email or password")
@@ -94,7 +87,6 @@ class Shared_User_Functions:
                     else:
                         return("Error logging in, please try again")
                 else:
-                    print("Password wrong")
                     return ("Error incorrect email or password")
 
         except Exception as ex:
@@ -104,14 +96,12 @@ class Shared_User_Functions:
       
         finally:
             con.close()
-            print("Successfully closed connection")
-    
+
 
     def update_password(self, email, oldPassword, newPassword):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -148,14 +138,12 @@ class Shared_User_Functions:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def reset_password(self,email,password):
         try:
 
             with sqlite3.connect(self.dbname + ".db") as con:
-                print("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -179,13 +167,11 @@ class Shared_User_Functions:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_role(self,email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -208,13 +194,11 @@ class Shared_User_Functions:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_user_profile(self, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -227,13 +211,11 @@ class Shared_User_Functions:
                    
                 # goes through the list to create a list with dict inside
                 if len(rows) > 0:
-                    print("rows of records:")
                     returnData = []
                     for records in rows:
 
                         returnData.append({'Username': records[0], 'Email': records[1], 'ContactNumber': records[2]})
 
-                        print(records)
                     return(returnData)
                 else:
                     return("No matching user in database") 
@@ -244,13 +226,11 @@ class Shared_User_Functions:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def verifyEmailExists(self, email):
         try:
 
             with sqlite3.connect(self.dbname + ".db") as con:
-                print("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -263,7 +243,6 @@ class Shared_User_Functions:
                 rows = cur.fetchall()
                 # goes through the list to create a list with dict inside
                 if len(rows) > 0:
-                    print("Email Valid")
                     return True
                 else:
                     return ("No matching email in database")
@@ -274,7 +253,6 @@ class Shared_User_Functions:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_reset_token(self,email, expires=50):
         times = time.time()
@@ -284,7 +262,6 @@ class Shared_User_Functions:
         try:
             username = jwt.decode(token, current_app.config.get('FLASK_SECRET_KEY'),algorithms='HS256'),['reset_password']
         except Exception as e:
-            print(e)
             return "Invalid"
 
         return username[0]['reset_password']

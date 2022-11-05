@@ -10,7 +10,6 @@ class key:
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -30,4 +29,3 @@ class key:
 
         finally:
             con.close()
-            print("Successfully closed connection")

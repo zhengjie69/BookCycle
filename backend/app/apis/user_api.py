@@ -100,7 +100,7 @@ def logout():
             email = request.form.get("Email")
             if session.get("email") is not None:
                 session.clear()
-                return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful Logging out by"+email, "logout", "Successfully logged out"))
+                return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful Logging out by "+email, "logout", "Successfully logged out"))
             
             else:
                 return jsonify(return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to log out", "logout", "Error Not logged in"))
@@ -142,10 +142,10 @@ def update_password():
             # checks if the input is null or empty and is valid
             if userEmail is not None and isemail(userEmail) and oldPassword is not None and newPassword is not None:
                 sharedUserFunctionModel.update_password(userEmail, oldPassword, newPassword)
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful updating user password by"+userEmail, "update_password", "Successful password update")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Successful updating user password by "+userEmail, "update_password", "Successful password update")
             
             else:
-                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update user password by"+userEmail, "update_password", "Error fields cannot be left blank and must be valid inputs")
+                return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Failed to update user password by "+userEmail, "update_password", "Error fields cannot be left blank and must be valid inputs")
         
         except Exception as ex:
             # logs the error log and returns a error message
@@ -398,31 +398,6 @@ def get_all_user_transactions():
                 return jsonify("Something went wrong, please try again later"), 401                    
 
 
-
-
-
-def forget_password_reset():
-    if request.method == "POST":
-        try:
-            email = request.form.get("Email")
-            if (sharedUserFunctionModel.verifyEmailExists(email) == True):
-                token = sharedUserFunctionModel.get_reset_token(email)
-
-                send_email(email,token)
-                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by"+email, "forget_password_reset", "Success")
-                return (jsonify(message='OKK'), 201)
-            else:
-                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by"+email, "forget_password_reset", "Fail. Invalid Email")
-                return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
-        
-        except Exception as ex:
-            # logs the error log and returns a error message
-            logMessage = "Exception Error " + str(ex)
-            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when sending email for password reset", "forget_password_reset", logMessage)
-            return jsonify("Something went wrong, please try again later"), 401
-
-
-
 def send_email(email,generatedtoken):
 
     from app import mail
@@ -436,6 +411,31 @@ def send_email(email,generatedtoken):
     msg.body = "You have requested for a password change, click on the link to reset your password now. "+"http://localhost:3000/ForgetResetPassword/"+generatedtoken
 
     mail.send(msg)
+
+
+def forget_password_reset():
+    if request.method == "POST":
+        try:
+            email = request.form.get("Email")
+            if (sharedUserFunctionModel.verifyEmailExists(email) == True):
+                token = sharedUserFunctionModel.get_reset_token(email)
+
+                send_email(email,token)
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by "+email, "forget_password_reset", "Success")
+                return (jsonify(message='OKK'), 201)
+            else:
+                return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Password reset was requested by "+email, "forget_password_reset", "Fail. Invalid Email")
+                return (jsonify(message='An email will be sent to the email provided for password reset if it exists'), 201)
+        
+        except Exception as ex:
+            # logs the error log and returns a error message
+            logMessage = "Exception Error " + str(ex)
+            return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Exception when sending email for password reset", "forget_password_reset", logMessage)
+            return jsonify("Something went wrong, please try again later"), 401
+
+
+
+
 
 def verify_reset_password(token):
 
@@ -484,12 +484,12 @@ def verify_captcha():
                 return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
                               "Verifying Captcha", "verify_reset_password", "Success")
 
-                return {'message': ['true']}
+                return jsonify("Valid captcha"), 201
 
             else:
                 return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr),
                               "Verifying Captcha", "verify_reset_password", "Fail! Invalid key")
-                return {jsonify({'message': ['false']})}
+                return jsonify("Something went wrong, please try again later"), 401
 
         except Exception as ex:
             # logs the error log and returns a error message

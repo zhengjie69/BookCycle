@@ -31,10 +31,8 @@ def isemail(email):
     # pass the regular expression
     # and the string into the fullmatch() method
     if(re.fullmatch(regex, email)):
-        print("Valid Email")
         return True
     else:
-        print("Invalid Email")
         return False
 
 def isvalidpassword(password):
@@ -46,10 +44,8 @@ def isvalidpassword(password):
     # pass the regular expression
     # and the string into the fullmatch() method
     if(re.fullmatch(regex, password)):
-        print("Valid Password")
         return True
     else:
-        print("Invalid Password")
         return False
 
 def isvalidcontactnumber(contactNumber):

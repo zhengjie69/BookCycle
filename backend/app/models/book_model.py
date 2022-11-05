@@ -19,13 +19,12 @@ class Book:
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
                 cur.execute("SELECT * FROM {}".format(self.genretablename))
                 rows = cur.fetchall()
                    
-                # test print db records
+
                 if len(rows) > 0:
 
                     # creates a return list for key value pair
@@ -43,19 +42,16 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
-    
+
     def get_all_locations(self):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
                 cur.execute("SELECT * FROM {}".format(self.locationtablename))
                 rows = cur.fetchall()
                    
-                # test print db records
                 if len(rows) > 0:
                     # creates a return list for key value pair
                     dataList = []
@@ -71,19 +67,16 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_all_book_conditions(self):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
                 cur.execute("SELECT * FROM {}".format(self.bookconditiontablename))
                 rows = cur.fetchall()
                    
-                # test print db records
                 if len(rows) > 0:
                     # creates a return list for key value pair
                     dataList = []
@@ -99,14 +92,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_book_image_name(self, bookID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -125,14 +116,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def create_book(self, title, price, description, genreID, email, image, locationID, bookConditionID):
         try:
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                        
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -166,13 +155,11 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
-    
+
     def search_book(self, bookTitle = None, userEmail = None, genreFilter = None, locationFilter = None, bookConditionFilter = None, minPriceFilter = None, maxPriceFilter = None):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -288,7 +275,6 @@ class Book:
                         elif query != "" and idx < len(queryStorage):
                             filterQuery += query
                 
-                print("filter query is {}".format(filterQuery))
 
                 if filterQuery != "":
                     cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE e.BookStatusName = ? AND {}".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename, filterQuery), ("Available",))
@@ -298,10 +284,8 @@ class Book:
                    
                 # if there are book records found:
                 if len(rows) > 0:
-                    print("rows of records:")
                     returnData = []
                     for records in rows:
-                        print(records)
 
 
                         # builds the image url
@@ -320,13 +304,11 @@ class Book:
             raise ex
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_all_available_books(self, userEmail, genreFilter = None, locationFilter = None, bookConditionFilter = None, minPriceFilter = None, maxPriceFilter = None):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -416,7 +398,6 @@ class Book:
                     bookConditionQuery += "b.BookConditionID in {}".format(tempData3)
 
                 filterQuery += minmaxQuery + genreQuery + locationQuery + bookConditionQuery
-                print(filterQuery)
 
                 if filterQuery == "":
                     cur.execute("SELECT a.bookID, a.Title, a.Price, a.Description, a.Image, b.GenreName, c.LocationName, d.BookConditionName  FROM {} AS a INNER JOIN {} AS b ON a.GenreID = b.GenreID INNER JOIN {} AS c ON a.LocationID = c.LocationID INNER JOIN {} AS d ON a.BookConditionID = d.BookConditionID INNER JOIN {} AS e ON a.BookStatusID = e.BookStatusID WHERE a.Email != ? AND e.BookStatusName = ?".format(self.tablename, self.genretablename, self.locationtablename, self.bookconditiontablename, self.bookstatustablename), (userEmail, "Available"))
@@ -428,10 +409,8 @@ class Book:
                    
                 # if there are book records found:
                 if len(rows) > 0:
-                    print("rows of records:")
                     returnData = []
                     for records in rows:
-                        print(records)
 
 
                         # builds the image url
@@ -451,15 +430,13 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def get_all_user_books(self, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
 
                 #fetches the books the user has created
@@ -468,10 +445,8 @@ class Book:
                    
                 # if there are book records, fetches the status, genre and builds the image  url for front end use
                 if len(rows) > 0:
-                    print("rows of records:")
                     returnData = []
                     for records in rows:
-                        print(records)
 
                         # builds the image url
                         fileurl = url_for('static', filename='BookImages/{}'.format(records[4]))
@@ -490,15 +465,13 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def get_book_offers(self, bookID, ownerEmail, userTableName):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
 
                 # check if the book belongs to the user
@@ -528,14 +501,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def get_all_user_book_offers(self, offererEmail, userTableName, getTransactionsTableName):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 if offererEmail is not None and isemail(offererEmail) and userTableName is not None and getTransactionsTableName is not None:
                     cur = con.cursor()
@@ -551,7 +522,6 @@ class Book:
 
                             cur.execute("SELECT d.TransactionID FROM {} AS a INNER JOIN {} AS b ON a.BookOfferStatusID = b.BookOfferStatusID INNER JOIN {} AS c ON a.OffererEmail = c.Email INNER JOIN {} AS d ON c.Email = d.PurchaserEmail WHERE a.BookOfferID = ? AND a.OffererEmail = ? AND b.BookOfferStatusName = ?".format(self.bookoffertablename, self.bookofferstatustablename, userTableName, getTransactionsTableName), (offers[0], offererEmail, "Accepted"))
                             returnedRows = cur.fetchall()
-                            print(returnedRows)
 
                             tempDict = {'BookOfferID': offers[0], 'BookID': offers[1],'BookTitle': offers[2], 'OfferPrice': offers[3], 'BookOfferStatus': offers[4]}
                             if len(returnedRows) == 1:
@@ -572,14 +542,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def delete_book_offer(self, bookOfferID, bookID, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -603,15 +571,13 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def search_book_by_title(self, userEmail, bookTitle):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
 
                 
                 cur = con.cursor()
@@ -627,10 +593,8 @@ class Book:
                    
                 # if there are book records found:
                 if len(rows) > 0:
-                    print("rows of records:")
                     returnData = []
                     for records in rows:
-                        print(records)
 
 
                         # builds the image url
@@ -645,20 +609,17 @@ class Book:
                     return("No records in database") 
 
         except sqlite3.Error as er:
-            print(er)
             con.rollback()
             return("Error in fetching books")
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def search_book_by_ID(self, bookID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -680,14 +641,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def update_book_details(self, bookID, email, tableName, title, price, description, genreID, image, locationID, bookconditionID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -717,14 +676,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def delete_book(self, bookID, ownerEmail):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 cur = con.cursor()
                 cur.execute("DELETE FROM {} WHERE BookID = ? AND Email = ?".format(self.tablename), (bookID, ownerEmail))
                 con.commit()
@@ -736,14 +693,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def send_book_offer(self, bookID, offer, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -784,14 +739,12 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection") 
 
     def accept_book_offer(self, bookOfferID, ownerEmail):
         try:
             if bookOfferID is not None and ownerEmail is not None:
                 with sqlite3.connect(self.dbname + ".db") as con:
-                    print ("Opened database successfully")
-                    
+
                     # this command forces sqlite to enforce the foreign key rules set  for the tables
                     con.execute("PRAGMA foreign_keys = 1")
 
@@ -853,20 +806,17 @@ class Book:
 
         except sqlite3.Error as er:
             con.rollback()
-            print(er)
             return("Error Accepting offer for Book")
 
         finally:
             con.close()
-            print("Successfully closed connection") 
-    
+
 
     def edit_book_offer(self, bookOfferID, offererEmail, newOffer):
         try:
             if bookOfferID is not None and offererEmail is not None and newOffer is not None:
                 with sqlite3.connect(self.dbname + ".db") as con:
-                    print ("Opened database successfully")
-                    
+
                     # this command forces sqlite to enforce the foreign key rules set  for the tables
                     con.execute("PRAGMA foreign_keys = 1")
 
@@ -906,15 +856,13 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection") 
 
 
     def delete_book_offer(self, bookOfferID, offererEmail):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -953,4 +901,3 @@ class Book:
 
         finally:
             con.close()
-            print("Successfully closed connection") 

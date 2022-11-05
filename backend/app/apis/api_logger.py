@@ -13,7 +13,7 @@ import logging
 # actionDescription will be used for logging purposes
 
 def encrypt(key):
-    #str(key, 'utf-8')
+
 
     bufferSize = 64 * 1024
     with open("record.log", "rb") as fIn:
@@ -21,7 +21,7 @@ def encrypt(key):
             pyAesCrypt.encryptStream(fIn, fOut, str(key, 'utf-8'), bufferSize)
 
     logging.shutdown()
-    remove('record.log')
+    #remove('record.log')
 
 def decrypt(key):
     #pyAesCrypt.decryptFile("record.log.encrypted", "recordc.log", key)
@@ -58,17 +58,12 @@ def return_result(ipAddress, actionDescription, functionCalled, result):
         decrypt(key)
         with open("record.log", "a") as file_to_write:
             file_to_write.write(txt)
-        f = open("record.log", "r")
-        encrypted = f.read()
-        print(encrypted)
-        f.close()
         encrypt(key)
 
 
     else:
         with open("record.log", "a") as file_to_write:
             file_to_write.write(txt)
-        f = open("record.log", "r")
         encrypt(key)
 
     # checks if the result is an error result
@@ -84,12 +79,12 @@ def return_result(ipAddress, actionDescription, functionCalled, result):
         if os.path.exists('record.log.encrypted'):
             # if key is not None:
             decrypt(key)
-            app.logger.error()
+            app.logger.error(txt)
             encrypt(key)
 
 
         else:
-            app.logger.error()
+            app.logger.error(txt)
             encrypt(key)
 
             # f = open("record.log.encrypted", "r")

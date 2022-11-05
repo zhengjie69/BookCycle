@@ -20,7 +20,6 @@ class User:
     # def get_role(self, email):
     #     try:
     #         with sqlite3.connect(self.dbname + ".db") as con:
-    #             print ("Opened database successfully")
 
     #             # this command forces sqlite to enforce the foreign key rules set  for the tables
     #             con.execute("PRAGMA foreign_keys = 1")
@@ -43,14 +42,12 @@ class User:
 
     #     finally:
     #         con.close()
-    #         print("Successfully closed connection")
 
     def create_user(self, username, email, password, contactNumber):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -107,14 +104,12 @@ class User:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def update_profile(self, email, username, contactnumber):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -142,7 +137,6 @@ class User:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     
 
@@ -151,8 +145,7 @@ class User:
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -172,14 +165,12 @@ class User:
             
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_transaction_details(self, transactionID):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -197,15 +188,13 @@ class User:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
     def get_all_user_transactions(self, email):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -229,14 +218,12 @@ class User:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def get_key(self):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -256,7 +243,6 @@ class User:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
 
         

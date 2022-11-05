@@ -118,7 +118,7 @@ def create_book():
                             imageExtension = image.filename.split(".")[1]
                             filename = generate_filename(8) + "." + imageExtension
 
-                            print(filename)
+
                             result = bookmodel.create_book(title, price, description, genreID, email, filename, locationID, bookConditionID)
                             
                             # if the book listing is successfully created, insert uploaded image into storage
@@ -211,8 +211,7 @@ def search_book():
             else:
                 maxPriceFilter = None
 
-            print("session email is")
-            print(session.get("email"))
+
             # checks if the result is an error result
             return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Fetching books with or without filter", "search_book", bookmodel.search_book(bookTitle, userEmail, genreFilter, locationFilter, bookConditionFilter, minPriceFilter, maxPriceFilter))
         
@@ -351,14 +350,13 @@ def delete_book():
                         # prepares to delete the image from storage if record is successfully deleted
                         if "Error" not in result:
 
-                            print("image name is")
-                            print(imagename)
+
                             current_dir = str(os.getcwd() + '\\app\\' + current_app.config['UPLOAD_FOLDER'])
-                            print(current_dir)
+
                             # searches for the image in the file system
                             # if found, delete the image
                             if find_image(imagename, current_dir):
-                                print(current_dir)
+
                                 os.remove(os.path.join(current_dir, imagename))
 
                         return return_result(request.environ.get('HTTP_X_REAL_IP', request.remote_addr), "Deleting book", "delete_book", result)

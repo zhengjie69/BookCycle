@@ -15,8 +15,7 @@ class SuperAdmin:
        try:
         
            with sqlite3.connect(self.dbname + ".db") as con:
-               print ("Opened database successfully")
-                
+
                cur = con.cursor()
                cur.execute("SELECT COUNT(*) FROM {} AS a INNER JOIN {} AS b ON a.RoleID = b.RoleID WHERE a.Email = ? AND b.RoleName = ?".format(self.userTablename, self.roleTableName), (loginEmail,"SuperAdmin"))
                rows = cur.fetchall()
@@ -32,15 +31,13 @@ class SuperAdmin:
       
        finally:
            con.close()
-           print("Successfully closed connection")
 
 
     def create_admin_account(self, username, email, password, contactNumber):
         try:
             
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -72,13 +69,11 @@ class SuperAdmin:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def search_admin(self, adminEmail):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -105,13 +100,11 @@ class SuperAdmin:
       
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def delete_admin_account(self, adminEmail):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
 
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
@@ -134,14 +127,12 @@ class SuperAdmin:
 
         finally:
             con.close()
-            print("Successfully closed connection")
 
     def disable_admin_account(self, adminEmail):
         try:
         
             with sqlite3.connect(self.dbname + ".db") as con:
-                print ("Opened database successfully")
-                
+
                 # this command forces sqlite to enforce the foreign key rules set  for the tables
                 con.execute("PRAGMA foreign_keys = 1")
 
@@ -169,4 +160,3 @@ class SuperAdmin:
 
         finally:
             con.close()
-            print("Successfully closed connection")
