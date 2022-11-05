@@ -12,9 +12,9 @@ const NavBarComp = () => {
     const Authentication = secureLocalStorage.getItem('Authentication');
     const Role = secureLocalStorage.getItem('Role');
     const Email = secureLocalStorage.getItem('Email');
-
     const LogoutData = new FormData();
-
+    const OTPpage = window.location.pathname === "/OTP";
+    
     const LogOut = async (e) => {
 
         e.preventDefault();
@@ -49,20 +49,25 @@ const NavBarComp = () => {
     }
 
     return (
-        <Navbar bg="light" expand="lg" >
+        <Navbar className="navbar navbar-dark bg-dark" expand="lg">
             <Container>
-                <LinkContainer to="/">
-                    <Navbar.Brand>BookCycle</Navbar.Brand>
-                </LinkContainer>
+                {OTPpage ?
+                    <Navbar.Brand>BookCycle</Navbar.Brand>: null
+                }
+                {!OTPpage ?
+                    <LinkContainer to="/">
+                        <Navbar.Brand>BookCycle</Navbar.Brand>
+                    </LinkContainer> : null
+                }
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav className="mr-auto">
-                        {Authentication && Role === "User" ?
+                        {Authentication && Role === "User" && !OTPpage ?
                             <LinkContainer to="/MyOffers">
                                 <Nav.Link>My Offers</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication && Role === "User" ?
+                        {Authentication && Role === "User" && !OTPpage ?
                             <LinkContainer to="/MyListings">
                                 <Nav.Link>My Listings</Nav.Link>
                             </LinkContainer> : null
@@ -82,13 +87,13 @@ const NavBarComp = () => {
                                 <Nav.Link>Manage Administrators</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {Authentication ?
+                        {Authentication && !OTPpage ?
                             <LinkContainer to="/MyProfile">
                                 <Nav.Link>My Profile</Nav.Link>
                             </LinkContainer> : null
                         }
-                        {!Authentication ? <Login /> : null}
-                        {Authentication ?
+                        {!Authentication && !OTPpage ? <Login /> : null}
+                        {Authentication && !OTPpage ?
                             <Button variant='primary' onClick={(e) => LogOut(e)}>Logout</Button> : null
                         }
                     </Nav>
