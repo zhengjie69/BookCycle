@@ -36,9 +36,10 @@ class Book:
                     return (dataList)
                 else:
                     return("Error no Genres in database") 
-        except sqlite3.Error as er:
+                    
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching genres")
+            raise ex
 
         finally:
             con.close()
@@ -61,9 +62,10 @@ class Book:
                     return (dataList)
                 else:
                     return("Error no locations in database") 
-        except sqlite3.Error as er:
+
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching locations")
+            raise ex
 
         finally:
             con.close()
@@ -110,9 +112,10 @@ class Book:
                     return(rows[0][0])
                 else:
                     return("Error no existing image found, please try again later") 
-        except sqlite3.Error as er:
+
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching locations")
+            raise ex
 
         finally:
             con.close()
@@ -148,10 +151,9 @@ class Book:
                     return("Error failed to create book listing, try again later")
                 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            #return("Error in creating book")
-            return "Exception Error " + str(er)
+            raise ex
 
         finally:
             con.close()
@@ -424,9 +426,9 @@ class Book:
                 else:
                     return("Error no records in database") 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching books")
+            raise ex
 
         finally:
             con.close()
@@ -459,9 +461,9 @@ class Book:
                 else:
                     return("No records in database") 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching books")
+            raise ex
 
         finally:
             con.close()
@@ -495,9 +497,9 @@ class Book:
                 else:
                     return("Error Book Does not belong to user")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching book offers")
+            raise ex
 
         finally:
             con.close()
@@ -536,9 +538,9 @@ class Book:
                     return("No book offers found")
                 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching book offers")
+            raise ex
 
         finally:
             con.close()
@@ -564,10 +566,9 @@ class Book:
                     returnResult = True
                 return returnResult
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            returnResult = None
-            return returnResult
+            raise ex
 
         finally:
             con.close()
@@ -608,9 +609,9 @@ class Book:
                 else:
                     return("No records in database") 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching books")
+            raise ex
 
         finally:
             con.close()
@@ -635,9 +636,9 @@ class Book:
                 else:
                     return("Error in fetching book details") 
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in fetching book details")
+            raise ex
 
         finally:
             con.close()
@@ -670,9 +671,9 @@ class Book:
                 con.commit()
                 return("successfully updated")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in updating book")
+            raise ex
 
         finally:
             con.close()
@@ -687,9 +688,9 @@ class Book:
                 con.commit()
                 return("successfully deleted")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error in deleting book")
+            raise ex
 
         finally:
             con.close()
@@ -733,9 +734,9 @@ class Book:
                 else:
                     return("Error cannot send offer for own Book")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error sending offer for Book")
+            raise ex
 
         finally:
             con.close()
@@ -804,9 +805,9 @@ class Book:
             else:
                 return("Error Accepting offer for Book")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error Accepting offer for Book")
+            raise ex
 
         finally:
             con.close()
@@ -850,9 +851,9 @@ class Book:
                     else:
                         return("Error failed to edit book offer")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error failed to edit book offer")
+            raise ex
 
         finally:
             con.close()
@@ -895,9 +896,9 @@ class Book:
                 else:
                     return("Error failed to deleted book offer")
 
-        except sqlite3.Error as er:
+        except Exception as ex:
             con.rollback()
-            return("Error failed to delete book offer")
+            raise ex
 
         finally:
             con.close()
