@@ -41,18 +41,18 @@ const Login = () => {
 
         if (res.status === 201) {
             handleClose();
-            secureLocalStorage.setItem("Authentication", data.authentication);
-            secureLocalStorage.setItem("Email", data.Email);
-            secureLocalStorage.setItem("Role", data.Role);
-            navigate('/');
-            // navigate('/OTP', {
-            //     state: {
-            //         Authentication: data.Authentication,
-            //         Email: data.Email,
-            //         Role: data.Role,
-            //         Route: "Login"
-            //     }
-            // });
+            // secureLocalStorage.setItem("Authentication", data.authentication);
+            // secureLocalStorage.setItem("Email", data.Email);
+            // secureLocalStorage.setItem("Role", data.Role);
+            // navigate('/');
+            navigate('/OTP', {
+                state: {
+                    Authentication: data.Authentication,
+                    Email: data.Email,
+                    Role: data.Role,
+                    Route: "Login"
+                }
+            });
             window.location.reload(false);
         }
 
