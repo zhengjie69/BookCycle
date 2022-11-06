@@ -6,3 +6,4 @@ pyjwt
 flask_recaptcha
 pyAesCrypt
 flask_session
+pytest==6.2.5
