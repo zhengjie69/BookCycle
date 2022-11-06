@@ -21,7 +21,7 @@ def encrypt(key):
             pyAesCrypt.encryptStream(fIn, fOut, str(key, 'utf-8'), bufferSize)
 
     logging.shutdown()
-    #remove('record.log')
+    remove('record.log')
 
 def decrypt(key):
     #pyAesCrypt.decryptFile("record.log.encrypted", "recordc.log", key)

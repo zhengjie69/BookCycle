@@ -114,7 +114,7 @@ def logout():
 
 def get_user_profile():
     if request.method == "GET":
-        
+
         try:
             #email = request.args.get("Email")
             email = session.get("email")
